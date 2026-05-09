@@ -1,0 +1,404 @@
+{
+  "code": "SETUP_MACHINE",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Setup Machine",
+  "description": "Prepare a machine for a job including fixture, recipe, program, material, and safety state.",
+  "inputs": [
+    {
+      "name": "machine",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: machine.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "setup_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: setup_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "machine_interface",
+    "safety_zone_check",
+    "manipulation",
+    "tool_use",
+    "equipment_interaction",
+    "high_risk_task"
+  ],
+  "required_tools": [
+    {
+      "alias": "scanner",
+      "tool_type": "scanner",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scanner, setup tools optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "setup_tools",
+      "tool_type": "setup_tools",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scanner, setup tools optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "machine",
+      "equipment_type": "machine",
+      "equipment_id": null,
+      "use_mode": "MACHINE_INTERFACE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, fixture, HMI, program, recipe"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "fixture",
+      "equipment_type": "fixture",
+      "equipment_id": null,
+      "use_mode": "FIXTURE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, fixture, HMI, program, recipe"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "hmi",
+      "equipment_type": "hmi",
+      "equipment_id": null,
+      "use_mode": "MACHINE_INTERFACE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, fixture, HMI, program, recipe"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "program",
+      "equipment_type": "program",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, fixture, HMI, program, recipe"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "recipe",
+      "equipment_type": "recipe",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, fixture, HMI, program, recipe"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "HIGH",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: HIGH."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_check_safety_zone",
+      "call_code": "CHECK_SAFETY_ZONE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_navigate_to",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "machine": "$inputs.machine"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_check_safety_zone"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_read_machine_state",
+      "call_code": "READ_MACHINE_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_navigate_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_execute_machine_action",
+      "call_code": "EXECUTE_MACHINE_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_read_machine_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_verify_machine_state",
+      "call_code": "VERIFY_MACHINE_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_execute_machine_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_verify_machine_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "C01",
+      "category_id": "C",
+      "category": "Machine Tending & Equipment Operation",
+      "function_signature": "setup_machine(machine, setup_spec)",
+      "implementation_priority": "P0",
+      "customization_notes": "Covers machine preparation before production.",
+      "primitive_template_id": "PT-MACHINE"
+    },
+    "primitive_template": {
+      "template_id": "PT-MACHINE",
+      "name": "Machine tending / operation",
+      "raw_sequence": "CHECK_SAFETY_ZONE → NAVIGATE_TO(machine) → READ_MACHINE_STATE → OPERATE_INTERFACE / LOAD / UNLOAD → VERIFY_MACHINE_STATE → LOG_RESULT",
+      "used_for": "Machine setup, loading, unloading, cycle control, fault clearing",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_SAFETY_ZONE",
+          "call_code": "CHECK_SAFETY_ZONE",
+          "args": {}
+        },
+        {
+          "raw": "NAVIGATE_TO(machine)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "machine": "$inputs.machine"
+          }
+        },
+        {
+          "raw": "READ_MACHINE_STATE",
+          "call_code": "READ_MACHINE_STATE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_INTERFACE / LOAD / UNLOAD",
+          "call_code": "EXECUTE_MACHINE_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_MACHINE_STATE",
+          "call_code": "VERIFY_MACHINE_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "scanner, setup tools optional",
+      "raw_vehicles": null,
+      "raw_equipment": "machine, fixture, HMI, program, recipe",
+      "optional_aliases": {
+        "tools": [
+          "scanner",
+          "setup_tools"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

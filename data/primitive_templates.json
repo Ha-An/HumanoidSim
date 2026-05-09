@@ -1,0 +1,584 @@
+{
+  "catalog_version": "0.2.0-core",
+  "templates": {
+    "PT-SYSTEM": {
+      "template_id": "PT-SYSTEM",
+      "name": "Robot system operation",
+      "raw_sequence": "CHECK_CONTEXT → EXECUTE_SYSTEM_ACTION → VERIFY_ROBOT_STATE → LOG_RESULT",
+      "used_for": "Robot readiness, mode changes, recovery, calibration",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_CONTEXT",
+          "call_code": "CHECK_CONTEXT",
+          "args": {}
+        },
+        {
+          "raw": "EXECUTE_SYSTEM_ACTION",
+          "call_code": "EXECUTE_SYSTEM_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_ROBOT_STATE",
+          "call_code": "VERIFY_ROBOT_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-TRANSFER": {
+      "template_id": "PT-TRANSFER",
+      "name": "Generic object transfer",
+      "raw_sequence": "NAVIGATE_TO(source) → LOCALIZE_OBJECT(item) → REACH_TO(item) → GRASP(item) → LIFT(item) → NAVIGATE_TO(destination) → PLACE(item, destination_pose) → RELEASE(item) → VERIFY_PLACEMENT(item)",
+      "used_for": "Moving any item, tote, pallet, sample, tool, scrap, WIP, finished goods",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(source)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "source": "$inputs.source"
+          }
+        },
+        {
+          "raw": "LOCALIZE_OBJECT(item)",
+          "call_code": "LOCALIZE_OBJECT",
+          "args": {
+            "item": "$inputs.item"
+          }
+        },
+        {
+          "raw": "REACH_TO(item)",
+          "call_code": "REACH_TO",
+          "args": {
+            "item": "$inputs.item"
+          }
+        },
+        {
+          "raw": "GRASP(item)",
+          "call_code": "GRASP",
+          "args": {
+            "item": "$inputs.item"
+          }
+        },
+        {
+          "raw": "LIFT(item)",
+          "call_code": "LIFT",
+          "args": {
+            "item": "$inputs.item"
+          }
+        },
+        {
+          "raw": "NAVIGATE_TO(destination)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "destination": "$inputs.destination"
+          }
+        },
+        {
+          "raw": "PLACE(item, destination_pose)",
+          "call_code": "PLACE",
+          "args": {
+            "item": "$inputs.item",
+            "destination_pose": "$inputs.destination_pose"
+          }
+        },
+        {
+          "raw": "RELEASE(item)",
+          "call_code": "RELEASE",
+          "args": {
+            "item": "$inputs.item"
+          }
+        },
+        {
+          "raw": "VERIFY_PLACEMENT(item)",
+          "call_code": "VERIFY_PLACEMENT",
+          "args": {
+            "item": "$inputs.item"
+          }
+        }
+      ]
+    },
+    "PT-REPLENISH": {
+      "template_id": "PT-REPLENISH",
+      "name": "Material replenishment / removal",
+      "raw_sequence": "CHECK_REQUEST → IDENTIFY_ITEM → TRANSFER or LOAD_UNLOAD_INTERFACE → VERIFY_LEVEL_OR_QUANTITY → UPDATE_RECORD",
+      "used_for": "Replenishment and removal workflows",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_REQUEST",
+          "call_code": "CHECK_REQUEST",
+          "args": {}
+        },
+        {
+          "raw": "IDENTIFY_ITEM",
+          "call_code": "IDENTIFY_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "TRANSFER or LOAD_UNLOAD_INTERFACE",
+          "call_code": "EXECUTE_REPLENISHMENT_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_LEVEL_OR_QUANTITY",
+          "call_code": "VERIFY_LEVEL_OR_QUANTITY",
+          "args": {}
+        },
+        {
+          "raw": "UPDATE_RECORD",
+          "call_code": "UPDATE_RECORD",
+          "args": {}
+        }
+      ]
+    },
+    "PT-VEHICLE": {
+      "template_id": "PT-VEHICLE",
+      "name": "Vehicle-assisted transport",
+      "raw_sequence": "NAVIGATE_TO(vehicle) → VERIFY_AUTHORIZATION → OPERATE_VEHICLE → LOAD_ITEM → MOVE_TO(destination) → UNLOAD_ITEM → PARK_OR_RELEASE_VEHICLE → VERIFY_PLACEMENT",
+      "used_for": "Forklift, pallet jack, tugger, cart, AMR, elevator-assisted movement",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(vehicle)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "vehicle": "$inputs.vehicle"
+          }
+        },
+        {
+          "raw": "VERIFY_AUTHORIZATION",
+          "call_code": "VERIFY_AUTHORIZATION",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_VEHICLE",
+          "call_code": "OPERATE_VEHICLE",
+          "args": {}
+        },
+        {
+          "raw": "LOAD_ITEM",
+          "call_code": "LOAD_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "MOVE_TO(destination)",
+          "call_code": "MOVE_TO",
+          "args": {
+            "destination": "$inputs.destination"
+          }
+        },
+        {
+          "raw": "UNLOAD_ITEM",
+          "call_code": "UNLOAD_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "PARK_OR_RELEASE_VEHICLE",
+          "call_code": "PARK_OR_RELEASE_VEHICLE",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_PLACEMENT",
+          "call_code": "VERIFY_PLACEMENT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-MACHINE": {
+      "template_id": "PT-MACHINE",
+      "name": "Machine tending / operation",
+      "raw_sequence": "CHECK_SAFETY_ZONE → NAVIGATE_TO(machine) → READ_MACHINE_STATE → OPERATE_INTERFACE / LOAD / UNLOAD → VERIFY_MACHINE_STATE → LOG_RESULT",
+      "used_for": "Machine setup, loading, unloading, cycle control, fault clearing",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_SAFETY_ZONE",
+          "call_code": "CHECK_SAFETY_ZONE",
+          "args": {}
+        },
+        {
+          "raw": "NAVIGATE_TO(machine)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "machine": "$inputs.machine"
+          }
+        },
+        {
+          "raw": "READ_MACHINE_STATE",
+          "call_code": "READ_MACHINE_STATE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_INTERFACE / LOAD / UNLOAD",
+          "call_code": "EXECUTE_MACHINE_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_MACHINE_STATE",
+          "call_code": "VERIFY_MACHINE_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-ASSEMBLY": {
+      "template_id": "PT-ASSEMBLY",
+      "name": "Assembly manipulation",
+      "raw_sequence": "LOCALIZE_COMPONENTS → REACH_TO → GRASP → ALIGN → INSERT / FASTEN / CONNECT → RELEASE → VERIFY_ASSEMBLY",
+      "used_for": "Assembly, disassembly, insertion, fastening, connection",
+      "normalized_steps": [
+        {
+          "raw": "LOCALIZE_COMPONENTS",
+          "call_code": "LOCALIZE_COMPONENTS",
+          "args": {}
+        },
+        {
+          "raw": "REACH_TO",
+          "call_code": "REACH_TO",
+          "args": {}
+        },
+        {
+          "raw": "GRASP",
+          "call_code": "GRASP",
+          "args": {}
+        },
+        {
+          "raw": "ALIGN",
+          "call_code": "ALIGN",
+          "args": {}
+        },
+        {
+          "raw": "INSERT / FASTEN / CONNECT",
+          "call_code": "EXECUTE_ASSEMBLY_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "RELEASE",
+          "call_code": "RELEASE",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_ASSEMBLY",
+          "call_code": "VERIFY_ASSEMBLY",
+          "args": {}
+        }
+      ]
+    },
+    "PT-MATERIAL": {
+      "template_id": "PT-MATERIAL",
+      "name": "Material application",
+      "raw_sequence": "LOCALIZE_SURFACE → PREPARE_SURFACE → OPERATE_TOOL_OR_DISPENSER → APPLY_MATERIAL → VERIFY_COVERAGE_OR_AMOUNT → RECORD_RESULT",
+      "used_for": "Adhesive, sealant, grease, lubricant, coating, masking, curing",
+      "normalized_steps": [
+        {
+          "raw": "LOCALIZE_SURFACE",
+          "call_code": "LOCALIZE_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "PREPARE_SURFACE",
+          "call_code": "PREPARE_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_TOOL_OR_DISPENSER",
+          "call_code": "OPERATE_TOOL_OR_DISPENSER",
+          "args": {}
+        },
+        {
+          "raw": "APPLY_MATERIAL",
+          "call_code": "APPLY_MATERIAL",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_COVERAGE_OR_AMOUNT",
+          "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-PROCESS": {
+      "template_id": "PT-PROCESS",
+      "name": "Processing / rework",
+      "raw_sequence": "LOCALIZE_PART → FIX_OR_HOLD_PART → OPERATE_TOOL → PROCESS_FEATURE_OR_SURFACE → INSPECT_RESULT → RECORD_RESULT",
+      "used_for": "Cutting, drilling, deburring, finishing, marking, rework",
+      "normalized_steps": [
+        {
+          "raw": "LOCALIZE_PART",
+          "call_code": "LOCALIZE_PART",
+          "args": {}
+        },
+        {
+          "raw": "FIX_OR_HOLD_PART",
+          "call_code": "FIX_OR_HOLD_PART",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_TOOL",
+          "call_code": "OPERATE_TOOL",
+          "args": {}
+        },
+        {
+          "raw": "PROCESS_FEATURE_OR_SURFACE",
+          "call_code": "PROCESS_FEATURE_OR_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "INSPECT_RESULT",
+          "call_code": "INSPECT_RESULT",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-QUALITY": {
+      "template_id": "PT-QUALITY",
+      "name": "Inspection / testing",
+      "raw_sequence": "IDENTIFY_ITEM → LOCALIZE_OBJECT → INSPECT / MEASURE / TEST → CLASSIFY_RESULT → RECORD_RESULT",
+      "used_for": "QC inspection, measurement, ID verification, testing",
+      "normalized_steps": [
+        {
+          "raw": "IDENTIFY_ITEM",
+          "call_code": "IDENTIFY_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "LOCALIZE_OBJECT",
+          "call_code": "LOCALIZE_OBJECT",
+          "args": {}
+        },
+        {
+          "raw": "INSPECT / MEASURE / TEST",
+          "call_code": "EXECUTE_QUALITY_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "CLASSIFY_RESULT",
+          "call_code": "CLASSIFY_RESULT",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-MAINTENANCE": {
+      "template_id": "PT-MAINTENANCE",
+      "name": "Maintenance / repair",
+      "raw_sequence": "CHECK_SAFETY_ZONE → VERIFY_LOCKOUT_IF_REQUIRED → INSPECT_OR_DIAGNOSE → OPERATE_TOOL / REPLACE / SERVICE → VERIFY_MACHINE_STATE → LOG_RESULT",
+      "used_for": "PM, repair, part replacement, fluid/lubrication service, calibration",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_SAFETY_ZONE",
+          "call_code": "CHECK_SAFETY_ZONE",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_LOCKOUT_IF_REQUIRED",
+          "call_code": "VERIFY_LOCKOUT_IF_REQUIRED",
+          "args": {}
+        },
+        {
+          "raw": "INSPECT_OR_DIAGNOSE",
+          "call_code": "INSPECT_OR_DIAGNOSE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_TOOL / REPLACE / SERVICE",
+          "call_code": "EXECUTE_MAINTENANCE_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_MACHINE_STATE",
+          "call_code": "VERIFY_MACHINE_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-EHS": {
+      "template_id": "PT-EHS",
+      "name": "Cleaning / EHS",
+      "raw_sequence": "NAVIGATE_TO(area) → INSPECT_AREA → CLEAN / COLLECT / RESPOND / AUDIT → VERIFY_AREA_STATE → REPORT_RESULT",
+      "used_for": "Cleaning, waste/scrap, spill response, audit, hazard reporting",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(area)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "area": "$inputs.area"
+          }
+        },
+        {
+          "raw": "INSPECT_AREA",
+          "call_code": "INSPECT_AREA",
+          "args": {}
+        },
+        {
+          "raw": "CLEAN / COLLECT / RESPOND / AUDIT",
+          "call_code": "EXECUTE_EHS_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_AREA_STATE",
+          "call_code": "VERIFY_AREA_STATE",
+          "args": {}
+        },
+        {
+          "raw": "REPORT_RESULT",
+          "call_code": "REPORT_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-PACKAGING": {
+      "template_id": "PT-PACKAGING",
+      "name": "Packaging / unitization",
+      "raw_sequence": "IDENTIFY_PRODUCT → PREPARE_PACKAGING → PACK / LABEL / UNITIZE → VERIFY_PACKAGE → RECORD_RESULT",
+      "used_for": "Packing, unpacking, labeling, verifying, palletizing/wrapping/strapping",
+      "normalized_steps": [
+        {
+          "raw": "IDENTIFY_PRODUCT",
+          "call_code": "IDENTIFY_PRODUCT",
+          "args": {}
+        },
+        {
+          "raw": "PREPARE_PACKAGING",
+          "call_code": "PREPARE_PACKAGING",
+          "args": {}
+        },
+        {
+          "raw": "PACK / LABEL / UNITIZE",
+          "call_code": "EXECUTE_PACKAGING_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_PACKAGE",
+          "call_code": "VERIFY_PACKAGE",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-WAREHOUSE": {
+      "template_id": "PT-WAREHOUSE",
+      "name": "Warehouse control",
+      "raw_sequence": "IDENTIFY_ITEM → VERIFY_RECORD → PICK / PUTAWAY / COUNT / KIT → UPDATE_INVENTORY_RECORD → VERIFY_RECORD",
+      "used_for": "Receiving, putaway, picking, counting, kit building, inventory update",
+      "normalized_steps": [
+        {
+          "raw": "IDENTIFY_ITEM",
+          "call_code": "IDENTIFY_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_RECORD",
+          "call_code": "VERIFY_RECORD",
+          "args": {}
+        },
+        {
+          "raw": "PICK / PUTAWAY / COUNT / KIT",
+          "call_code": "EXECUTE_WAREHOUSE_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "UPDATE_INVENTORY_RECORD",
+          "call_code": "UPDATE_INVENTORY_RECORD",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_RECORD",
+          "call_code": "VERIFY_RECORD",
+          "args": {}
+        }
+      ]
+    },
+    "PT-DIGITAL": {
+      "template_id": "PT-DIGITAL",
+      "name": "Digital transaction",
+      "raw_sequence": "READ_CONTEXT → CREATE_OR_UPDATE_RECORD → VERIFY_TRANSACTION → LOG_RESULT",
+      "used_for": "MES, ERP, WMS, traceability, status, evidence, exception reports",
+      "normalized_steps": [
+        {
+          "raw": "READ_CONTEXT",
+          "call_code": "READ_CONTEXT",
+          "args": {}
+        },
+        {
+          "raw": "CREATE_OR_UPDATE_RECORD",
+          "call_code": "CREATE_OR_UPDATE_RECORD",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_TRANSACTION",
+          "call_code": "VERIFY_TRANSACTION",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "PT-HUMAN": {
+      "template_id": "PT-HUMAN",
+      "name": "Human collaboration",
+      "raw_sequence": "NAVIGATE_TO(operator) → ANNOUNCE_INTENT → HANDOVER / RECEIVE / HOLD / ASSIST → CONFIRM_OPERATOR_STATE → LOG_RESULT",
+      "used_for": "Operator assistance and handovers",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(operator)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "operator": "$inputs.operator"
+          }
+        },
+        {
+          "raw": "ANNOUNCE_INTENT",
+          "call_code": "ANNOUNCE_INTENT",
+          "args": {}
+        },
+        {
+          "raw": "HANDOVER / RECEIVE / HOLD / ASSIST",
+          "call_code": "EXECUTE_HUMAN_COLLABORATION_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "CONFIRM_OPERATOR_STATE",
+          "call_code": "CONFIRM_OPERATOR_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    }
+  }
+}

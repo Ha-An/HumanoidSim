@@ -1,0 +1,52 @@
+{
+  "code": "INSPECT_AREA",
+  "level": "PRIMITIVE_SKILL",
+  "version": "1.0.0",
+  "name": "Inspect Area",
+  "description": "Primitive skill generated from manufacturing humanoid primitive templates for INSPECT_AREA.",
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [],
+  "required_tools": [],
+  "required_vehicles": [],
+  "required_equipment": [],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": ""
+  },
+  "preconditions": [],
+  "postconditions": [],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": ""
+    }
+  ],
+  "steps": [],
+  "metadata": {
+    "generated_from": "primitive_templates"
+  }
+}

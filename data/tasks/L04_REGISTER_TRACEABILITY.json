@@ -1,0 +1,312 @@
+{
+  "code": "REGISTER_TRACEABILITY",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Register Traceability",
+  "description": "Associate item, lot, serial, parent-child relation, station, operator, robot, and timestamp.",
+  "inputs": [
+    {
+      "name": "entity",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: entity.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "traceability_data",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: traceability_data.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "digital_transaction",
+    "traceability",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "scanner",
+      "tool_type": "scanner",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scanner/RFID optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "rfid",
+      "tool_type": "rfid",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scanner/RFID optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "mes",
+      "equipment_type": "mes",
+      "equipment_id": null,
+      "use_mode": "STORAGE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "MES/QMS/traceability system"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "qms",
+      "equipment_type": "qms",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "MES/QMS/traceability system"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "traceability_system",
+      "equipment_type": "traceability_system",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "MES/QMS/traceability system"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_read_context",
+      "call_code": "READ_CONTEXT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_create_or_update_record",
+      "call_code": "CREATE_OR_UPDATE_RECORD",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_read_context"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_verify_transaction",
+      "call_code": "VERIFY_TRANSACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_create_or_update_record"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_verify_transaction"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "L04",
+      "category_id": "L",
+      "category": "MES, Traceability & Digital Operations",
+      "function_signature": "register_traceability(entity, traceability_data)",
+      "implementation_priority": "P0",
+      "customization_notes": "Essential for manufacturing audit trail.",
+      "primitive_template_id": "PT-DIGITAL"
+    },
+    "primitive_template": {
+      "template_id": "PT-DIGITAL",
+      "name": "Digital transaction",
+      "raw_sequence": "READ_CONTEXT → CREATE_OR_UPDATE_RECORD → VERIFY_TRANSACTION → LOG_RESULT",
+      "used_for": "MES, ERP, WMS, traceability, status, evidence, exception reports",
+      "normalized_steps": [
+        {
+          "raw": "READ_CONTEXT",
+          "call_code": "READ_CONTEXT",
+          "args": {}
+        },
+        {
+          "raw": "CREATE_OR_UPDATE_RECORD",
+          "call_code": "CREATE_OR_UPDATE_RECORD",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_TRANSACTION",
+          "call_code": "VERIFY_TRANSACTION",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "scanner/RFID optional",
+      "raw_vehicles": null,
+      "raw_equipment": "MES/QMS/traceability system",
+      "optional_aliases": {
+        "tools": [
+          "rfid",
+          "scanner"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

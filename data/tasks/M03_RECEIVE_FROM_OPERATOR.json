@@ -1,0 +1,297 @@
+{
+  "code": "RECEIVE_FROM_OPERATOR",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Receive From Operator",
+  "description": "Safely receive an item from an operator.",
+  "inputs": [
+    {
+      "name": "item_spec",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: item_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "operator",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: operator.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "receive_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: receive_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "human_collaboration",
+    "handover",
+    "safe_interaction",
+    "equipment_interaction"
+  ],
+  "required_tools": [],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "operator",
+      "equipment_type": "operator",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "operator, item"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "item",
+      "equipment_type": "item",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "operator, item"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "MEDIUM",
+    "human_clearance_required": true,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: MEDIUM."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_navigate_to",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "operator": "$inputs.operator"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_announce_intent",
+      "call_code": "ANNOUNCE_INTENT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_navigate_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_execute_human_collaboration_action",
+      "call_code": "EXECUTE_HUMAN_COLLABORATION_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_announce_intent"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_confirm_operator_state",
+      "call_code": "CONFIRM_OPERATOR_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_execute_human_collaboration_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_confirm_operator_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "M03",
+      "category_id": "M",
+      "category": "Human Collaboration & Operator Assistance",
+      "function_signature": "receive_from_operator(item_spec, operator, receive_spec)",
+      "implementation_priority": "P0",
+      "customization_notes": "Direction is different from HANDOVER_ITEM; keep distinct for safety and intent.",
+      "primitive_template_id": "PT-HUMAN"
+    },
+    "primitive_template": {
+      "template_id": "PT-HUMAN",
+      "name": "Human collaboration",
+      "raw_sequence": "NAVIGATE_TO(operator) → ANNOUNCE_INTENT → HANDOVER / RECEIVE / HOLD / ASSIST → CONFIRM_OPERATOR_STATE → LOG_RESULT",
+      "used_for": "Operator assistance and handovers",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(operator)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "operator": "$inputs.operator"
+          }
+        },
+        {
+          "raw": "ANNOUNCE_INTENT",
+          "call_code": "ANNOUNCE_INTENT",
+          "args": {}
+        },
+        {
+          "raw": "HANDOVER / RECEIVE / HOLD / ASSIST",
+          "call_code": "EXECUTE_HUMAN_COLLABORATION_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "CONFIRM_OPERATOR_STATE",
+          "call_code": "CONFIRM_OPERATOR_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": null,
+      "raw_vehicles": null,
+      "raw_equipment": "operator, item",
+      "optional_aliases": {
+        "tools": [],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

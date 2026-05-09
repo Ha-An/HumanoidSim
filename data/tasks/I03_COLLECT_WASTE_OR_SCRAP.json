@@ -1,0 +1,365 @@
+{
+  "code": "COLLECT_WASTE_OR_SCRAP",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Collect Waste or Scrap",
+  "description": "Collect, sort, and move waste, recycling, scrap, or discarded material.",
+  "inputs": [
+    {
+      "name": "items",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: items.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "source",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: source.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "destination",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: destination.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "sorting_rule",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: sorting_rule.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "cleaning",
+    "ehs_audit",
+    "hazard_reporting",
+    "tool_use",
+    "vehicle_operation",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "scanner",
+      "tool_type": "scanner",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scanner optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [
+    {
+      "alias": "cart",
+      "vehicle_type": "cart",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "amr",
+      "vehicle_type": "amr",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_equipment": [
+    {
+      "alias": "waste_bins",
+      "equipment_type": "waste_bins",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "waste bins, scrap area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "scrap_area",
+      "equipment_type": "scrap_area",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "waste bins, scrap area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_navigate_to",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "area": "$inputs.area"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_inspect_area",
+      "call_code": "INSPECT_AREA",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_navigate_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_execute_ehs_action",
+      "call_code": "EXECUTE_EHS_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_inspect_area"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_verify_area_state",
+      "call_code": "VERIFY_AREA_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_execute_ehs_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_report_result",
+      "call_code": "REPORT_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_verify_area_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "I03",
+      "category_id": "I",
+      "category": "Cleaning, 5S, EHS & Safety Patrol",
+      "function_signature": "collect_waste_or_scrap(items, source, destination, sorting_rule=None)",
+      "implementation_priority": "P1",
+      "customization_notes": "Absorbs WASTE_COLLECT, SCRAP_SORT, EMPTY_TRASH.",
+      "primitive_template_id": "PT-EHS"
+    },
+    "primitive_template": {
+      "template_id": "PT-EHS",
+      "name": "Cleaning / EHS",
+      "raw_sequence": "NAVIGATE_TO(area) → INSPECT_AREA → CLEAN / COLLECT / RESPOND / AUDIT → VERIFY_AREA_STATE → REPORT_RESULT",
+      "used_for": "Cleaning, waste/scrap, spill response, audit, hazard reporting",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(area)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "area": "$inputs.area"
+          }
+        },
+        {
+          "raw": "INSPECT_AREA",
+          "call_code": "INSPECT_AREA",
+          "args": {}
+        },
+        {
+          "raw": "CLEAN / COLLECT / RESPOND / AUDIT",
+          "call_code": "EXECUTE_EHS_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_AREA_STATE",
+          "call_code": "VERIFY_AREA_STATE",
+          "args": {}
+        },
+        {
+          "raw": "REPORT_RESULT",
+          "call_code": "REPORT_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "scanner optional",
+      "raw_vehicles": "optional cart/AMR",
+      "raw_equipment": "waste bins, scrap area",
+      "optional_aliases": {
+        "tools": [
+          "scanner"
+        ],
+        "vehicles": [
+          "amr",
+          "cart"
+        ],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/Fix1.png",
+        "assets/worker_processed/Fix2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

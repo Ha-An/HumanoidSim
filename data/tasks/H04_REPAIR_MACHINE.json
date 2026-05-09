@@ -1,0 +1,342 @@
+{
+  "code": "REPAIR_MACHINE",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Repair Machine",
+  "description": "Perform or assist a repair procedure on an asset.",
+  "inputs": [
+    {
+      "name": "machine",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: machine.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "fault",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: fault.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "repair_procedure",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: repair_procedure.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "maintenance",
+    "diagnostics",
+    "tool_use",
+    "safety_zone_check",
+    "equipment_interaction",
+    "high_risk_task"
+  ],
+  "required_tools": [
+    {
+      "alias": "maintenance_tools",
+      "tool_type": "maintenance_tools",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "maintenance tools optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "machine",
+      "equipment_type": "machine",
+      "equipment_id": null,
+      "use_mode": "MACHINE_INTERFACE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, spare parts"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "spare_parts",
+      "equipment_type": "spare_parts",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "machine, spare parts"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "HIGH",
+    "human_clearance_required": false,
+    "lockout_tagout_required": true,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: HIGH."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_check_safety_zone",
+      "call_code": "CHECK_SAFETY_ZONE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_verify_lockout_if_required",
+      "call_code": "VERIFY_LOCKOUT_IF_REQUIRED",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_check_safety_zone"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_inspect_or_diagnose",
+      "call_code": "INSPECT_OR_DIAGNOSE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_verify_lockout_if_required"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_execute_maintenance_action",
+      "call_code": "EXECUTE_MAINTENANCE_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_inspect_or_diagnose"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_verify_machine_state",
+      "call_code": "VERIFY_MACHINE_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_execute_maintenance_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_verify_machine_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "H04",
+      "category_id": "H",
+      "category": "Maintenance, Repair & Calibration",
+      "function_signature": "repair_machine(machine, fault, repair_procedure)",
+      "implementation_priority": "P1",
+      "customization_notes": "Requires authorization and safety procedures.",
+      "primitive_template_id": "PT-MAINTENANCE"
+    },
+    "primitive_template": {
+      "template_id": "PT-MAINTENANCE",
+      "name": "Maintenance / repair",
+      "raw_sequence": "CHECK_SAFETY_ZONE → VERIFY_LOCKOUT_IF_REQUIRED → INSPECT_OR_DIAGNOSE → OPERATE_TOOL / REPLACE / SERVICE → VERIFY_MACHINE_STATE → LOG_RESULT",
+      "used_for": "PM, repair, part replacement, fluid/lubrication service, calibration",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_SAFETY_ZONE",
+          "call_code": "CHECK_SAFETY_ZONE",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_LOCKOUT_IF_REQUIRED",
+          "call_code": "VERIFY_LOCKOUT_IF_REQUIRED",
+          "args": {}
+        },
+        {
+          "raw": "INSPECT_OR_DIAGNOSE",
+          "call_code": "INSPECT_OR_DIAGNOSE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_TOOL / REPLACE / SERVICE",
+          "call_code": "EXECUTE_MAINTENANCE_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_MACHINE_STATE",
+          "call_code": "VERIFY_MACHINE_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "maintenance tools optional",
+      "raw_vehicles": null,
+      "raw_equipment": "machine, spare parts",
+      "optional_aliases": {
+        "tools": [
+          "maintenance_tools"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/Fix1.png",
+        "assets/worker_processed/Fix2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

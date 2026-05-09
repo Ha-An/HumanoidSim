@@ -1,0 +1,350 @@
+{
+  "code": "RUN_TEST",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Run Test",
+  "description": "Connect, trigger, monitor, and record an electrical, leak, functional, thermal, acoustic, or vibration test.",
+  "inputs": [
+    {
+      "name": "target",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: target.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "tester",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: tester.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "test_plan",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: test_plan.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "inspection",
+    "measurement",
+    "digital_recording",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "test_leads",
+      "tool_type": "test_leads",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "test leads/fixtures optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "fixtures",
+      "tool_type": "fixtures",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "test leads/fixtures optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "tester",
+      "equipment_type": "tester",
+      "equipment_id": null,
+      "use_mode": "TESTER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "tester, fixture, target"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "fixture",
+      "equipment_type": "fixture",
+      "equipment_id": null,
+      "use_mode": "FIXTURE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "tester, fixture, target"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "target",
+      "equipment_type": "target",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "tester, fixture, target"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "MEDIUM",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: MEDIUM."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_primitive_identify_item",
+      "call_code": "PRIMITIVE_IDENTIFY_ITEM",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_localize_object",
+      "call_code": "LOCALIZE_OBJECT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_primitive_identify_item"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_execute_quality_action",
+      "call_code": "EXECUTE_QUALITY_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_localize_object"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_classify_result",
+      "call_code": "CLASSIFY_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_execute_quality_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_record_result",
+      "call_code": "RECORD_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_classify_result"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "G05",
+      "category_id": "G",
+      "category": "Quality Inspection, Measurement & Testing",
+      "function_signature": "run_test(target, tester, test_plan)",
+      "implementation_priority": "P1",
+      "customization_notes": "Absorbs FUNCTIONAL_TEST, LEAK_TEST, ELECTRICAL_TEST variants.",
+      "primitive_template_id": "PT-QUALITY"
+    },
+    "primitive_template": {
+      "template_id": "PT-QUALITY",
+      "name": "Inspection / testing",
+      "raw_sequence": "IDENTIFY_ITEM → LOCALIZE_OBJECT → INSPECT / MEASURE / TEST → CLASSIFY_RESULT → RECORD_RESULT",
+      "used_for": "QC inspection, measurement, ID verification, testing",
+      "normalized_steps": [
+        {
+          "raw": "IDENTIFY_ITEM",
+          "call_code": "IDENTIFY_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "LOCALIZE_OBJECT",
+          "call_code": "LOCALIZE_OBJECT",
+          "args": {}
+        },
+        {
+          "raw": "INSPECT / MEASURE / TEST",
+          "call_code": "EXECUTE_QUALITY_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "CLASSIFY_RESULT",
+          "call_code": "CLASSIFY_RESULT",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "test leads/fixtures optional",
+      "raw_vehicles": null,
+      "raw_equipment": "tester, fixture, target",
+      "optional_aliases": {
+        "tools": [
+          "fixtures",
+          "test_leads"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

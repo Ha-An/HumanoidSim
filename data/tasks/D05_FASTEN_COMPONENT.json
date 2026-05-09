@@ -1,0 +1,405 @@
+{
+  "code": "FASTEN_COMPONENT",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Fasten Component",
+  "description": "Fasten parts using screw, bolt, nut, clip, rivet, or equivalent fastener.",
+  "inputs": [
+    {
+      "name": "fastener",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: fastener.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "target",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: target.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "fastening_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: fastening_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "assembly_manipulation",
+    "object_localization",
+    "fine_manipulation",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "torque_driver",
+      "tool_type": "torque_driver",
+      "tool_id": null,
+      "use_mode": "FASTENING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "torque_driver/nutrunner/rivet_tool optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "nutrunner",
+      "tool_type": "nutrunner",
+      "tool_id": null,
+      "use_mode": "FASTENING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "torque_driver/nutrunner/rivet_tool optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "rivet_tool",
+      "tool_type": "rivet_tool",
+      "tool_id": null,
+      "use_mode": "FASTENING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "torque_driver/nutrunner/rivet_tool optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "fixture",
+      "equipment_type": "fixture",
+      "equipment_id": null,
+      "use_mode": "FIXTURE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "fixture, assembly"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "assembly",
+      "equipment_type": "assembly",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "fixture, assembly"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "MEDIUM",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: MEDIUM."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_localize_components",
+      "call_code": "LOCALIZE_COMPONENTS",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_reach_to",
+      "call_code": "REACH_TO",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_localize_components"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_grasp",
+      "call_code": "GRASP",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_reach_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_align",
+      "call_code": "ALIGN",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_grasp"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_execute_assembly_action",
+      "call_code": "EXECUTE_ASSEMBLY_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_align"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_release",
+      "call_code": "RELEASE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_execute_assembly_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s07_primitive_verify_assembly",
+      "call_code": "PRIMITIVE_VERIFY_ASSEMBLY",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s06_release"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "D05",
+      "category_id": "D",
+      "category": "Assembly, Fastening & Connection",
+      "function_signature": "fasten_component(fastener, target, fastening_spec)",
+      "implementation_priority": "P0",
+      "customization_notes": "Absorbs FASTEN_SCREW, BOLT_TIGHTEN, RIVET, CLIP_ATTACH.",
+      "primitive_template_id": "PT-ASSEMBLY"
+    },
+    "primitive_template": {
+      "template_id": "PT-ASSEMBLY",
+      "name": "Assembly manipulation",
+      "raw_sequence": "LOCALIZE_COMPONENTS → REACH_TO → GRASP → ALIGN → INSERT / FASTEN / CONNECT → RELEASE → VERIFY_ASSEMBLY",
+      "used_for": "Assembly, disassembly, insertion, fastening, connection",
+      "normalized_steps": [
+        {
+          "raw": "LOCALIZE_COMPONENTS",
+          "call_code": "LOCALIZE_COMPONENTS",
+          "args": {}
+        },
+        {
+          "raw": "REACH_TO",
+          "call_code": "REACH_TO",
+          "args": {}
+        },
+        {
+          "raw": "GRASP",
+          "call_code": "GRASP",
+          "args": {}
+        },
+        {
+          "raw": "ALIGN",
+          "call_code": "ALIGN",
+          "args": {}
+        },
+        {
+          "raw": "INSERT / FASTEN / CONNECT",
+          "call_code": "EXECUTE_ASSEMBLY_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "RELEASE",
+          "call_code": "RELEASE",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_ASSEMBLY",
+          "call_code": "VERIFY_ASSEMBLY",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "torque_driver/nutrunner/rivet_tool optional",
+      "raw_vehicles": null,
+      "raw_equipment": "fixture, assembly",
+      "optional_aliases": {
+        "tools": [
+          "nutrunner",
+          "rivet_tool",
+          "torque_driver"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

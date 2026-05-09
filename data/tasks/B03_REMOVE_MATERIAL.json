@@ -1,0 +1,413 @@
+{
+  "code": "REMOVE_MATERIAL",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Remove Material",
+  "description": "Remove items, empty containers, waste, WIP, or scrap from a source to a destination/disposition area.",
+  "inputs": [
+    {
+      "name": "item",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: item.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "source",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: source.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "destination",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: destination.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "reason",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: reason.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "navigation",
+    "manipulation",
+    "inventory_interaction",
+    "tool_use",
+    "vehicle_operation",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "scanner",
+      "tool_type": "scanner",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "optional scanner"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [
+    {
+      "alias": "cart",
+      "vehicle_type": "cart",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "pallet_jack",
+      "vehicle_type": "pallet_jack",
+      "vehicle_id": null,
+      "use_mode": "LIFT_AND_TRANSPORT",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "forklift",
+      "vehicle_type": "forklift",
+      "vehicle_id": null,
+      "use_mode": "LIFT_AND_TRANSPORT",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "amr",
+      "vehicle_type": "amr",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_equipment": [
+    {
+      "alias": "collection_area",
+      "equipment_type": "collection_area",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "collection area, quarantine/scrap area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "quarantine",
+      "equipment_type": "quarantine",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "collection area, quarantine/scrap area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "scrap_area",
+      "equipment_type": "scrap_area",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "collection area, quarantine/scrap area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_check_request",
+      "call_code": "CHECK_REQUEST",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_primitive_identify_item",
+      "call_code": "PRIMITIVE_IDENTIFY_ITEM",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_check_request"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_execute_replenishment_action",
+      "call_code": "EXECUTE_REPLENISHMENT_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_primitive_identify_item"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_verify_level_or_quantity",
+      "call_code": "VERIFY_LEVEL_OR_QUANTITY",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_execute_replenishment_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_update_record",
+      "call_code": "UPDATE_RECORD",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_verify_level_or_quantity"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "B03",
+      "category_id": "B",
+      "category": "Mobility, Intralogistics & Material Flow",
+      "function_signature": "remove_material(item, source, destination, reason=None)",
+      "implementation_priority": "P1",
+      "customization_notes": "Use TRANSFER internally; keep only when removal/disposition semantics matter.",
+      "primitive_template_id": "PT-REPLENISH"
+    },
+    "primitive_template": {
+      "template_id": "PT-REPLENISH",
+      "name": "Material replenishment / removal",
+      "raw_sequence": "CHECK_REQUEST → IDENTIFY_ITEM → TRANSFER or LOAD_UNLOAD_INTERFACE → VERIFY_LEVEL_OR_QUANTITY → UPDATE_RECORD",
+      "used_for": "Replenishment and removal workflows",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_REQUEST",
+          "call_code": "CHECK_REQUEST",
+          "args": {}
+        },
+        {
+          "raw": "IDENTIFY_ITEM",
+          "call_code": "IDENTIFY_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "TRANSFER or LOAD_UNLOAD_INTERFACE",
+          "call_code": "EXECUTE_REPLENISHMENT_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_LEVEL_OR_QUANTITY",
+          "call_code": "VERIFY_LEVEL_OR_QUANTITY",
+          "args": {}
+        },
+        {
+          "raw": "UPDATE_RECORD",
+          "call_code": "UPDATE_RECORD",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "optional scanner",
+      "raw_vehicles": "optional cart/pallet_jack/forklift/AMR",
+      "raw_equipment": "collection area, quarantine/scrap area",
+      "optional_aliases": {
+        "tools": [
+          "scanner"
+        ],
+        "vehicles": [
+          "amr",
+          "cart",
+          "forklift",
+          "pallet_jack"
+        ],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/Delivery1.png",
+        "assets/worker_processed/Delivery2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "code": "CAPTURE_EVIDENCE_OR_STATUS",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Capture Evidence or Status",
+  "description": "Capture image, video, measurement, display value, or status evidence for traceability.",
+  "inputs": [
+    {
+      "name": "target",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: target.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "evidence_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: evidence_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "digital_transaction",
+    "traceability",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "camera",
+      "tool_type": "camera",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "camera/scanner/sensor optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "scanner",
+      "tool_type": "scanner",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "camera/scanner/sensor optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "sensor",
+      "tool_type": "sensor",
+      "tool_id": null,
+      "use_mode": "MEASURING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "camera/scanner/sensor optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "camera",
+      "equipment_type": "camera",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "camera/sensor, storage system"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "sensor",
+      "equipment_type": "sensor",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "camera/sensor, storage system"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "storage_system",
+      "equipment_type": "storage_system",
+      "equipment_id": null,
+      "use_mode": "STORAGE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "camera/sensor, storage system"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_read_context",
+      "call_code": "READ_CONTEXT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_create_or_update_record",
+      "call_code": "CREATE_OR_UPDATE_RECORD",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_read_context"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_verify_transaction",
+      "call_code": "VERIFY_TRANSACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_create_or_update_record"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_verify_transaction"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "L06",
+      "category_id": "L",
+      "category": "MES, Traceability & Digital Operations",
+      "function_signature": "capture_evidence_or_status(target, evidence_spec)",
+      "implementation_priority": "P0",
+      "customization_notes": "Absorbs PHOTO_DOCUMENT, CAPTURE_VIDEO, READ_DISPLAY when used as evidence.",
+      "primitive_template_id": "PT-DIGITAL"
+    },
+    "primitive_template": {
+      "template_id": "PT-DIGITAL",
+      "name": "Digital transaction",
+      "raw_sequence": "READ_CONTEXT → CREATE_OR_UPDATE_RECORD → VERIFY_TRANSACTION → LOG_RESULT",
+      "used_for": "MES, ERP, WMS, traceability, status, evidence, exception reports",
+      "normalized_steps": [
+        {
+          "raw": "READ_CONTEXT",
+          "call_code": "READ_CONTEXT",
+          "args": {}
+        },
+        {
+          "raw": "CREATE_OR_UPDATE_RECORD",
+          "call_code": "CREATE_OR_UPDATE_RECORD",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_TRANSACTION",
+          "call_code": "VERIFY_TRANSACTION",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "camera/scanner/sensor optional",
+      "raw_vehicles": null,
+      "raw_equipment": "camera/sensor, storage system",
+      "optional_aliases": {
+        "tools": [
+          "camera",
+          "scanner",
+          "sensor"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

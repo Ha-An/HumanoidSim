@@ -1,0 +1,376 @@
+{
+  "code": "REMOVE_APPLIED_MATERIAL",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Remove Applied Material",
+  "description": "Remove excess, incorrect, old, or temporary applied material from a target.",
+  "inputs": [
+    {
+      "name": "material_or_residue",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: material_or_residue.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "target",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: target.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "removal_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: removal_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "material_application",
+    "surface_preparation",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "scraper",
+      "tool_type": "scraper",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scraper/wiper/solvent optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "wiper",
+      "tool_type": "wiper",
+      "tool_id": null,
+      "use_mode": "CLEANING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scraper/wiper/solvent optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "solvent",
+      "tool_type": "solvent",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "scraper/wiper/solvent optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "target_surface",
+      "equipment_type": "target_surface",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "target surface, waste container"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "waste_container",
+      "equipment_type": "waste_container",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "target surface, waste container"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_localize_surface",
+      "call_code": "LOCALIZE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_primitive_prepare_surface",
+      "call_code": "PRIMITIVE_PREPARE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_localize_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_operate_tool_or_dispenser",
+      "call_code": "OPERATE_TOOL_OR_DISPENSER",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_primitive_prepare_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_primitive_apply_material",
+      "call_code": "PRIMITIVE_APPLY_MATERIAL",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_operate_tool_or_dispenser"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_verify_coverage_or_amount",
+      "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_primitive_apply_material"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_record_result",
+      "call_code": "RECORD_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_verify_coverage_or_amount"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "E03",
+      "category_id": "E",
+      "category": "Material Application, Dispensing & Sealing",
+      "function_signature": "remove_applied_material(material_or_residue, target, removal_spec)",
+      "implementation_priority": "P2",
+      "customization_notes": "Useful for rework and cleanup after application.",
+      "primitive_template_id": "PT-MATERIAL"
+    },
+    "primitive_template": {
+      "template_id": "PT-MATERIAL",
+      "name": "Material application",
+      "raw_sequence": "LOCALIZE_SURFACE → PREPARE_SURFACE → OPERATE_TOOL_OR_DISPENSER → APPLY_MATERIAL → VERIFY_COVERAGE_OR_AMOUNT → RECORD_RESULT",
+      "used_for": "Adhesive, sealant, grease, lubricant, coating, masking, curing",
+      "normalized_steps": [
+        {
+          "raw": "LOCALIZE_SURFACE",
+          "call_code": "LOCALIZE_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "PREPARE_SURFACE",
+          "call_code": "PREPARE_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_TOOL_OR_DISPENSER",
+          "call_code": "OPERATE_TOOL_OR_DISPENSER",
+          "args": {}
+        },
+        {
+          "raw": "APPLY_MATERIAL",
+          "call_code": "APPLY_MATERIAL",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_COVERAGE_OR_AMOUNT",
+          "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "scraper/wiper/solvent optional",
+      "raw_vehicles": null,
+      "raw_equipment": "target surface, waste container",
+      "optional_aliases": {
+        "tools": [
+          "scraper",
+          "solvent",
+          "wiper"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

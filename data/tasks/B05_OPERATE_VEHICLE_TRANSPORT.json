@@ -1,0 +1,555 @@
+{
+  "code": "OPERATE_VEHICLE_TRANSPORT",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Operate Vehicle Transport",
+  "description": "Use a vehicle or mobile asset to transport payloads.",
+  "inputs": [
+    {
+      "name": "vehicle",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: vehicle.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "item",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: item.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "source",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: source.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "destination",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: destination.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "route",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: route.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "navigation",
+    "vehicle_operation",
+    "load_handling",
+    "tool_use",
+    "equipment_interaction",
+    "high_risk_task"
+  ],
+  "required_tools": [
+    {
+      "alias": "scanner",
+      "tool_type": "scanner",
+      "tool_id": null,
+      "use_mode": "SCANNING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "optional scanner"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [
+    {
+      "alias": "forklift",
+      "vehicle_type": "forklift",
+      "vehicle_id": null,
+      "use_mode": "LIFT_AND_TRANSPORT",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "pallet_jack",
+      "vehicle_type": "pallet_jack",
+      "vehicle_id": null,
+      "use_mode": "LIFT_AND_TRANSPORT",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "tugger",
+      "vehicle_type": "tugger",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "cart",
+      "vehicle_type": "cart",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "amr",
+      "vehicle_type": "amr",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "elevator",
+      "vehicle_type": "elevator",
+      "vehicle_id": null,
+      "use_mode": "OPERATE",
+      "control_mode": "ROBOT_OPERATED",
+      "interface_type": null,
+      "acquire_policy": "RESERVED_RESOURCE",
+      "pickup_location": null,
+      "return_location": null,
+      "payload_capacity_kg": null,
+      "allowed_routes": [],
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "required_equipment": [
+    {
+      "alias": "vehicle",
+      "equipment_type": "vehicle",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "vehicle, route, parking/charging area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "route",
+      "equipment_type": "route",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "vehicle, route, parking/charging area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "parking",
+      "equipment_type": "parking",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "vehicle, route, parking/charging area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "charging_area",
+      "equipment_type": "charging_area",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "vehicle, route, parking/charging area"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "HIGH",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: HIGH."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_navigate_to",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "vehicle": "$inputs.vehicle"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_verify_authorization",
+      "call_code": "VERIFY_AUTHORIZATION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_navigate_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_operate_vehicle",
+      "call_code": "OPERATE_VEHICLE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_verify_authorization"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_load_item",
+      "call_code": "LOAD_ITEM",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_operate_vehicle"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_move_to",
+      "call_code": "MOVE_TO",
+      "args": {
+        "destination": "$inputs.destination"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_load_item"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_unload_item",
+      "call_code": "UNLOAD_ITEM",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_move_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s07_park_or_release_vehicle",
+      "call_code": "PARK_OR_RELEASE_VEHICLE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s06_unload_item"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s08_verify_placement",
+      "call_code": "VERIFY_PLACEMENT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s07_park_or_release_vehicle"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "B05",
+      "category_id": "B",
+      "category": "Mobility, Intralogistics & Material Flow",
+      "function_signature": "operate_vehicle_transport(vehicle, item, source, destination, route=None)",
+      "implementation_priority": "P1",
+      "customization_notes": "Single canonical vehicle task. Avoid separate CART_PUSH, FORKLIFT_TRANSFER, PALLET_JACK_MOVE tasks.",
+      "primitive_template_id": "PT-VEHICLE"
+    },
+    "primitive_template": {
+      "template_id": "PT-VEHICLE",
+      "name": "Vehicle-assisted transport",
+      "raw_sequence": "NAVIGATE_TO(vehicle) → VERIFY_AUTHORIZATION → OPERATE_VEHICLE → LOAD_ITEM → MOVE_TO(destination) → UNLOAD_ITEM → PARK_OR_RELEASE_VEHICLE → VERIFY_PLACEMENT",
+      "used_for": "Forklift, pallet jack, tugger, cart, AMR, elevator-assisted movement",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(vehicle)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "vehicle": "$inputs.vehicle"
+          }
+        },
+        {
+          "raw": "VERIFY_AUTHORIZATION",
+          "call_code": "VERIFY_AUTHORIZATION",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_VEHICLE",
+          "call_code": "OPERATE_VEHICLE",
+          "args": {}
+        },
+        {
+          "raw": "LOAD_ITEM",
+          "call_code": "LOAD_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "MOVE_TO(destination)",
+          "call_code": "MOVE_TO",
+          "args": {
+            "destination": "$inputs.destination"
+          }
+        },
+        {
+          "raw": "UNLOAD_ITEM",
+          "call_code": "UNLOAD_ITEM",
+          "args": {}
+        },
+        {
+          "raw": "PARK_OR_RELEASE_VEHICLE",
+          "call_code": "PARK_OR_RELEASE_VEHICLE",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_PLACEMENT",
+          "call_code": "VERIFY_PLACEMENT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "optional scanner",
+      "raw_vehicles": "forklift/pallet_jack/tugger/cart/AMR/elevator",
+      "raw_equipment": "vehicle, route, parking/charging area",
+      "optional_aliases": {
+        "tools": [
+          "scanner"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/Walk1.png",
+        "assets/worker_processed/Walk2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

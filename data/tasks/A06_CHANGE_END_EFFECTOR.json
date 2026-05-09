@@ -1,0 +1,288 @@
+{
+  "code": "CHANGE_END_EFFECTOR",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Change End Effector",
+  "description": "Change or verify a gripper/tool/end-effector mounted on the robot.",
+  "inputs": [
+    {
+      "name": "robot",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Catalog input parameter: robot.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "end_effector",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: end_effector.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "station",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: station.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "system_operation",
+    "digital_context",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "end_effector",
+      "tool_type": "end_effector",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "end_effector/tool changer"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "tool_changer",
+      "tool_type": "tool_changer",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "end_effector/tool changer"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "tool_changer_station",
+      "equipment_type": "tool_changer_station",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "tool changer station"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "MEDIUM",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: MEDIUM."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_check_context",
+      "call_code": "CHECK_CONTEXT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_execute_system_action",
+      "call_code": "EXECUTE_SYSTEM_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_check_context"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_verify_robot_state",
+      "call_code": "VERIFY_ROBOT_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_execute_system_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_verify_robot_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "A06",
+      "category_id": "A",
+      "category": "Robot Readiness & Self-Operation",
+      "function_signature": "change_end_effector(robot, end_effector, station)",
+      "implementation_priority": "P1",
+      "customization_notes": "Keep distinct because it changes robot capability for downstream tasks.",
+      "primitive_template_id": "PT-SYSTEM"
+    },
+    "primitive_template": {
+      "template_id": "PT-SYSTEM",
+      "name": "Robot system operation",
+      "raw_sequence": "CHECK_CONTEXT → EXECUTE_SYSTEM_ACTION → VERIFY_ROBOT_STATE → LOG_RESULT",
+      "used_for": "Robot readiness, mode changes, recovery, calibration",
+      "normalized_steps": [
+        {
+          "raw": "CHECK_CONTEXT",
+          "call_code": "CHECK_CONTEXT",
+          "args": {}
+        },
+        {
+          "raw": "EXECUTE_SYSTEM_ACTION",
+          "call_code": "EXECUTE_SYSTEM_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_ROBOT_STATE",
+          "call_code": "VERIFY_ROBOT_STATE",
+          "args": {}
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "end_effector/tool changer",
+      "raw_vehicles": null,
+      "raw_equipment": "tool changer station",
+      "optional_aliases": {
+        "tools": [],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

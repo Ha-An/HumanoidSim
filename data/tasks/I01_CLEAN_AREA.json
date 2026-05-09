@@ -1,0 +1,346 @@
+{
+  "code": "CLEAN_AREA",
+  "level": "COMPOSITE_TASK",
+  "version": "0.2.0-core",
+  "name": "Clean Area",
+  "description": "Clean a workstation, floor area, aisle, cell, or shared work zone.",
+  "inputs": [
+    {
+      "name": "area",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Catalog input parameter: area.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "cleaning_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: cleaning_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "cleaning",
+    "ehs_audit",
+    "hazard_reporting",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "wiper",
+      "tool_type": "wiper",
+      "tool_id": null,
+      "use_mode": "CLEANING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "wiper/vacuum/mop optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "vacuum",
+      "tool_type": "vacuum",
+      "tool_id": null,
+      "use_mode": "CLEANING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "wiper/vacuum/mop optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "mop",
+      "tool_type": "mop",
+      "tool_id": null,
+      "use_mode": "CLEANING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "wiper/vacuum/mop optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "area",
+      "equipment_type": "area",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "area, cleaning supplies"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "cleaning_supplies",
+      "equipment_type": "cleaning_supplies",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "area, cleaning supplies"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_navigate_to",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "area": "$inputs.area"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_inspect_area",
+      "call_code": "INSPECT_AREA",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_navigate_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_execute_ehs_action",
+      "call_code": "EXECUTE_EHS_ACTION",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_inspect_area"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_verify_area_state",
+      "call_code": "VERIFY_AREA_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_execute_ehs_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_report_result",
+      "call_code": "REPORT_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_verify_area_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "I01",
+      "category_id": "I",
+      "category": "Cleaning, 5S, EHS & Safety Patrol",
+      "function_signature": "clean_area(area, cleaning_spec)",
+      "implementation_priority": "P1",
+      "customization_notes": "Absorbs WORKSTATION_CLEAN, FLOOR_SPOT_CLEAN, AISLE_CLEAR.",
+      "primitive_template_id": "PT-EHS"
+    },
+    "primitive_template": {
+      "template_id": "PT-EHS",
+      "name": "Cleaning / EHS",
+      "raw_sequence": "NAVIGATE_TO(area) → INSPECT_AREA → CLEAN / COLLECT / RESPOND / AUDIT → VERIFY_AREA_STATE → REPORT_RESULT",
+      "used_for": "Cleaning, waste/scrap, spill response, audit, hazard reporting",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO(area)",
+          "call_code": "NAVIGATE_TO",
+          "args": {
+            "area": "$inputs.area"
+          }
+        },
+        {
+          "raw": "INSPECT_AREA",
+          "call_code": "INSPECT_AREA",
+          "args": {}
+        },
+        {
+          "raw": "CLEAN / COLLECT / RESPOND / AUDIT",
+          "call_code": "EXECUTE_EHS_ACTION",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_AREA_STATE",
+          "call_code": "VERIFY_AREA_STATE",
+          "args": {}
+        },
+        {
+          "raw": "REPORT_RESULT",
+          "call_code": "REPORT_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "wiper/vacuum/mop optional",
+      "raw_vehicles": null,
+      "raw_equipment": "area, cleaning supplies",
+      "optional_aliases": {
+        "tools": [
+          "mop",
+          "vacuum",
+          "wiper"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/Fix1.png",
+        "assets/worker_processed/Fix2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

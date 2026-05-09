@@ -1,0 +1,383 @@
+{
+  "code": "PREPARE_SURFACE",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Prepare Surface",
+  "description": "Clean, expose, mask, or prepare a surface before application, bonding, coating, or inspection.",
+  "inputs": [
+    {
+      "name": "surface",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: surface.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "preparation_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Catalog input parameter: preparation_spec.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "material_application",
+    "surface_preparation",
+    "tool_use",
+    "equipment_interaction"
+  ],
+  "required_tools": [
+    {
+      "alias": "wiper",
+      "tool_type": "wiper",
+      "tool_id": null,
+      "use_mode": "CLEANING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "wiper/solvent/masking tool optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "solvent",
+      "tool_type": "solvent",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "wiper/solvent/masking tool optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    },
+    {
+      "alias": "masking_tool",
+      "tool_type": "masking_tool",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {
+        "source_text": "wiper/solvent/masking tool optional"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Optional resource from catalog."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "surface",
+      "equipment_type": "surface",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "surface, fixture, cleaning supplies"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "fixture",
+      "equipment_type": "fixture",
+      "equipment_id": null,
+      "use_mode": "FIXTURE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "surface, fixture, cleaning supplies"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "cleaning_supplies",
+      "equipment_type": "cleaning_supplies",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "surface, fixture, cleaning supplies"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "LOW",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Catalog safety risk: LOW."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_localize_surface",
+      "call_code": "LOCALIZE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_primitive_prepare_surface",
+      "call_code": "PRIMITIVE_PREPARE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_localize_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_operate_tool_or_dispenser",
+      "call_code": "OPERATE_TOOL_OR_DISPENSER",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_primitive_prepare_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_primitive_apply_material",
+      "call_code": "PRIMITIVE_APPLY_MATERIAL",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_operate_tool_or_dispenser"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_verify_coverage_or_amount",
+      "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_primitive_apply_material"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_record_result",
+      "call_code": "RECORD_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_verify_coverage_or_amount"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "E01",
+      "category_id": "E",
+      "category": "Material Application, Dispensing & Sealing",
+      "function_signature": "prepare_surface(surface, preparation_spec)",
+      "implementation_priority": "P1",
+      "customization_notes": "Absorbs CLEAN_BEFORE_BONDING, MASK_AREA, DEMASK_AREA via action parameter.",
+      "primitive_template_id": "PT-MATERIAL"
+    },
+    "primitive_template": {
+      "template_id": "PT-MATERIAL",
+      "name": "Material application",
+      "raw_sequence": "LOCALIZE_SURFACE → PREPARE_SURFACE → OPERATE_TOOL_OR_DISPENSER → APPLY_MATERIAL → VERIFY_COVERAGE_OR_AMOUNT → RECORD_RESULT",
+      "used_for": "Adhesive, sealant, grease, lubricant, coating, masking, curing",
+      "normalized_steps": [
+        {
+          "raw": "LOCALIZE_SURFACE",
+          "call_code": "LOCALIZE_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "PREPARE_SURFACE",
+          "call_code": "PREPARE_SURFACE",
+          "args": {}
+        },
+        {
+          "raw": "OPERATE_TOOL_OR_DISPENSER",
+          "call_code": "OPERATE_TOOL_OR_DISPENSER",
+          "args": {}
+        },
+        {
+          "raw": "APPLY_MATERIAL",
+          "call_code": "APPLY_MATERIAL",
+          "args": {}
+        },
+        {
+          "raw": "VERIFY_COVERAGE_OR_AMOUNT",
+          "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+          "args": {}
+        },
+        {
+          "raw": "RECORD_RESULT",
+          "call_code": "RECORD_RESULT",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": "wiper/solvent/masking tool optional",
+      "raw_vehicles": null,
+      "raw_equipment": "surface, fixture, cleaning supplies",
+      "optional_aliases": {
+        "tools": [
+          "masking_tool",
+          "solvent",
+          "wiper"
+        ],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}
