@@ -4,6 +4,66 @@ Humanoid_Tasks는 제조 환경의 휴머노이드 에이전트를 위한 독립
 
 ![Humanoid_Tasks overview](assets/IMG.png)
 
+## Humanoid State Model
+
+Humanoid_Tasks v0.1은 task와 state를 분리해서 다룹니다. `TaskSpec`은 로봇이 수행해야 하는 목표 작업이고, `StepCall`/primitive는 그 작업을 이루는 실행 단계입니다. 반면 `HumanoidStateSnapshot`은 특정 시점에 로봇이 어떤 운용 상태인지 기록합니다.
+
+상태는 네 개의 축으로 정의합니다.
+
+| 축 | 상태 | 의미 | Task/Primitive와의 관계 |
+|---|---|---|---|
+| Availability | `AVAILABLE` | 새 task 수락 가능 | 현재 실행 중인 task가 없음 |
+| Availability | `ASSIGNED` | task는 받았지만 아직 본격 실행 전 | `TaskInstance`는 할당되었지만 step/primitive 시작 전 |
+| Availability | `EXECUTING` | task 실행 중 | 현재 step 또는 primitive 실행 중 |
+| Availability | `WAITING` | 조건 대기 중 | resource, input, safety clearance, dependency 등을 기다림 |
+| Availability | `BLOCKED` | 진행 불가, 원인 필요 | `reason.code`로 원인을 남겨야 함 |
+| Availability | `OFFLINE` | 운용 제외 | planner/execution loop에서 제외 |
+| Availability | `DISABLED` | 방전/고장 등으로 작업 불가 | 전원, 고장, 안전 interlock 등으로 task 수행 불가 |
+| Mobility | `STATIONARY` | 멈춰 있음 | 이동 primitive가 실행 중이 아님 |
+| Mobility | `NAVIGATING` | 목적지로 이동 중 | `NAVIGATE_TO` primitive 실행 중 |
+| Mobility | `DOCKING` | 충전기/작업대/설비에 정렬 중 | `DOCK`, `ALIGN` 계열 primitive 실행 중 |
+| Power | `POWER_NORMAL` | 정상 전원 상태 | caller가 배터리/전원 기준으로 판단 |
+| Power | `POWER_LOW` | 전원 낮음 | caller가 배터리/전원 기준으로 판단 |
+| Power | `POWER_CRITICAL` | 전원 위험 수준 | caller가 배터리/전원 기준으로 판단 |
+| Power | `DEPLETED` | 방전됨 | 보통 `DISABLED`와 함께 사용 |
+| Power | `CHARGING` | 충전 중 | `MANAGE_ROBOT_POWER` task 또는 충전 primitive 수행 중 |
+| Manipulation | `FREE` | 손이 비어 있음 | item/tool을 들고 있지 않음 |
+| Manipulation | `REACHING` | 대상에 접근 중 | `REACH_TO` primitive 실행 중 |
+| Manipulation | `HOLDING` | item/tool을 들고 있음 | `GRASP`, `LIFT` 이후 |
+| Manipulation | `PLACING` | 내려놓는 중 | `PLACE`, `RELEASE` primitive 실행 중 |
+
+예시 snapshot은 아래처럼 저장할 수 있습니다.
+
+```json
+{
+  "humanoid_id": "A1",
+  "availability": "EXECUTING",
+  "mobility": "STATIONARY",
+  "power": "POWER_NORMAL",
+  "manipulation": "FREE",
+  "task_context": {
+    "task_code": "INSPECT_PRODUCT",
+    "task_instance_id": "TASK-0007",
+    "step_id": "s3_execute_quality_action",
+    "primitive_call_code": "EXECUTE_QUALITY_ACTION",
+    "execution_status": "RUNNING"
+  }
+}
+```
+
+코드에서는 `humanoids.state_schema` 또는 package root에서 바로 import할 수 있습니다.
+
+```python
+from humanoids import (
+    AvailabilityState,
+    HumanoidStateSnapshot,
+    build_state_snapshot_for_task_lifecycle,
+    apply_primitive_state_hint,
+)
+```
+
+추후 state를 커스터마이즈하려면 `src/humanoids/state_schema.py`의 enum, `data/state_schema_core.json`, README 설명, `tests/test_state_schema.py`를 함께 갱신합니다. primitive에 따른 상태 전환이 필요하면 `primitive_state_hint()` mapping에도 새 규칙을 추가합니다.
+
 
 
 ## 구성
@@ -74,6 +134,23 @@ Humanoid_Tasks는 task를 세 계층으로 다룹니다.
 .\.venv\Scripts\python.exe -m humanoids validate-catalog
 .\.venv\Scripts\python.exe -m humanoids validate-sequence examples\manufacturing_sequence.json
 ```
+
+## Traffic Reason Codes
+
+ManSim 같은 runtime은 이동 중 발생하는 traffic incident를 State나 Task로 새로 정의하지 않고,
+`HumanoidStateSnapshot.reason.code`로 연결합니다. v0.1에서 표준으로 사용하는 reason code는 아래와 같습니다.
+
+| Reason code | 의미 |
+|---|---|
+| `path_overlap` | 두 worker의 planned path가 같은 tile 또는 edge를 공유함 |
+| `tile_conflict` | 같은 시간 구간에 같은 tile에 진입하거나 점유함 |
+| `edge_conflict` | 같은 edge를 반대 방향으로 동시에 통과함 |
+| `near_miss` | traffic headway 기준보다 짧은 간격으로 지나감 |
+| `collision` | tile/edge conflict가 실제 이동 구간에서 겹침 |
+| `traffic_wait` | traffic policy 또는 reservation 때문에 이동을 대기함 |
+
+이 reason code들은 `data/state_schema_core.json`의 `standard_reason_codes`에도 정의되어 있습니다.
+새로운 traffic 상황을 추가할 때는 enum을 늘리기보다 먼저 reason code를 추가하고, runtime event와 Replay/KPI가 그 code를 읽도록 연결합니다.
 
 Excel 원본에서 전체 catalog를 다시 생성하려면 `scripts/generate_catalog.py`를 실행합니다. 단, 이 작업은 `data/tasks/`와 `data/primitives/`의 생성 파일을 다시 쓰므로, 수동 커스텀을 유지하려면 별도 override layer를 두는 편이 안전합니다.
 

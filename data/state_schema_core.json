@@ -1,0 +1,188 @@
+{
+  "schema_version": "0.1.0",
+  "name": "Humanoid_Tasks Core State Schema",
+  "axes": {
+    "availability": {
+      "name": "Availability State",
+      "description": "로봇이 일을 받을 수 있는지와 현재 작업 수명주기에서 어디에 있는지를 나타낸다.",
+      "default": "AVAILABLE",
+      "states": [
+        {
+          "value": "AVAILABLE",
+          "description": "새 task 수락 가능",
+          "relation": "task_context가 비어 있거나 이전 task가 종료된 상태"
+        },
+        {
+          "value": "ASSIGNED",
+          "description": "task는 받았지만 아직 본격 실행 전",
+          "relation": "TaskInstance는 할당되었지만 StepCall/Primitive 실행은 시작되지 않은 상태"
+        },
+        {
+          "value": "EXECUTING",
+          "description": "task 실행 중",
+          "relation": "TaskContext에 현재 step_id 또는 primitive_call_code가 있는 상태"
+        },
+        {
+          "value": "WAITING",
+          "description": "조건 대기 중",
+          "relation": "resource, input, safety clearance, dependency 등 외부 조건을 기다리는 상태"
+        },
+        {
+          "value": "BLOCKED",
+          "description": "진행 불가, 원인 필요",
+          "relation": "현재 task/primitive를 계속할 수 없으며 reason.code가 필요"
+        },
+        {
+          "value": "OFFLINE",
+          "description": "운용 제외",
+          "relation": "planner와 execution loop에서 제외해야 하는 상태"
+        },
+        {
+          "value": "DISABLED",
+          "description": "방전/고장 등으로 작업 불가",
+          "relation": "전원, 고장, 안전 interlock 등으로 task 수행이 불가능한 상태"
+        }
+      ]
+    },
+    "mobility": {
+      "name": "Mobility State",
+      "description": "로봇의 이동 관점 상태를 나타낸다.",
+      "default": "STATIONARY",
+      "states": [
+        {
+          "value": "STATIONARY",
+          "description": "멈춰 있음",
+          "relation": "이동 primitive가 실행 중이 아니거나 이동 primitive가 종료된 상태"
+        },
+        {
+          "value": "NAVIGATING",
+          "description": "목적지로 이동 중",
+          "relation": "NAVIGATE_TO primitive 실행 중"
+        },
+        {
+          "value": "DOCKING",
+          "description": "충전기/작업대/설비에 정렬 중",
+          "relation": "DOCK, ALIGN 계열 primitive 실행 중"
+        }
+      ]
+    },
+    "power": {
+      "name": "Power State",
+      "description": "배터리와 전원 관점 상태를 나타낸다.",
+      "default": "POWER_NORMAL",
+      "states": [
+        {
+          "value": "POWER_NORMAL",
+          "description": "정상 전원 상태",
+          "relation": "caller가 배터리/전원 기준으로 판단"
+        },
+        {
+          "value": "POWER_LOW",
+          "description": "전원 낮음",
+          "relation": "caller가 배터리/전원 기준으로 판단"
+        },
+        {
+          "value": "POWER_CRITICAL",
+          "description": "전원 위험 수준",
+          "relation": "caller가 배터리/전원 기준으로 판단"
+        },
+        {
+          "value": "DEPLETED",
+          "description": "방전됨",
+          "relation": "보통 AvailabilityState.DISABLED와 함께 사용"
+        },
+        {
+          "value": "CHARGING",
+          "description": "충전 중",
+          "relation": "MANAGE_ROBOT_POWER task 또는 충전 primitive 수행 중"
+        }
+      ]
+    },
+    "manipulation": {
+      "name": "Manipulation State",
+      "description": "팔, 그리퍼, 적재 관점 상태를 나타낸다.",
+      "default": "FREE",
+      "states": [
+        {
+          "value": "FREE",
+          "description": "손이 비어 있음",
+          "relation": "물체나 도구를 들고 있지 않은 상태"
+        },
+        {
+          "value": "REACHING",
+          "description": "대상에 접근 중",
+          "relation": "REACH_TO primitive 실행 중"
+        },
+        {
+          "value": "HOLDING",
+          "description": "item/tool을 들고 있음",
+          "relation": "GRASP 또는 LIFT primitive 이후"
+        },
+        {
+          "value": "PLACING",
+          "description": "내려놓는 중",
+          "relation": "PLACE 또는 RELEASE primitive 실행 중"
+        }
+      ]
+    }
+  },
+  "primitive_state_hints": {
+    "NAVIGATE_TO": {
+      "mobility": "NAVIGATING"
+    },
+    "REACH_TO": {
+      "manipulation": "REACHING"
+    },
+    "GRASP": {
+      "manipulation": "HOLDING"
+    },
+    "LIFT": {
+      "manipulation": "HOLDING"
+    },
+    "PLACE": {
+      "manipulation": "PLACING"
+    },
+    "RELEASE": {
+      "manipulation": "PLACING"
+    },
+    "EXECUTE_SYSTEM_ACTION:MANAGE_ROBOT_POWER": {
+      "power": "CHARGING"
+    }
+  },
+  "standard_reason_codes": [
+    {
+      "code": "path_overlap",
+      "description": "두 worker의 planned path가 같은 tile 또는 edge를 공유한다."
+    },
+    {
+      "code": "tile_conflict",
+      "description": "두 worker가 같은 시간 구간에 같은 tile에 진입하거나 점유한다."
+    },
+    {
+      "code": "edge_conflict",
+      "description": "두 worker가 같은 시간 구간에 같은 edge를 반대 방향으로 통과한다."
+    },
+    {
+      "code": "near_miss",
+      "description": "두 worker의 tile/edge 통과 간격이 traffic headway 기준보다 짧다."
+    },
+    {
+      "code": "collision",
+      "description": "tile conflict 또는 reverse edge conflict가 실제 이동 구간에서 겹친다."
+    },
+    {
+      "code": "traffic_wait",
+      "description": "traffic policy 또는 reservation 때문에 이동을 대기한다."
+    }
+  ],
+  "customization": {
+    "policy": "v0.1에서는 core enum과 이 JSON schema를 함께 갱신하는 방식으로 상태를 확장한다.",
+    "steps": [
+      "src/humanoids/state_schema.py의 해당 Enum에 새 상태 값을 추가한다.",
+      "data/state_schema_core.json의 축 정의와 설명을 갱신한다.",
+      "primitive에 따른 상태 전환이 필요하면 primitive_state_hint mapping을 추가한다.",
+      "README.md의 Humanoid State Model 섹션을 갱신한다.",
+      "tests/test_state_schema.py에 enum, schema validation, round-trip 테스트를 추가한다."
+    ]
+  }
+}
