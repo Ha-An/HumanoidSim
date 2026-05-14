@@ -3,19 +3,19 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "humanoids"
+name = "humanoidsim"
 version = "0.1.0"
-description = "Humanoid_Tasks workspace: task definitions, validation, and animation-preview tooling for manufacturing simulation."
+description = "HumanoidSim workspace: task definitions, validation, and animation-preview tooling for manufacturing simulation."
 readme = "README.md"
 requires-python = ">=3.12"
-authors = [{ name = "ManSim/Humanoid_Tasks" }]
+authors = [{ name = "ManSim/HumanoidSim" }]
 dependencies = []
 
 [project.optional-dependencies]
 catalog = ["openpyxl>=3.1"]
 
 [project.scripts]
-humanoids = "humanoids.cli:main"
+humanoidsim = "humanoidsim.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

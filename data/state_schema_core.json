@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "name": "Humanoid_Tasks Core State Schema",
+  "name": "HumanoidSim Core State Schema",
   "axes": {
     "availability": {
       "name": "Availability State",
@@ -178,7 +178,7 @@
   "customization": {
     "policy": "v0.1에서는 core enum과 이 JSON schema를 함께 갱신하는 방식으로 상태를 확장한다.",
     "steps": [
-      "src/humanoids/state_schema.py의 해당 Enum에 새 상태 값을 추가한다.",
+      "src/humanoidsim/state_schema.py의 해당 Enum에 새 상태 값을 추가한다.",
       "data/state_schema_core.json의 축 정의와 설명을 갱신한다.",
       "primitive에 따른 상태 전환이 필요하면 primitive_state_hint mapping을 추가한다.",
       "README.md의 Humanoid State Model 섹션을 갱신한다.",

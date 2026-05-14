@@ -15,7 +15,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from humanoids.task_schema import (  # noqa: E402
+from humanoidsim.task_schema import (  # noqa: E402
     Condition,
     EquipmentRequirement,
     EquipmentUseMode,

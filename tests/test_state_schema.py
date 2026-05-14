@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from humanoids import (
+from humanoidsim import (
     AvailabilityState,
     HumanoidStateSnapshot,
     ManipulationState,
@@ -19,7 +19,7 @@ from humanoids import (
     primitive_state_hint,
     validate_state_snapshot,
 )
-from humanoids.task_schema import ExecutionStatus
+from humanoidsim.task_schema import ExecutionStatus
 
 
 class StateSchemaTests(unittest.TestCase):

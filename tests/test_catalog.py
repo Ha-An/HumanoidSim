@@ -4,9 +4,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from humanoids import export_validation_viewer, load_sequence_file, load_task_catalog, validate_task_sequence
-from humanoids.execution import HumanoidProfile
-from humanoids.task_schema import TaskInstance
+from humanoidsim import export_validation_viewer, load_sequence_file, load_task_catalog, validate_task_sequence
+from humanoidsim.execution import HumanoidProfile
+from humanoidsim.task_schema import TaskInstance
 
 
 class CatalogTests(unittest.TestCase):
@@ -46,7 +46,7 @@ class CatalogTests(unittest.TestCase):
             out = Path(tmp) / "viewer.html"
             export_validation_viewer(self.catalog.root / "examples" / "manufacturing_sequence.json", out=out, catalog=self.catalog)
             text = out.read_text(encoding="utf-8")
-            self.assertIn("Humanoid_Tasks Sequence Viewer", text)
+            self.assertIn("HumanoidSim Sequence Viewer", text)
             self.assertIn("TASK-0001", text)
 
 

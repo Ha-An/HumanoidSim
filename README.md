@@ -1,12 +1,12 @@
-# Humanoid_Tasks_v0.1
+# HumanoidSim_v0.1
 
-Humanoid_Tasks는 제조 환경의 휴머노이드 에이전트를 위한 독립 task 정의 및 검증 라이브러리입니다.  
+HumanoidSim은 제조 환경의 휴머노이드 에이전트를 위한 독립 task 정의 및 검증 라이브러리입니다.
 
-![Humanoid_Tasks overview](assets/IMG.png)
+![HumanoidSim overview](assets/IMG.png)
 
 ## Humanoid State Model
 
-Humanoid_Tasks v0.1은 task와 state를 분리해서 다룹니다. `TaskSpec`은 로봇이 수행해야 하는 목표 작업이고, `StepCall`/primitive는 그 작업을 이루는 실행 단계입니다. 반면 `HumanoidStateSnapshot`은 특정 시점에 로봇이 어떤 운용 상태인지 기록합니다.
+HumanoidSim v0.1은 task와 state를 분리해서 다룹니다. `TaskSpec`은 로봇이 수행해야 하는 목표 작업이고, `StepCall`/primitive는 그 작업을 이루는 실행 단계입니다. 반면 `HumanoidStateSnapshot`은 특정 시점에 로봇이 어떤 운용 상태인지 기록합니다.
 
 상태는 네 개의 축으로 정의합니다.
 
@@ -51,10 +51,10 @@ Humanoid_Tasks v0.1은 task와 state를 분리해서 다룹니다. `TaskSpec`은
 }
 ```
 
-코드에서는 `humanoids.state_schema` 또는 package root에서 바로 import할 수 있습니다.
+코드에서는 `humanoidsim.state_schema` 또는 package root에서 바로 import할 수 있습니다.
 
 ```python
-from humanoids import (
+from humanoidsim import (
     AvailabilityState,
     HumanoidStateSnapshot,
     build_state_snapshot_for_task_lifecycle,
@@ -62,23 +62,32 @@ from humanoids import (
 )
 ```
 
-추후 state를 커스터마이즈하려면 `src/humanoids/state_schema.py`의 enum, `data/state_schema_core.json`, README 설명, `tests/test_state_schema.py`를 함께 갱신합니다. primitive에 따른 상태 전환이 필요하면 `primitive_state_hint()` mapping에도 새 규칙을 추가합니다.
+추후 state를 커스터마이즈하려면 `src/humanoidsim/state_schema.py`의 enum, `data/state_schema_core.json`, README 설명, `tests/test_state_schema.py`를 함께 갱신합니다. primitive에 따른 상태 전환이 필요하면 `primitive_state_hint()` mapping에도 새 규칙을 추가합니다.
 
 
 
 ## 구성
 
-- `src/humanoids/task_schema.py` - `TaskSpec`, `TaskInstance`, resource, validation을 위한 public dataclass schema.
-- `src/humanoids/catalog.py` - task catalog loader와 registry 구성.
-- `src/humanoids/execution.py` - `HumanoidProfile`, sequence validation, timeline simulation.
-- `src/humanoids/viewer.py` - task sequence와 animation을 확인하는 정적 HTML viewer 생성.
+- `src/humanoidsim/task_schema.py` - `TaskSpec`, `TaskInstance`, resource, validation을 위한 public dataclass schema.
+- `src/humanoidsim/catalog.py` - task catalog loader와 registry 구성.
+- `src/humanoidsim/execution.py` - `HumanoidProfile`, sequence validation, timeline simulation.
+- `src/humanoidsim/viewer.py` - task sequence와 animation을 확인하는 정적 HTML viewer 생성.
 - `data/tasks/` - 제조 core task 82개의 JSON 정의.
 - `data/primitives/` - task step에서 참조하는 primitive skill 정의.
 - `data/task_catalog_core.json` - catalog index.
 - `data/primitive_templates.json` - 원본 primitive template의 정규화 map.
+- `docs/tasks_reference.md` - 82개 task별 목적, 입력, capability, resource, primitive sequence를 정리한 reference.
+- `docs/primitives_reference.md` - 64개 primitive별 설명과 어떤 task에서 쓰이는지 정리한 reference.
 - `assets/worker_processed/` - ManSim에서 복사한 임시 2-frame task animation placeholder.
 - `examples/manufacturing_sequence.json` - humanoid task sequence 예제.
 - `outputs/task_sequence_viewer.html` - 생성된 검증 및 animation viewer.
+
+## Reference 문서
+
+Task와 Primitive를 빠르게 훑어볼 때는 아래 문서를 먼저 보면 됩니다.
+
+- [Task Reference](docs/tasks_reference.md): 전체 82개 task를 level, category, primitive sequence와 함께 표로 정리했습니다.
+- [Primitive Reference](docs/primitives_reference.md): 전체 64개 primitive skill과 각 primitive를 사용하는 task 목록을 표로 정리했습니다.
 
 ## Task 개수와 분류
 
@@ -104,7 +113,7 @@ Task level 기준으로는 `Atomic Task` 50개, `Composite Task` 32개입니다.
 
 ## 휴머노이드를 위한 Task 분류체계
 
-Humanoid_Tasks는 task를 세 계층으로 다룹니다.
+HumanoidSim은 task를 세 계층으로 다룹니다.
 
 - `Primitive Skill`
   - planner나 execution engine이 호출하는 최소 의미 단위입니다.
@@ -131,8 +140,8 @@ Humanoid_Tasks는 task를 세 계층으로 다룹니다.
 6. 변경 후 반드시 검증합니다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m humanoids validate-catalog
-.\.venv\Scripts\python.exe -m humanoids validate-sequence examples\manufacturing_sequence.json
+.\.venv\Scripts\python.exe -m humanoidsim validate-catalog
+.\.venv\Scripts\python.exe -m humanoidsim validate-sequence examples\manufacturing_sequence.json
 ```
 
 ## Traffic Reason Codes
@@ -159,14 +168,14 @@ Excel 원본에서 전체 catalog를 다시 생성하려면 `scripts/generate_ca
 워크스페이스 전용 가상환경을 활성화합니다.
 
 ```powershell
-cd C:\Github\Humanoid_Tasks
+cd C:\Github\HumanoidSim
 .\.venv\Scripts\Activate.ps1
 ```
 
 editable package로 설치합니다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -e C:\Github\Humanoid_Tasks
+.\.venv\Scripts\python.exe -m pip install -e C:\Github\HumanoidSim
 ```
 
 Excel workbook에서 catalog를 다시 생성합니다.
@@ -178,26 +187,26 @@ Excel workbook에서 catalog를 다시 생성합니다.
 catalog를 검증합니다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m humanoids validate-catalog
+.\.venv\Scripts\python.exe -m humanoidsim validate-catalog
 ```
 
 task sequence를 검증합니다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m humanoids validate-sequence examples\manufacturing_sequence.json
+.\.venv\Scripts\python.exe -m humanoidsim validate-sequence examples\manufacturing_sequence.json
 ```
 
 정적 HTML viewer를 생성합니다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m humanoids export-viewer examples\manufacturing_sequence.json --out outputs\task_sequence_viewer.html
+.\.venv\Scripts\python.exe -m humanoidsim export-viewer examples\manufacturing_sequence.json --out outputs\task_sequence_viewer.html
 ```
 
 ManSim에서 가져와 쓰려면 ManSim 가상환경에 editable package로 설치합니다.
 
 ```powershell
 cd C:\Github\ManSim
-.\.venv\Scripts\python.exe -m pip install -e C:\Github\Humanoid_Tasks
+.\.venv\Scripts\python.exe -m pip install -e C:\Github\HumanoidSim
 ```
 
 ## 설계 메모
@@ -205,4 +214,4 @@ cd C:\Github\ManSim
 - `v0.1`의 82개 core task는 template 기반 decomposition을 사용합니다.
 - task code는 유지한 채, 나중에 task별 step override로 세부 동작을 정교화할 수 있습니다.
 - animation metadata는 임시로 ManSim worker frame을 사용하며, 이후 task별 humanoid 이미지로 교체할 예정입니다.
-- 나중에 ManSim과 통합할 때도 현재 simulation state가 우선이며, Humanoid_Tasks catalog는 task 정의와 검증 기준으로 사용합니다.
+- 나중에 ManSim과 통합할 때도 현재 simulation state가 우선이며, HumanoidSim catalog는 task 정의와 검증 기준으로 사용합니다.

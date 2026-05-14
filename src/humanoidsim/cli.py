@@ -10,7 +10,7 @@ from .viewer import export_validation_viewer
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="humanoids")
+    parser = argparse.ArgumentParser(prog="humanoidsim")
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("validate-catalog", help="Validate the generated task catalog.")
@@ -54,4 +54,3 @@ def main(argv: list[str] | None = None) -> int:
 
     parser.error(f"Unknown command: {args.command}")
     return 2
-

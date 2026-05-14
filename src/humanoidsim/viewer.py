@@ -53,7 +53,7 @@ def _html(payload: str, sequence_name: str) -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Humanoid_Tasks Sequence Viewer</title>
+  <title>HumanoidSim Sequence Viewer</title>
   <style>
     :root {{ color-scheme: light; font-family: Inter, Segoe UI, Arial, sans-serif; background: #f5f7fb; color: #18243a; }}
     body {{ margin: 0; }}
@@ -84,7 +84,7 @@ def _html(payload: str, sequence_name: str) -> str:
   </style>
 </head>
 <body>
-  <header><h1>Humanoid_Tasks Sequence Viewer</h1><span>{html.escape(sequence_name)}</span></header>
+  <header><h1>HumanoidSim Sequence Viewer</h1><span>{html.escape(sequence_name)}</span></header>
   <main>
     <section><h2>Task Queue</h2><ul id="queue" class="queue"></ul></section>
     <section>
