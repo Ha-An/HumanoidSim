@@ -181,12 +181,16 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_navigate_to",
-      "call_code": "NAVIGATE_TO",
+      "step_id": "s02_operate_machine_interface",
+      "call_code": "OPERATE_MACHINE_INTERFACE",
       "args": {
-        "machine": "$inputs.machine"
+        "machine": "$inputs.machine",
+        "interface_action": {
+          "derived_from_parent": "CLEAR_MACHINE_FAULT",
+          "field": "interface_action"
+        }
       },
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
         "s01_check_safety_zone"
       ],
@@ -204,54 +208,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_read_machine_state",
-      "call_code": "READ_MACHINE_STATE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s02_navigate_to"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s04_execute_machine_action",
-      "call_code": "EXECUTE_MACHINE_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s03_read_machine_state"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s05_verify_machine_state",
+      "step_id": "s03_verify_machine_state",
       "call_code": "VERIFY_MACHINE_STATE",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s04_execute_machine_action"
+        "s02_operate_machine_interface"
       ],
       "optional": false,
       "timeout_s": null,
@@ -267,12 +229,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s06_log_result",
+      "step_id": "s04_log_result",
       "call_code": "LOG_RESULT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s05_verify_machine_state"
+        "s03_verify_machine_state"
       ],
       "optional": false,
       "timeout_s": null,

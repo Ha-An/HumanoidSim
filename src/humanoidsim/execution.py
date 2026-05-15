@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .catalog import TaskCatalog, load_task_catalog
-from .task_schema import TaskInstance, TaskSpec
+from .task_schema import StepCall, TaskInstance, TaskLevel, TaskSpec
 
 
 @dataclass
@@ -115,6 +115,34 @@ def validate_task_sequence(
     return SequenceValidationResult(ok=not _has_errors(sequence_issues), task_results=task_results, issues=sequence_issues)
 
 
+def expand_task_steps(
+    task_code: str,
+    args: dict[str, Any] | None = None,
+    *,
+    catalog: TaskCatalog | None = None,
+) -> list[dict[str, Any]]:
+    """Expand a task into nested step rows while preserving task boundaries.
+
+    Composite tasks may call other tasks directly. This helper keeps every row
+    in the plan, including child task rows and primitive leaf rows, so callers
+    can either execute leaf primitives or display the parent/child workflow.
+    """
+    catalog = catalog or load_task_catalog()
+    root_spec = catalog.get(task_code)
+    rows: list[dict[str, Any]] = []
+    _expand_steps_recursive(
+        spec=root_spec,
+        args=dict(args or {}),
+        catalog=catalog,
+        rows=rows,
+        path_prefix=root_spec.code,
+        depth=0,
+        parent_task_code=None,
+        stack=[],
+    )
+    return rows
+
+
 def simulate_task_sequence(
     profile: HumanoidProfile | dict[str, HumanoidProfile] | Iterable[HumanoidProfile],
     task_instances: Iterable[TaskInstance],
@@ -138,7 +166,20 @@ def simulate_task_sequence(
         humanoid_id = instance.assigned_robot_id or next(iter(profiles.keys()), "")
         frames = list(spec.metadata.get("animation", {}).get("frames", []))
         start = time_cursor
-        step_rows = spec.steps or []
+        step_rows = expand_task_steps(instance.task_code, instance.args, catalog=catalog)
+        if not step_rows:
+            step_rows = [
+                {
+                    "path": spec.code,
+                    "depth": 0,
+                    "parent_task_code": None,
+                    "call_code": spec.code,
+                    "call_level": spec.level.value,
+                    "step_id": spec.code,
+                    "args": dict(instance.args),
+                    "depends_on": [],
+                }
+            ]
         for step in step_rows:
             end = time_cursor + step_duration_s
             events.append(
@@ -147,8 +188,12 @@ def simulate_task_sequence(
                     "humanoid_id": humanoid_id,
                     "instance_id": instance.instance_id,
                     "task_code": instance.task_code,
-                    "step_id": step.step_id,
-                    "call_code": step.call_code,
+                    "path": step["path"],
+                    "depth": step["depth"],
+                    "parent_task_code": step["parent_task_code"],
+                    "step_id": step["step_id"],
+                    "call_code": step["call_code"],
+                    "call_level": step["call_level"],
                     "start_s": round(time_cursor, 3),
                     "end_s": round(end, 3),
                     "status": "SUCCESS" if task_ok.get(instance.instance_id, False) else "FAILED",
@@ -219,8 +264,173 @@ def _validate_one(profile: HumanoidProfile, instance: TaskInstance, catalog: Tas
 
     _validate_payload(profile, instance, issues)
     _validate_resources(profile, spec, instance, issues)
+    _validate_nested_task_calls(profile, spec, instance.args, catalog, instance, issues, path=spec.code, stack=[])
     _validate_animation(spec, catalog.root, instance, issues)
     return issues
+
+
+def _expand_steps_recursive(
+    *,
+    spec: TaskSpec,
+    args: dict[str, Any],
+    catalog: TaskCatalog,
+    rows: list[dict[str, Any]],
+    path_prefix: str,
+    depth: int,
+    parent_task_code: str | None,
+    stack: list[str],
+) -> None:
+    if spec.code in stack:
+        raise ValueError(f"Task cycle detected while expanding: {' -> '.join(stack + [spec.code])}")
+
+    for step in spec.steps:
+        called = _get_called_spec(catalog, step.call_code)
+        call_level = called.level if called is not None else step.expected_level
+        if call_level is None:
+            raise ValueError(f"{spec.code}.{step.step_id}: cannot determine level of {step.call_code}.")
+
+        resolved_args = _resolve_step_args(step, args)
+        row_path = f"{path_prefix}/{step.step_id}"
+        rows.append(
+            {
+                "path": row_path,
+                "depth": depth + 1,
+                "parent_task_code": spec.code,
+                "call_code": step.call_code,
+                "call_level": call_level.value,
+                "step_id": step.step_id,
+                "args": resolved_args,
+                "depends_on": list(step.depends_on),
+                "optional": bool(step.optional),
+            }
+        )
+
+        if called is not None and call_level != TaskLevel.PRIMITIVE_SKILL:
+            child_args = dict(args)
+            child_args.update(resolved_args)
+            _expand_steps_recursive(
+                spec=called,
+                args=child_args,
+                catalog=catalog,
+                rows=rows,
+                path_prefix=row_path,
+                depth=depth + 1,
+                parent_task_code=spec.code,
+                stack=stack + [spec.code],
+            )
+
+
+def _validate_nested_task_calls(
+    profile: HumanoidProfile,
+    spec: TaskSpec,
+    args: dict[str, Any],
+    catalog: TaskCatalog,
+    root_instance: TaskInstance,
+    issues: list[TaskValidationIssue],
+    *,
+    path: str,
+    stack: list[str],
+) -> None:
+    if spec.code in stack:
+        issues.append(_issue("NESTED_TASK_CYCLE", f"Nested task cycle at {path}.", root_instance, "error"))
+        return
+
+    for step in spec.steps:
+        called = _get_called_spec(catalog, step.call_code)
+        if called is None or called.level == TaskLevel.PRIMITIVE_SKILL:
+            continue
+
+        child_args = dict(args)
+        child_args.update(_resolve_step_args(step, args))
+        child_instance = TaskInstance(
+            instance_id=f"{root_instance.instance_id}:{step.step_id}",
+            task_code=called.code,
+            args=child_args,
+            work_order_id=root_instance.work_order_id,
+            assigned_robot_id=root_instance.assigned_robot_id,
+            priority=root_instance.priority,
+            metadata={"nested_path": f"{path}/{step.step_id}", "parent_task_code": spec.code},
+        )
+
+        try:
+            called.validate_instance_args(child_args)
+        except ValueError as exc:
+            issues.append(
+                TaskValidationIssue(
+                    severity="error",
+                    code="NESTED_MISSING_INPUT",
+                    message=f"{path}/{step.step_id}: {exc}",
+                    instance_id=root_instance.instance_id,
+                    task_code=called.code,
+                )
+            )
+
+        missing_caps = [cap for cap in called.required_capabilities if not profile.has_capability(cap)]
+        if missing_caps:
+            issues.append(
+                TaskValidationIssue(
+                    severity="error",
+                    code="NESTED_MISSING_CAPABILITY",
+                    message=f"{path}/{step.step_id}: Humanoid lacks capabilities for {called.code}: {missing_caps}",
+                    instance_id=root_instance.instance_id,
+                    task_code=called.code,
+                )
+            )
+
+        _validate_payload(profile, child_instance, issues)
+        _validate_resources(profile, called, child_instance, issues)
+        _validate_nested_task_calls(
+            profile,
+            called,
+            child_args,
+            catalog,
+            root_instance,
+            issues,
+            path=f"{path}/{step.step_id}",
+            stack=stack + [spec.code],
+        )
+
+
+def _get_called_spec(catalog: TaskCatalog, code: str) -> TaskSpec | None:
+    try:
+        return catalog.get(code)
+    except KeyError:
+        return None
+
+
+def _resolve_step_args(step: StepCall, parent_args: dict[str, Any]) -> dict[str, Any]:
+    resolved: dict[str, Any] = {}
+    for key, value in step.args.items():
+        resolved_value, present = _resolve_arg_value(value, parent_args)
+        if present:
+            resolved[key] = resolved_value
+    return resolved
+
+
+def _resolve_arg_value(value: Any, parent_args: dict[str, Any]) -> tuple[Any, bool]:
+    if isinstance(value, str) and value.startswith("$inputs."):
+        input_name = value.removeprefix("$inputs.")
+        if input_name not in parent_args:
+            return None, False
+        return parent_args[input_name], True
+
+    if isinstance(value, list):
+        output: list[Any] = []
+        for item in value:
+            resolved, present = _resolve_arg_value(item, parent_args)
+            if present:
+                output.append(resolved)
+        return output, True
+
+    if isinstance(value, dict):
+        output: dict[str, Any] = {}
+        for key, item in value.items():
+            resolved, present = _resolve_arg_value(item, parent_args)
+            if present:
+                output[str(key)] = resolved
+        return output, True
+
+    return value, True
 
 
 def _validate_payload(profile: HumanoidProfile, instance: TaskInstance, issues: list[TaskValidationIssue]) -> None:
@@ -278,4 +488,3 @@ def _profile_map(profile: HumanoidProfile | dict[str, HumanoidProfile] | Iterabl
 
 def _has_errors(issues: Iterable[TaskValidationIssue]) -> bool:
     return any(issue.severity == "error" for issue in issues)
-

@@ -278,10 +278,14 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_execute_replenishment_action",
-      "call_code": "EXECUTE_REPLENISHMENT_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s03_transfer",
+      "call_code": "TRANSFER",
+      "args": {
+        "item": "$inputs.item",
+        "source": "$inputs.source",
+        "destination": "$inputs.destination"
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
         "s02_primitive_identify_item"
       ],
@@ -304,7 +308,7 @@
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s03_execute_replenishment_action"
+        "s03_transfer"
       ],
       "optional": false,
       "timeout_s": null,

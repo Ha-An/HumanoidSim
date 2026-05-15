@@ -162,12 +162,16 @@
   ],
   "steps": [
     {
-      "step_id": "s01_navigate_to",
-      "call_code": "NAVIGATE_TO",
+      "step_id": "s01_clean_area",
+      "call_code": "CLEAN_AREA",
       "args": {
-        "area": "$inputs.area"
+        "area": "$inputs.area",
+        "cleaning_spec": {
+          "derived_from_parent": "RESPOND_TO_SPILL",
+          "field": "cleaning_spec"
+        }
       },
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "COMPOSITE_TASK",
       "depends_on": [],
       "optional": false,
       "timeout_s": null,
@@ -183,75 +187,25 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_inspect_area",
-      "call_code": "INSPECT_AREA",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s01_navigate_to"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
+      "step_id": "s02_report_hazard",
+      "call_code": "REPORT_HAZARD",
+      "args": {
+        "location": {
+          "derived_from_parent": "RESPOND_TO_SPILL",
+          "field": "location"
+        },
+        "hazard_type": {
+          "derived_from_parent": "RESPOND_TO_SPILL",
+          "field": "hazard_type"
+        },
+        "evidence": {
+          "derived_from_parent": "RESPOND_TO_SPILL",
+          "field": "evidence"
+        }
       },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s03_execute_ehs_action",
-      "call_code": "EXECUTE_EHS_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s02_inspect_area"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s04_verify_area_state",
-      "call_code": "VERIFY_AREA_STATE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s03_execute_ehs_action"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s05_report_result",
-      "call_code": "REPORT_RESULT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s04_verify_area_state"
+        "s01_clean_area"
       ],
       "optional": false,
       "timeout_s": null,

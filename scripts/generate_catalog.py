@@ -34,6 +34,8 @@ from humanoidsim.task_schema import (  # noqa: E402
 )
 
 WORKBOOK = Path(r"C:\Github\manufacturing_humanoid_core_task_catalog.xlsx")
+if not WORKBOOK.exists():
+    WORKBOOK = ROOT / "manufacturing_humanoid_core_task_catalog.xlsx"
 ASSET_SOURCE = Path(r"C:\Github\ManSim\replay_studio\public\assets\worker_processed")
 DATA = ROOT / "data"
 TASKS = DATA / "tasks"
@@ -76,6 +78,90 @@ CAPABILITIES_BY_TEMPLATE = {
     "PT-HUMAN": ["human_collaboration", "handover", "safe_interaction"],
 }
 
+COMPOSITE_STEP_OVERRIDES = {
+    "RECOVER_FROM_FAULT": ["CHECK_CONTEXT", "SELF_CHECK", "EXECUTE_SYSTEM_ACTION", "VERIFY_ROBOT_STATE", "LOG_RESULT"],
+    "REPLENISH_MATERIAL": ["CHECK_REQUEST", "PRIMITIVE_IDENTIFY_ITEM", "TRANSFER", "VERIFY_LEVEL_OR_QUANTITY", "UPDATE_RECORD"],
+    "REMOVE_MATERIAL": ["CHECK_REQUEST", "PRIMITIVE_IDENTIFY_ITEM", "TRANSFER", "VERIFY_LEVEL_OR_QUANTITY", "UPDATE_RECORD"],
+    "OPERATE_VEHICLE_TRANSPORT": ["VERIFY_AUTHORIZATION", "TRANSFER", "PARK_OR_RELEASE_VEHICLE", "VERIFY_PLACEMENT"],
+    "SETUP_MACHINE": ["CHECK_SAFETY_ZONE", "READ_MACHINE_STATE", "LOAD_MACHINE", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "CHANGE_MACHINE_CONFIGURATION": ["CHECK_SAFETY_ZONE", "OPERATE_MACHINE_INTERFACE", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "CLEAR_MACHINE_FAULT": ["CHECK_SAFETY_ZONE", "OPERATE_MACHINE_INTERFACE", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "ASSEMBLE_COMPONENTS": ["INSERT_COMPONENT", "FASTEN_COMPONENT", "VERIFY_ASSEMBLY"],
+    "DISASSEMBLE_COMPONENTS": ["UNFASTEN_COMPONENT", "REMOVE_COMPONENT", "VERIFY_ASSEMBLY"],
+    "ROUTE_FLEXIBLE_COMPONENT": ["INSERT_COMPONENT", "CONNECT_COMPONENT", "VERIFY_ASSEMBLY"],
+    "CURE_MATERIAL": ["PREPARE_SURFACE", "APPLY_MATERIAL", "VERIFY_MATERIAL_APPLICATION", "RECORD_RESULT"],
+    "RUN_TEST": ["IDENTIFY_ITEM", "INSPECT_PRODUCT", "RECORD_QUALITY_RESULT"],
+    "SORT_OR_QUARANTINE_ITEM": ["IDENTIFY_ITEM", "INSPECT_PRODUCT", "RECORD_QUALITY_RESULT"],
+    "PREVENTIVE_MAINTENANCE": ["CHECK_SAFETY_ZONE", "INSPECT_MACHINE", "LOG_RESULT"],
+    "DIAGNOSE_MACHINE": ["CHECK_SAFETY_ZONE", "INSPECT_MACHINE", "LOG_RESULT"],
+    "REPAIR_MACHINE": ["CHECK_SAFETY_ZONE", "INSPECT_MACHINE", "EXECUTE_MAINTENANCE_ACTION", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "REPLACE_MACHINE_PART": ["CHECK_SAFETY_ZONE", "INSPECT_MACHINE", "EXECUTE_MAINTENANCE_ACTION", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "SERVICE_FLUID_OR_LUBRICATION": ["INSPECT_MACHINE", "EXECUTE_MAINTENANCE_ACTION", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "CALIBRATE_MACHINE": ["INSPECT_MACHINE", "EXECUTE_MAINTENANCE_ACTION", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
+    "CLEAN_AREA": ["CLEAN_ASSET", "VERIFY_AREA_STATE", "REPORT_RESULT"],
+    "COLLECT_WASTE_OR_SCRAP": ["TRANSFER", "UPDATE_INVENTORY_RECORD"],
+    "RESPOND_TO_SPILL": ["CLEAN_AREA", "REPORT_HAZARD"],
+    "CONDUCT_EHS_OR_5S_AUDIT": ["CLEAN_ASSET", "REPORT_HAZARD"],
+    "PACK_PRODUCT": ["LABEL_ITEM_OR_PACKAGE", "VERIFY_PACKAGE"],
+    "UNPACK_MATERIAL": ["VERIFY_PACKAGE", "UPDATE_INVENTORY_RECORD"],
+    "UNITIZE_LOAD": ["PACK_PRODUCT", "VERIFY_PACKAGE"],
+    "RECEIVE_MATERIAL": ["IDENTIFY_ITEM", "UPDATE_INVENTORY_RECORD"],
+    "PUTAWAY_ITEM": ["TRANSFER", "UPDATE_INVENTORY_RECORD"],
+    "PICK_INVENTORY": ["COUNT_INVENTORY", "TRANSFER", "UPDATE_INVENTORY_RECORD"],
+    "BUILD_KIT": ["PICK_INVENTORY", "UPDATE_INVENTORY_RECORD"],
+    "FETCH_FOR_OPERATOR": ["TRANSFER", "HANDOVER_ITEM"],
+    "ASSIST_OPERATOR_MOVE_OR_LIFT": ["TRANSFER", "HANDOVER_ITEM"],
+}
+
+ATOMIC_STEP_OVERRIDES = {
+    "INSPECT_MACHINE": ["CHECK_SAFETY_ZONE", "VERIFY_LOCKOUT_IF_REQUIRED", "INSPECT_OR_DIAGNOSE", "LOG_RESULT"],
+}
+
+SPECIAL_CHILD_ARG_MAP = {
+    ("REPLENISH_MATERIAL", "TRANSFER"): {"item": "$inputs.item", "source": "$inputs.source", "destination": "$inputs.destination"},
+    ("REMOVE_MATERIAL", "TRANSFER"): {"item": "$inputs.item", "source": "$inputs.source", "destination": "$inputs.destination"},
+    ("SETUP_MACHINE", "LOAD_MACHINE"): {
+        "machine": "$inputs.machine",
+        "item": {"derived_from_parent": "SETUP_MACHINE", "field": "item"},
+        "source": {"derived_from_parent": "SETUP_MACHINE", "field": "source"},
+        "target_slot": {"derived_from_parent": "SETUP_MACHINE", "field": "target_slot"},
+    },
+    ("REPAIR_MACHINE", "INSPECT_MACHINE"): {"machine": "$inputs.machine", "inspection_plan": "$inputs.fault"},
+    ("DIAGNOSE_MACHINE", "INSPECT_MACHINE"): {"machine": "$inputs.machine", "inspection_plan": "$inputs.symptom"},
+    ("PREVENTIVE_MAINTENANCE", "INSPECT_MACHINE"): {"machine": "$inputs.asset", "inspection_plan": "$inputs.checklist"},
+    ("FETCH_FOR_OPERATOR", "TRANSFER"): {
+        "item": "$inputs.request",
+        "source": {"derived_from_parent": "FETCH_FOR_OPERATOR", "field": "source"},
+        "destination": "$inputs.operator_or_station",
+    },
+    ("FETCH_FOR_OPERATOR", "HANDOVER_ITEM"): {
+        "item": "$inputs.request",
+        "recipient": "$inputs.operator_or_station",
+        "handover_spec": "$inputs.request",
+    },
+    ("ASSIST_OPERATOR_MOVE_OR_LIFT", "TRANSFER"): {"item": "$inputs.item", "source": "$inputs.source", "destination": "$inputs.destination"},
+    ("ASSIST_OPERATOR_MOVE_OR_LIFT", "HANDOVER_ITEM"): {
+        "item": "$inputs.item",
+        "recipient": "$inputs.operator",
+        "handover_spec": "$inputs.assist_spec",
+    },
+    ("PUTAWAY_ITEM", "TRANSFER"): {
+        "item": "$inputs.item",
+        "source": {"derived_from_parent": "PUTAWAY_ITEM", "field": "source"},
+        "destination": "$inputs.storage_location",
+    },
+    ("PICK_INVENTORY", "TRANSFER"): {
+        "item": "$inputs.request",
+        "source": {"derived_from_parent": "PICK_INVENTORY", "field": "source"},
+        "destination": {"derived_from_parent": "PICK_INVENTORY", "field": "destination"},
+    },
+    ("COLLECT_WASTE_OR_SCRAP", "TRANSFER"): {
+        "item": "$inputs.waste_or_scrap",
+        "source": "$inputs.source",
+        "destination": "$inputs.disposal_location",
+    },
+}
+
 
 def main() -> int:
     for path in (TASKS, PRIMITIVES, ASSETS, EXAMPLES):
@@ -89,11 +175,18 @@ def main() -> int:
     templates = _load_templates(wb)
     rows = _load_task_rows(wb)
     task_codes = {str(row["Task Code"]) for row in rows}
-    primitive_codes: dict[str, set[str]] = {}
+    task_levels = {
+        str(row["Task Code"]): (
+            TaskLevel.ATOMIC_TASK if str(row["Suggested Level"]).upper().startswith("ATOMIC") else TaskLevel.COMPOSITE_TASK
+        )
+        for row in rows
+    }
+    task_inputs = {str(row["Task Code"]): _split_csv(str(row.get("Primary Inputs", ""))) for row in rows}
+    primitive_codes: dict[str, set[str]] = _seed_template_primitives(templates, task_codes)
     task_paths: list[str] = []
 
     for row in rows:
-        spec, used_primitives = _task_from_row(row, templates, task_codes)
+        spec, used_primitives = _task_from_row(row, templates, task_codes, task_levels, task_inputs)
         for code, args in used_primitives.items():
             primitive_codes.setdefault(code, set()).update(args)
         rel = f"data/tasks/{row['Task No']}_{row['Task Code']}.json"
@@ -171,17 +264,32 @@ def _load_task_rows(wb: Any) -> list[dict[str, Any]]:
     return rows
 
 
-def _task_from_row(row: dict[str, Any], templates: dict[str, dict[str, Any]], task_codes: set[str]) -> tuple[TaskSpec, dict[str, set[str]]]:
+def _task_from_row(
+    row: dict[str, Any],
+    templates: dict[str, dict[str, Any]],
+    task_codes: set[str],
+    task_levels: dict[str, TaskLevel],
+    task_inputs: dict[str, list[str]],
+) -> tuple[TaskSpec, dict[str, set[str]]]:
     template_id = str(row["Primitive Template ID"])
     template = templates[template_id]
-    inputs = [_parameter(name) for name in _split_csv(str(row.get("Primary Inputs", "")))]
+    parent_inputs = _split_csv(str(row.get("Primary Inputs", "")))
+    inputs = [_parameter(name) for name in parent_inputs]
     tools, optional_tools = _tools(row.get("Required Tools"))
     vehicles, optional_vehicles = _vehicles(row.get("Required Vehicles"))
     equipment, optional_equipment = _equipment(row.get("Required Equipment / Assets"))
-    steps, primitives = _steps(template, task_codes)
+    level = task_levels[str(row["Task Code"])]
+    steps, primitives = _steps(
+        str(row["Task Code"]),
+        template,
+        task_codes,
+        task_levels,
+        parent_inputs,
+        task_inputs,
+        level,
+    )
     animation = _animation(row)
     capabilities = list(dict.fromkeys(CAPABILITIES_BY_TEMPLATE.get(template_id, []) + _resource_capabilities(tools, vehicles, equipment, row)))
-    level = TaskLevel.ATOMIC_TASK if str(row["Suggested Level"]).upper().startswith("ATOMIC") else TaskLevel.COMPOSITE_TASK
 
     spec = TaskSpec(
         code=str(row["Task Code"]),
@@ -248,15 +356,47 @@ def _normalize_primitive(raw: str, template_id: str) -> dict[str, Any]:
     return {"raw": raw, "call_code": code, "args": args}
 
 
-def _steps(template: dict[str, Any], task_codes: set[str]) -> tuple[list[StepCall], dict[str, set[str]]]:
+def _seed_template_primitives(templates: dict[str, dict[str, Any]], task_codes: set[str]) -> dict[str, set[str]]:
+    primitives: dict[str, set[str]] = {}
+    for template in templates.values():
+        for row in template["normalized_steps"]:
+            raw_code = row["call_code"]
+            code = f"PRIMITIVE_{raw_code}" if raw_code in task_codes else raw_code
+            primitives.setdefault(code, set()).update(row.get("args", {}).keys())
+    return primitives
+
+
+def _steps(
+    task_code: str,
+    template: dict[str, Any],
+    task_codes: set[str],
+    task_levels: dict[str, TaskLevel],
+    parent_inputs: list[str],
+    task_inputs: dict[str, list[str]],
+    task_level: TaskLevel,
+) -> tuple[list[StepCall], dict[str, set[str]]]:
     steps: list[StepCall] = []
     primitives: dict[str, set[str]] = {}
     seen: dict[str, int] = {}
     previous: str | None = None
-    for index, row in enumerate(template["normalized_steps"], start=1):
+    if task_code in ATOMIC_STEP_OVERRIDES:
+        source_rows = [{"call_code": code, "args": {}} for code in ATOMIC_STEP_OVERRIDES[task_code]]
+    elif task_level == TaskLevel.COMPOSITE_TASK and task_code in COMPOSITE_STEP_OVERRIDES:
+        source_rows = [{"call_code": code, "args": {}} for code in COMPOSITE_STEP_OVERRIDES[task_code]]
+    else:
+        source_rows = template["normalized_steps"]
+
+    for index, row in enumerate(source_rows, start=1):
         raw_code = row["call_code"]
-        code = f"PRIMITIVE_{raw_code}" if raw_code in task_codes else raw_code
-        primitives.setdefault(code, set()).update(row.get("args", {}).keys())
+        if task_level == TaskLevel.ATOMIC_TASK and raw_code in task_codes:
+            code = f"PRIMITIVE_{raw_code}"
+        else:
+            code = raw_code
+
+        expected_level = task_levels.get(code, TaskLevel.PRIMITIVE_SKILL)
+        args = _step_args(task_code, code, row.get("args", {}), expected_level, parent_inputs, task_inputs)
+        if expected_level == TaskLevel.PRIMITIVE_SKILL:
+            primitives.setdefault(code, set()).update(args.keys())
         seen[code] = seen.get(code, 0) + 1
         suffix = f"_{seen[code]}" if seen[code] > 1 else ""
         step_id = f"s{index:02d}_{code.lower()}{suffix}"
@@ -264,13 +404,36 @@ def _steps(template: dict[str, Any], task_codes: set[str]) -> tuple[list[StepCal
             StepCall(
                 step_id=step_id,
                 call_code=code,
-                args=row.get("args", {}),
-                expected_level=TaskLevel.PRIMITIVE_SKILL,
+                args=args,
+                expected_level=expected_level,
                 depends_on=[previous] if previous else [],
             )
         )
         previous = step_id
     return steps, primitives
+
+
+def _step_args(
+    parent_code: str,
+    call_code: str,
+    template_args: dict[str, Any],
+    expected_level: TaskLevel,
+    parent_inputs: list[str],
+    task_inputs: dict[str, list[str]],
+) -> dict[str, Any]:
+    if expected_level == TaskLevel.PRIMITIVE_SKILL:
+        return dict(template_args)
+
+    if (parent_code, call_code) in SPECIAL_CHILD_ARG_MAP:
+        return dict(SPECIAL_CHILD_ARG_MAP[(parent_code, call_code)])
+
+    output: dict[str, Any] = {}
+    for name in task_inputs.get(call_code, []):
+        if name in parent_inputs:
+            output[name] = f"$inputs.{name}"
+        else:
+            output[name] = {"derived_from_parent": parent_code, "field": name}
+    return output
 
 
 def _parameter(name: str) -> ParameterSpec:

@@ -382,6 +382,11 @@ class TaskSpec:
 
         step_id_set = set(step_ids)
         for step in self.steps:
+            if strict and self.level in {TaskLevel.ATOMIC_TASK, TaskLevel.COMPOSITE_TASK} and step.expected_level is None:
+                raise ValueError(
+                    f"{self.code}.{step.step_id}: expected_level is required for child step calls."
+                )
+
             missing_dependencies = set(step.depends_on) - step_id_set
             if missing_dependencies:
                 raise ValueError(
@@ -516,6 +521,7 @@ class TaskRegistry:
         if task.level == TaskLevel.PRIMITIVE_SKILL:
             return
 
+        composite_has_child_task = False
         for step in task.steps:
             called = self._tasks.get(step.call_code)
             called_level = called.level if called else step.expected_level
@@ -524,6 +530,17 @@ class TaskRegistry:
                 raise ValueError(
                     f"{task.code}.{step.step_id}: cannot determine level of {step.call_code}. "
                     "Register the called task or set expected_level."
+                )
+
+            if step.expected_level is None:
+                raise ValueError(
+                    f"{task.code}.{step.step_id}: expected_level is required for {step.call_code}."
+                )
+
+            if step.expected_level != called_level:
+                raise ValueError(
+                    f"{task.code}.{step.step_id}: expected_level={step.expected_level.value} "
+                    f"does not match {step.call_code} level={called_level.value}."
                 )
 
             if task.level == TaskLevel.ATOMIC_TASK:
@@ -542,9 +559,16 @@ class TaskRegistry:
                     raise ValueError(
                         f"{task.code}.{step.step_id}: invalid child level {called_level}"
                     )
+                if called_level in {TaskLevel.ATOMIC_TASK, TaskLevel.COMPOSITE_TASK}:
+                    composite_has_child_task = True
 
             if called is not None:
                 self._validate_hierarchy_recursive(called.code, stack + [code])
+
+        if task.level == TaskLevel.COMPOSITE_TASK and not composite_has_child_task:
+            raise ValueError(
+                f"{task.code}: Composite Task must include at least one child task call."
+            )
 
 
 # =============================================================================

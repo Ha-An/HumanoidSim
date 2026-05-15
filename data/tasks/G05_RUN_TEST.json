@@ -179,10 +179,16 @@
   ],
   "steps": [
     {
-      "step_id": "s01_primitive_identify_item",
-      "call_code": "PRIMITIVE_IDENTIFY_ITEM",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s01_identify_item",
+      "call_code": "IDENTIFY_ITEM",
+      "args": {
+        "target": "$inputs.target",
+        "id_spec": {
+          "derived_from_parent": "RUN_TEST",
+          "field": "id_spec"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [],
       "optional": false,
       "timeout_s": null,
@@ -198,12 +204,18 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_localize_object",
-      "call_code": "LOCALIZE_OBJECT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s02_inspect_product",
+      "call_code": "INSPECT_PRODUCT",
+      "args": {
+        "target": "$inputs.target",
+        "inspection_plan": {
+          "derived_from_parent": "RUN_TEST",
+          "field": "inspection_plan"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s01_primitive_identify_item"
+        "s01_identify_item"
       ],
       "optional": false,
       "timeout_s": null,
@@ -219,54 +231,22 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_execute_quality_action",
-      "call_code": "EXECUTE_QUALITY_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s02_localize_object"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
+      "step_id": "s03_record_quality_result",
+      "call_code": "RECORD_QUALITY_RESULT",
+      "args": {
+        "target": "$inputs.target",
+        "result": {
+          "derived_from_parent": "RUN_TEST",
+          "field": "result"
+        },
+        "evidence": {
+          "derived_from_parent": "RUN_TEST",
+          "field": "evidence"
+        }
       },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s04_classify_result",
-      "call_code": "CLASSIFY_RESULT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s03_execute_quality_action"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s05_record_result",
-      "call_code": "RECORD_RESULT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s04_classify_result"
+        "s02_inspect_product"
       ],
       "optional": false,
       "timeout_s": null,

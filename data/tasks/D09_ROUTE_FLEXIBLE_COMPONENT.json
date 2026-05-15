@@ -197,10 +197,20 @@
   ],
   "steps": [
     {
-      "step_id": "s01_localize_components",
-      "call_code": "LOCALIZE_COMPONENTS",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s01_insert_component",
+      "call_code": "INSERT_COMPONENT",
+      "args": {
+        "component": "$inputs.component",
+        "target": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "target"
+        },
+        "insertion_spec": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "insertion_spec"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [],
       "optional": false,
       "timeout_s": null,
@@ -216,12 +226,25 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_reach_to",
-      "call_code": "REACH_TO",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s02_connect_component",
+      "call_code": "CONNECT_COMPONENT",
+      "args": {
+        "component_a": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "component_a"
+        },
+        "component_b": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "component_b"
+        },
+        "connection_spec": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "connection_spec"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s01_localize_components"
+        "s01_insert_component"
       ],
       "optional": false,
       "timeout_s": null,
@@ -237,96 +260,21 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_grasp",
-      "call_code": "GRASP",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s02_reach_to"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
+      "step_id": "s03_verify_assembly",
+      "call_code": "VERIFY_ASSEMBLY",
+      "args": {
+        "assembly": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "assembly"
+        },
+        "verification_plan": {
+          "derived_from_parent": "ROUTE_FLEXIBLE_COMPONENT",
+          "field": "verification_plan"
+        }
       },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s04_align",
-      "call_code": "ALIGN",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s03_grasp"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s05_execute_assembly_action",
-      "call_code": "EXECUTE_ASSEMBLY_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s04_align"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s06_release",
-      "call_code": "RELEASE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s05_execute_assembly_action"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s07_primitive_verify_assembly",
-      "call_code": "PRIMITIVE_VERIFY_ASSEMBLY",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s06_release"
+        "s02_connect_component"
       ],
       "optional": false,
       "timeout_s": null,

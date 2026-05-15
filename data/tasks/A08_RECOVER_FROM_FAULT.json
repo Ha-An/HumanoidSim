@@ -143,10 +143,16 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_execute_system_action",
-      "call_code": "EXECUTE_SYSTEM_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s02_self_check",
+      "call_code": "SELF_CHECK",
+      "args": {
+        "robot": "$inputs.robot",
+        "checklist": {
+          "derived_from_parent": "RECOVER_FROM_FAULT",
+          "field": "checklist"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
         "s01_check_context"
       ],
@@ -164,12 +170,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_verify_robot_state",
-      "call_code": "VERIFY_ROBOT_STATE",
+      "step_id": "s03_execute_system_action",
+      "call_code": "EXECUTE_SYSTEM_ACTION",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s02_execute_system_action"
+        "s02_self_check"
       ],
       "optional": false,
       "timeout_s": null,
@@ -185,12 +191,33 @@
       "success_criteria": []
     },
     {
-      "step_id": "s04_log_result",
+      "step_id": "s04_verify_robot_state",
+      "call_code": "VERIFY_ROBOT_STATE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_execute_system_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_log_result",
       "call_code": "LOG_RESULT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s03_verify_robot_state"
+        "s04_verify_robot_state"
       ],
       "optional": false,
       "timeout_s": null,

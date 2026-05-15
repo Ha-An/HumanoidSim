@@ -170,12 +170,17 @@
   ],
   "steps": [
     {
-      "step_id": "s01_navigate_to",
-      "call_code": "NAVIGATE_TO",
+      "step_id": "s01_transfer",
+      "call_code": "TRANSFER",
       "args": {
-        "operator": "$inputs.operator"
+        "item": "$inputs.request",
+        "source": {
+          "derived_from_parent": "FETCH_FOR_OPERATOR",
+          "field": "source"
+        },
+        "destination": "$inputs.operator_or_station"
       },
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [],
       "optional": false,
       "timeout_s": null,
@@ -191,75 +196,16 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_announce_intent",
-      "call_code": "ANNOUNCE_INTENT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s01_navigate_to"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
+      "step_id": "s02_handover_item",
+      "call_code": "HANDOVER_ITEM",
+      "args": {
+        "item": "$inputs.request",
+        "recipient": "$inputs.operator_or_station",
+        "handover_spec": "$inputs.request"
       },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s03_execute_human_collaboration_action",
-      "call_code": "EXECUTE_HUMAN_COLLABORATION_ACTION",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s02_announce_intent"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s04_confirm_operator_state",
-      "call_code": "CONFIRM_OPERATOR_STATE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s03_execute_human_collaboration_action"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s05_log_result",
-      "call_code": "LOG_RESULT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s04_confirm_operator_state"
+        "s01_transfer"
       ],
       "optional": false,
       "timeout_s": null,

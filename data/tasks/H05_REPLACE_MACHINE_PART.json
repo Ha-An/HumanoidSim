@@ -165,10 +165,16 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_verify_lockout_if_required",
-      "call_code": "VERIFY_LOCKOUT_IF_REQUIRED",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s02_inspect_machine",
+      "call_code": "INSPECT_MACHINE",
+      "args": {
+        "machine": "$inputs.machine",
+        "inspection_plan": {
+          "derived_from_parent": "REPLACE_MACHINE_PART",
+          "field": "inspection_plan"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
         "s01_check_safety_zone"
       ],
@@ -186,33 +192,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_inspect_or_diagnose",
-      "call_code": "INSPECT_OR_DIAGNOSE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s02_verify_lockout_if_required"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s04_execute_maintenance_action",
+      "step_id": "s03_execute_maintenance_action",
       "call_code": "EXECUTE_MAINTENANCE_ACTION",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s03_inspect_or_diagnose"
+        "s02_inspect_machine"
       ],
       "optional": false,
       "timeout_s": null,
@@ -228,12 +213,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s05_verify_machine_state",
+      "step_id": "s04_verify_machine_state",
       "call_code": "VERIFY_MACHINE_STATE",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s04_execute_maintenance_action"
+        "s03_execute_maintenance_action"
       ],
       "optional": false,
       "timeout_s": null,
@@ -249,12 +234,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s06_log_result",
+      "step_id": "s05_log_result",
       "call_code": "LOG_RESULT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s05_verify_machine_state"
+        "s04_verify_machine_state"
       ],
       "optional": false,
       "timeout_s": null,

@@ -178,10 +178,19 @@
   ],
   "steps": [
     {
-      "step_id": "s01_localize_surface",
-      "call_code": "LOCALIZE_SURFACE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s01_prepare_surface",
+      "call_code": "PREPARE_SURFACE",
+      "args": {
+        "surface": {
+          "derived_from_parent": "CURE_MATERIAL",
+          "field": "surface"
+        },
+        "preparation_spec": {
+          "derived_from_parent": "CURE_MATERIAL",
+          "field": "preparation_spec"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [],
       "optional": false,
       "timeout_s": null,
@@ -197,12 +206,19 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_primitive_prepare_surface",
-      "call_code": "PRIMITIVE_PREPARE_SURFACE",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s02_apply_material",
+      "call_code": "APPLY_MATERIAL",
+      "args": {
+        "material": "$inputs.material",
+        "target": "$inputs.target",
+        "application_spec": {
+          "derived_from_parent": "CURE_MATERIAL",
+          "field": "application_spec"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s01_localize_surface"
+        "s01_prepare_surface"
       ],
       "optional": false,
       "timeout_s": null,
@@ -218,12 +234,18 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_operate_tool_or_dispenser",
-      "call_code": "OPERATE_TOOL_OR_DISPENSER",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
+      "step_id": "s03_verify_material_application",
+      "call_code": "VERIFY_MATERIAL_APPLICATION",
+      "args": {
+        "target": "$inputs.target",
+        "verification_spec": {
+          "derived_from_parent": "CURE_MATERIAL",
+          "field": "verification_spec"
+        }
+      },
+      "expected_level": "ATOMIC_TASK",
       "depends_on": [
-        "s02_primitive_prepare_surface"
+        "s02_apply_material"
       ],
       "optional": false,
       "timeout_s": null,
@@ -239,54 +261,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s04_primitive_apply_material",
-      "call_code": "PRIMITIVE_APPLY_MATERIAL",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s03_operate_tool_or_dispenser"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s05_verify_coverage_or_amount",
-      "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
-      "args": {},
-      "expected_level": "PRIMITIVE_SKILL",
-      "depends_on": [
-        "s04_primitive_apply_material"
-      ],
-      "optional": false,
-      "timeout_s": null,
-      "retry": {
-        "max_attempts": 1,
-        "retry_on": [],
-        "recovery_step_code": null
-      },
-      "uses_tools": [],
-      "uses_vehicles": [],
-      "uses_equipment": [],
-      "preconditions": [],
-      "success_criteria": []
-    },
-    {
-      "step_id": "s06_record_result",
+      "step_id": "s04_record_result",
       "call_code": "RECORD_RESULT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s05_verify_coverage_or_amount"
+        "s03_verify_material_application"
       ],
       "optional": false,
       "timeout_s": null,

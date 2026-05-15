@@ -1,8 +1,8 @@
 {
   "schema_version": "0.1.0",
   "catalog_version": "0.2.0-core",
-  "generated_at": "2026-05-08T17:34:29.035273+00:00",
-  "source_workbook": "C:\\Github\\manufacturing_humanoid_core_task_catalog.xlsx",
+  "generated_at": "2026-05-15T10:21:08.358046+00:00",
+  "source_workbook": "C:\\Github\\HumanoidSim\\manufacturing_humanoid_core_task_catalog.xlsx",
   "task_count": 82,
   "primitive_count": 64,
   "task_paths": [
