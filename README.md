@@ -128,6 +128,17 @@ HumanoidSim은 task를 세 계층으로 다룹니다.
   - 예: `REPLENISH_MATERIAL`, `SETUP_MACHINE`, `REPAIR_MACHINE`, `FETCH_FOR_OPERATOR`.
   - 복합 제조 job이나 운영 절차를 표현합니다.
 
+## Task Level 판정 기준
+
+`Atomic Task`와 `Composite Task`는 primitive 개수로 구분하지 않습니다. 핵심 기준은 task가 표현하는 작업 의미의 범위와 실행 중 workflow 성격입니다.
+
+| Level | 판정 기준 | 대표 신호 | 예시 |
+|---|---|---|---|
+| `ATOMIC_TASK` | 하나의 명확한 목표를 가진 단일 작업 단위 | 입력과 결과가 비교적 직접적이며, 실행 흐름이 큰 정책 분기 없이 primitive sequence로 닫힘 | `TRANSFER`, `LOAD_MACHINE`, `INSPECT_PRODUCT`, `FASTEN_COMPONENT` |
+| `COMPOSITE_TASK` | 여러 작업, 절차, 정책 판단, 시스템 update, 에스컬레이션을 묶은 운영 workflow | 조건에 따라 세부 절차가 달라지거나, 여러 resource/location/system을 조합하거나, 하위 atomic task로 분해 가능 | `REPLENISH_MATERIAL`, `SETUP_MACHINE`, `REPAIR_MACHINE`, `RECOVER_FROM_FAULT` |
+
+따라서 primitive sequence가 짧아도 workflow 성격이 강하면 `COMPOSITE_TASK`가 될 수 있습니다. 예를 들어 `RECOVER_FROM_FAULT`는 현재 `CHECK_CONTEXT -> EXECUTE_SYSTEM_ACTION -> VERIFY_ROBOT_STATE -> LOG_RESULT`로 표현되지만, fault code와 policy에 따라 자동 복구, 실패 처리, assistance 요청, 안전 절차가 달라질 수 있으므로 composite로 분류합니다. 반대로 primitive가 여러 개여도 목표가 좁고 실행 의미가 단일하면 atomic으로 유지합니다.
+
 ## Task 커스텀 방법
 
 기본 82개 task는 Excel의 `Primitive Template ID`를 바탕으로 template-based step decomposition을 사용합니다. 특정 현장이나 ManSim 시나리오에 맞게 task를 커스텀하려면 아래 순서를 권장합니다.
