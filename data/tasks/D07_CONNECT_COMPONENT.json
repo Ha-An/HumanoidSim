@@ -359,36 +359,43 @@
         {
           "raw": "LOCALIZE_COMPONENTS",
           "call_code": "LOCALIZE_COMPONENTS",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "REACH_TO",
           "call_code": "REACH_TO",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "GRASP",
           "call_code": "GRASP",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "ALIGN",
           "call_code": "ALIGN",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "INSERT / FASTEN / CONNECT",
+          "raw": "EXECUTE_ASSEMBLY_ACTION",
           "call_code": "EXECUTE_ASSEMBLY_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "RELEASE",
           "call_code": "RELEASE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "VERIFY_ASSEMBLY",
-          "call_code": "VERIFY_ASSEMBLY",
+          "raw": "PRIMITIVE_VERIFY_ASSEMBLY",
+          "call_code": "PRIMITIVE_VERIFY_ASSEMBLY",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

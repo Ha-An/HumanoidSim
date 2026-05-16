@@ -269,33 +269,31 @@
         {
           "raw": "CHECK_SAFETY_ZONE",
           "call_code": "CHECK_SAFETY_ZONE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "NAVIGATE_TO(machine)",
-          "call_code": "NAVIGATE_TO",
+          "raw": "OPERATE_MACHINE_INTERFACE",
+          "call_code": "OPERATE_MACHINE_INTERFACE",
+          "expected_level": "ATOMIC_TASK",
           "args": {
-            "machine": "$inputs.machine"
+            "machine": "$inputs.machine",
+            "interface_action": {
+              "derived_from_parent": "CLEAR_MACHINE_FAULT",
+              "field": "interface_action"
+            }
           }
-        },
-        {
-          "raw": "READ_MACHINE_STATE",
-          "call_code": "READ_MACHINE_STATE",
-          "args": {}
-        },
-        {
-          "raw": "OPERATE_INTERFACE / LOAD / UNLOAD",
-          "call_code": "EXECUTE_MACHINE_ACTION",
-          "args": {}
         },
         {
           "raw": "VERIFY_MACHINE_STATE",
           "call_code": "VERIFY_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

@@ -454,65 +454,74 @@
       "used_for": "Moving any item, tote, pallet, sample, tool, scrap, WIP, finished goods",
       "normalized_steps": [
         {
-          "raw": "NAVIGATE_TO(source)",
+          "raw": "NAVIGATE_TO",
           "call_code": "NAVIGATE_TO",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "source": "$inputs.source"
           }
         },
         {
-          "raw": "LOCALIZE_OBJECT(item)",
+          "raw": "LOCALIZE_OBJECT",
           "call_code": "LOCALIZE_OBJECT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item"
           }
         },
         {
-          "raw": "REACH_TO(item)",
+          "raw": "REACH_TO",
           "call_code": "REACH_TO",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item"
           }
         },
         {
-          "raw": "GRASP(item)",
+          "raw": "GRASP",
           "call_code": "GRASP",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item"
           }
         },
         {
-          "raw": "LIFT(item)",
+          "raw": "LIFT",
           "call_code": "LIFT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item"
           }
         },
         {
-          "raw": "NAVIGATE_TO(destination)",
+          "raw": "NAVIGATE_TO",
           "call_code": "NAVIGATE_TO",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "destination": "$inputs.destination"
           }
         },
         {
-          "raw": "PLACE(item, destination_pose)",
+          "raw": "PLACE",
           "call_code": "PLACE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item",
             "destination_pose": "$inputs.destination_pose"
           }
         },
         {
-          "raw": "RELEASE(item)",
+          "raw": "RELEASE",
           "call_code": "RELEASE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item"
           }
         },
         {
-          "raw": "VERIFY_PLACEMENT(item)",
+          "raw": "VERIFY_PLACEMENT",
           "call_code": "VERIFY_PLACEMENT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item"
           }

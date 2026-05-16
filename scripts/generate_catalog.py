@@ -47,7 +47,7 @@ SEPARATOR = "Ąć"
 CATALOG_VERSION = "0.2.0-core"
 
 ACTION_BY_TEMPLATE = {
-    "PT-REPLENISH": "EXECUTE_REPLENISHMENT_ACTION",
+    "PT-REPLENISH": "TRANSFER",
     "PT-MACHINE": "EXECUTE_MACHINE_ACTION",
     "PT-ASSEMBLY": "EXECUTE_ASSEMBLY_ACTION",
     "PT-MATERIAL": "EXECUTE_MATERIAL_ACTION",
@@ -182,7 +182,7 @@ def main() -> int:
         for row in rows
     }
     task_inputs = {str(row["Task Code"]): _split_csv(str(row.get("Primary Inputs", ""))) for row in rows}
-    primitive_codes: dict[str, set[str]] = _seed_template_primitives(templates, task_codes)
+    primitive_codes: dict[str, set[str]] = {}
     task_paths: list[str] = []
 
     for row in rows:
@@ -318,7 +318,7 @@ def _task_from_row(
                 "customization_notes": row["Customization / Implementation Notes"],
                 "primitive_template_id": template_id,
             },
-            "primitive_template": template,
+            "primitive_template": _effective_template_metadata(template, steps),
             "resources": {
                 "raw_tools": row.get("Required Tools"),
                 "raw_vehicles": row.get("Required Vehicles"),
@@ -338,6 +338,20 @@ def _task_from_row(
 def _split_sequence(value: str) -> list[str]:
     text = value.replace("→", SEPARATOR).replace("->", SEPARATOR)
     return [item.strip() for item in text.split(SEPARATOR) if item.strip()]
+
+
+def _effective_template_metadata(template: dict[str, Any], steps: list[StepCall]) -> dict[str, Any]:
+    metadata = dict(template)
+    metadata["normalized_steps"] = [
+        {
+            "raw": step.call_code,
+            "call_code": step.call_code,
+            "expected_level": step.expected_level.value if step.expected_level else None,
+            "args": step.args,
+        }
+        for step in steps
+    ]
+    return metadata
 
 
 def _normalize_primitive(raw: str, template_id: str) -> dict[str, Any]:

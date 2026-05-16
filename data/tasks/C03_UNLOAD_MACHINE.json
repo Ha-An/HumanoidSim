@@ -341,11 +341,13 @@
         {
           "raw": "CHECK_SAFETY_ZONE",
           "call_code": "CHECK_SAFETY_ZONE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "NAVIGATE_TO(machine)",
+          "raw": "NAVIGATE_TO",
           "call_code": "NAVIGATE_TO",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "machine": "$inputs.machine"
           }
@@ -353,21 +355,25 @@
         {
           "raw": "READ_MACHINE_STATE",
           "call_code": "READ_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "OPERATE_INTERFACE / LOAD / UNLOAD",
+          "raw": "EXECUTE_MACHINE_ACTION",
           "call_code": "EXECUTE_MACHINE_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_MACHINE_STATE",
           "call_code": "VERIFY_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

@@ -289,33 +289,36 @@
       "used_for": "PM, repair, part replacement, fluid/lubrication service, calibration",
       "normalized_steps": [
         {
-          "raw": "CHECK_SAFETY_ZONE",
-          "call_code": "CHECK_SAFETY_ZONE",
-          "args": {}
+          "raw": "INSPECT_MACHINE",
+          "call_code": "INSPECT_MACHINE",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "machine": {
+              "derived_from_parent": "SERVICE_FLUID_OR_LUBRICATION",
+              "field": "machine"
+            },
+            "inspection_plan": {
+              "derived_from_parent": "SERVICE_FLUID_OR_LUBRICATION",
+              "field": "inspection_plan"
+            }
+          }
         },
         {
-          "raw": "VERIFY_LOCKOUT_IF_REQUIRED",
-          "call_code": "VERIFY_LOCKOUT_IF_REQUIRED",
-          "args": {}
-        },
-        {
-          "raw": "INSPECT_OR_DIAGNOSE",
-          "call_code": "INSPECT_OR_DIAGNOSE",
-          "args": {}
-        },
-        {
-          "raw": "OPERATE_TOOL / REPLACE / SERVICE",
+          "raw": "EXECUTE_MAINTENANCE_ACTION",
           "call_code": "EXECUTE_MAINTENANCE_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_MACHINE_STATE",
           "call_code": "VERIFY_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

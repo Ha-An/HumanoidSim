@@ -297,29 +297,34 @@
       "used_for": "Packing, unpacking, labeling, verifying, palletizing/wrapping/strapping",
       "normalized_steps": [
         {
-          "raw": "IDENTIFY_PRODUCT",
-          "call_code": "IDENTIFY_PRODUCT",
-          "args": {}
-        },
-        {
-          "raw": "PREPARE_PACKAGING",
-          "call_code": "PREPARE_PACKAGING",
-          "args": {}
-        },
-        {
-          "raw": "PACK / LABEL / UNITIZE",
-          "call_code": "EXECUTE_PACKAGING_ACTION",
-          "args": {}
+          "raw": "PACK_PRODUCT",
+          "call_code": "PACK_PRODUCT",
+          "expected_level": "COMPOSITE_TASK",
+          "args": {
+            "product": {
+              "derived_from_parent": "UNITIZE_LOAD",
+              "field": "product"
+            },
+            "packaging_spec": {
+              "derived_from_parent": "UNITIZE_LOAD",
+              "field": "packaging_spec"
+            }
+          }
         },
         {
           "raw": "VERIFY_PACKAGE",
           "call_code": "VERIFY_PACKAGE",
-          "args": {}
-        },
-        {
-          "raw": "RECORD_RESULT",
-          "call_code": "RECORD_RESULT",
-          "args": {}
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "package": {
+              "derived_from_parent": "UNITIZE_LOAD",
+              "field": "package"
+            },
+            "verification_plan": {
+              "derived_from_parent": "UNITIZE_LOAD",
+              "field": "verification_plan"
+            }
+          }
         }
       ]
     },

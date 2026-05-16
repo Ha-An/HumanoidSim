@@ -245,21 +245,25 @@
         {
           "raw": "CHECK_CONTEXT",
           "call_code": "CHECK_CONTEXT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "EXECUTE_SYSTEM_ACTION",
           "call_code": "EXECUTE_SYSTEM_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_ROBOT_STATE",
           "call_code": "VERIFY_ROBOT_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

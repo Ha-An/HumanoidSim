@@ -238,31 +238,27 @@
       "used_for": "Operator assistance and handovers",
       "normalized_steps": [
         {
-          "raw": "NAVIGATE_TO(operator)",
-          "call_code": "NAVIGATE_TO",
+          "raw": "TRANSFER",
+          "call_code": "TRANSFER",
+          "expected_level": "ATOMIC_TASK",
           "args": {
-            "operator": "$inputs.operator"
+            "item": "$inputs.request",
+            "source": {
+              "derived_from_parent": "FETCH_FOR_OPERATOR",
+              "field": "source"
+            },
+            "destination": "$inputs.operator_or_station"
           }
         },
         {
-          "raw": "ANNOUNCE_INTENT",
-          "call_code": "ANNOUNCE_INTENT",
-          "args": {}
-        },
-        {
-          "raw": "HANDOVER / RECEIVE / HOLD / ASSIST",
-          "call_code": "EXECUTE_HUMAN_COLLABORATION_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "CONFIRM_OPERATOR_STATE",
-          "call_code": "CONFIRM_OPERATOR_STATE",
-          "args": {}
-        },
-        {
-          "raw": "LOG_RESULT",
-          "call_code": "LOG_RESULT",
-          "args": {}
+          "raw": "HANDOVER_ITEM",
+          "call_code": "HANDOVER_ITEM",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "item": "$inputs.request",
+            "recipient": "$inputs.operator_or_station",
+            "handover_spec": "$inputs.request"
+          }
         }
       ]
     },

@@ -1,14 +1,16 @@
 # Primitive Reference
 
-이 문서는 `data/primitives/*.json`에 정의된 primitive skill을 정리한 reference입니다. Primitive는 task를 구성하는 가장 작은 실행 skill이며, `ATOMIC_TASK`와 `COMPOSITE_TASK`의 step에서 참조됩니다.
+이 문서는 task step에서 실제로 참조되는 active primitive skill을 정리한 reference입니다. Primitive는 task를 구성하는 가장 작은 실행 skill이며, `ATOMIC_TASK`와 `COMPOSITE_TASK`의 step에서 참조됩니다.
 
 ## 요약
 
-- Primitive 수: 64
+- Active primitive 수: 59
+- Registry primitive 수: 59
 - 원본 primitive 정의: `data/primitives/*.json`
 - Primitive template index: `data/primitive_templates.json`
+- 이 표에는 현재 task catalog의 `steps`에서 참조되는 primitive만 표시합니다.
 
-## 전체 Primitive 표
+## Active Primitive 표
 
 | Code | Name | Description | Inputs | Outputs | Used by Tasks | Source |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -27,7 +29,6 @@
 | `EXECUTE_MAINTENANCE_ACTION` | Execute Maintenance Action | 점검, 진단, 수리, 교체, calibration 같은 maintenance action을 수행합니다. | - | result: dict | `CALIBRATE_MACHINE`<br>`REPAIR_MACHINE`<br>`REPLACE_MACHINE_PART`<br>`SERVICE_FLUID_OR_LUBRICATION` | `data/primitives/EXECUTE_MAINTENANCE_ACTION.json` |
 | `EXECUTE_PACKAGING_ACTION` | Execute Packaging Action | `EXECUTE_PACKAGING_ACTION` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `LABEL_ITEM_OR_PACKAGE` | `data/primitives/EXECUTE_PACKAGING_ACTION.json` |
 | `EXECUTE_QUALITY_ACTION` | Execute Quality Action | 검사, 측정, test 같은 quality action을 수행합니다. | - | result: dict | `IDENTIFY_ITEM`<br>`INSPECT_PRODUCT`<br>`MEASURE_FEATURE`<br>`VERIFY_ASSEMBLY`<br>`VERIFY_PACKAGE` | `data/primitives/EXECUTE_QUALITY_ACTION.json` |
-| `EXECUTE_REPLENISHMENT_ACTION` | Execute Replenishment Action | `EXECUTE_REPLENISHMENT_ACTION` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | - | `data/primitives/EXECUTE_REPLENISHMENT_ACTION.json` |
 | `EXECUTE_SYSTEM_ACTION` | Execute System Action | 로봇 초기화, mode 변경, 충전, recovery 같은 system action을 수행합니다. | - | result: dict | `CALIBRATE_ROBOT`<br>`CHANGE_END_EFFECTOR`<br>`INITIALIZE_ROBOT`<br>`LOAD_WORK_CONTEXT`<br>`MANAGE_ROBOT_POWER`<br>`RECOVER_FROM_FAULT`<br>`SELF_CHECK`<br>`SET_OPERATION_MODE` | `data/primitives/EXECUTE_SYSTEM_ACTION.json` |
 | `EXECUTE_WAREHOUSE_ACTION` | Execute Warehouse Action | 입고, putaway, picking, counting, kitting 같은 warehouse action을 수행합니다. | - | result: dict | `COUNT_INVENTORY` | `data/primitives/EXECUTE_WAREHOUSE_ACTION.json` |
 | `FIX_OR_HOLD_PART` | Fix Or Hold Part | `FIX_OR_HOLD_PART` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CREATE_FEATURE`<br>`CUT_OR_TRIM_MATERIAL`<br>`FINISH_SURFACE`<br>`MARK_PART`<br>`REMOVE_BURR_OR_FLASH` | `data/primitives/FIX_OR_HOLD_PART.json` |
@@ -37,17 +38,14 @@
 | `INSPECT_OR_DIAGNOSE` | Inspect Or Diagnose | `INSPECT_OR_DIAGNOSE` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `INSPECT_MACHINE` | `data/primitives/INSPECT_OR_DIAGNOSE.json` |
 | `INSPECT_RESULT` | Inspect Result | `INSPECT_RESULT` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CREATE_FEATURE`<br>`CUT_OR_TRIM_MATERIAL`<br>`FINISH_SURFACE`<br>`MARK_PART`<br>`REMOVE_BURR_OR_FLASH` | `data/primitives/INSPECT_RESULT.json` |
 | `LIFT` | Lift | 잡은 대상을 들어 운반 가능한 상태로 만듭니다. | item: Any | result: dict | `LOAD_UNLOAD_TRANSFER_INTERFACE`<br>`TRANSFER` | `data/primitives/LIFT.json` |
-| `LOAD_ITEM` | Load Item | `LOAD_ITEM` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | - | `data/primitives/LOAD_ITEM.json` |
 | `LOCALIZE_COMPONENTS` | Localize Components | `LOCALIZE_COMPONENTS` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CONNECT_COMPONENT`<br>`DISCONNECT_COMPONENT`<br>`FASTEN_COMPONENT`<br>`INSERT_COMPONENT`<br>`REMOVE_COMPONENT`<br>`UNFASTEN_COMPONENT` | `data/primitives/LOCALIZE_COMPONENTS.json` |
 | `LOCALIZE_OBJECT` | Localize Object | 대상 객체의 위치와 식별 정보를 확인합니다. | item: Any | result: dict | `IDENTIFY_ITEM`<br>`INSPECT_PRODUCT`<br>`LOAD_UNLOAD_TRANSFER_INTERFACE`<br>`MEASURE_FEATURE`<br>`TRANSFER`<br>`VERIFY_ASSEMBLY`<br>`VERIFY_PACKAGE` | `data/primitives/LOCALIZE_OBJECT.json` |
 | `LOCALIZE_PART` | Localize Part | `LOCALIZE_PART` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CREATE_FEATURE`<br>`CUT_OR_TRIM_MATERIAL`<br>`FINISH_SURFACE`<br>`MARK_PART`<br>`REMOVE_BURR_OR_FLASH` | `data/primitives/LOCALIZE_PART.json` |
 | `LOCALIZE_SURFACE` | Localize Surface | `LOCALIZE_SURFACE` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `APPLY_MATERIAL`<br>`PREPARE_SURFACE`<br>`REMOVE_APPLIED_MATERIAL`<br>`VERIFY_MATERIAL_APPLICATION` | `data/primitives/LOCALIZE_SURFACE.json` |
 | `LOG_RESULT` | Log Result | `LOG_RESULT` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CALIBRATE_MACHINE`<br>`CALIBRATE_ROBOT`<br>`CAPTURE_EVIDENCE_OR_STATUS`<br>`CHANGE_END_EFFECTOR`<br>`CHANGE_MACHINE_CONFIGURATION`<br>`CLEAR_MACHINE_FAULT`<br>`COMPLETE_WORK_ORDER`<br>`CONTROL_MACHINE_CYCLE`<br>`CREATE_EXCEPTION_REPORT`<br>`DIAGNOSE_MACHINE`<br>`HANDOVER_ITEM`<br>`HANDOVER_TOOL`<br>`HOLD_OR_POSITION_FOR_OPERATOR`<br>`INITIALIZE_ROBOT`<br>`INSPECT_MACHINE`<br>`LOAD_MACHINE`<br>`LOAD_WORK_CONTEXT`<br>`MANAGE_ROBOT_POWER`<br>`OPERATE_MACHINE_INTERFACE`<br>`PREVENTIVE_MAINTENANCE`<br>`RECEIVE_FROM_OPERATOR`<br>`RECORD_QUALITY_RESULT`<br>`RECOVER_FROM_FAULT`<br>`REGISTER_TRACEABILITY`<br>`REPAIR_MACHINE`<br>`REPLACE_MACHINE_PART`<br>`REPORT_HAZARD`<br>`REPORT_OPERATION_RESULT`<br>`SELF_CHECK`<br>`SERVICE_FLUID_OR_LUBRICATION`<br>`SETUP_MACHINE`<br>`SET_OPERATION_MODE`<br>`START_WORK_ORDER`<br>`UNLOAD_MACHINE`<br>`UPDATE_INVENTORY_RECORD` | `data/primitives/LOG_RESULT.json` |
-| `MOVE_TO` | Move To | `MOVE_TO` 실행 단계를 나타내는 primitive skill입니다. | destination: Any | result: dict | - | `data/primitives/MOVE_TO.json` |
-| `NAVIGATE_TO` | Navigate To | 목표 위치까지 이동합니다. | area: Any<br>destination: Any<br>machine: Any<br>operator: Any<br>source: Any<br>vehicle: Any | result: dict | `CLEAN_ASSET`<br>`CONTROL_MACHINE_CYCLE`<br>`HANDOVER_ITEM`<br>`HANDOVER_TOOL`<br>`HOLD_OR_POSITION_FOR_OPERATOR`<br>`LOAD_MACHINE`<br>`LOAD_UNLOAD_TRANSFER_INTERFACE`<br>`OPERATE_MACHINE_INTERFACE`<br>`RECEIVE_FROM_OPERATOR`<br>`TRANSFER`<br>`UNLOAD_MACHINE` | `data/primitives/NAVIGATE_TO.json` |
+| `NAVIGATE_TO` | Navigate To | 목표 위치까지 이동합니다. | area: Any<br>destination: Any<br>machine: Any<br>operator: Any<br>source: Any | result: dict | `CLEAN_ASSET`<br>`CONTROL_MACHINE_CYCLE`<br>`HANDOVER_ITEM`<br>`HANDOVER_TOOL`<br>`HOLD_OR_POSITION_FOR_OPERATOR`<br>`LOAD_MACHINE`<br>`LOAD_UNLOAD_TRANSFER_INTERFACE`<br>`OPERATE_MACHINE_INTERFACE`<br>`RECEIVE_FROM_OPERATOR`<br>`TRANSFER`<br>`UNLOAD_MACHINE` | `data/primitives/NAVIGATE_TO.json` |
 | `OPERATE_TOOL` | Operate Tool | `OPERATE_TOOL` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CREATE_FEATURE`<br>`CUT_OR_TRIM_MATERIAL`<br>`FINISH_SURFACE`<br>`MARK_PART`<br>`REMOVE_BURR_OR_FLASH` | `data/primitives/OPERATE_TOOL.json` |
 | `OPERATE_TOOL_OR_DISPENSER` | Operate Tool Or Dispenser | `OPERATE_TOOL_OR_DISPENSER` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `APPLY_MATERIAL`<br>`PREPARE_SURFACE`<br>`REMOVE_APPLIED_MATERIAL`<br>`VERIFY_MATERIAL_APPLICATION` | `data/primitives/OPERATE_TOOL_OR_DISPENSER.json` |
-| `OPERATE_VEHICLE` | Operate Vehicle | `OPERATE_VEHICLE` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | - | `data/primitives/OPERATE_VEHICLE.json` |
 | `PARK_OR_RELEASE_VEHICLE` | Park Or Release Vehicle | `PARK_OR_RELEASE_VEHICLE` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `OPERATE_VEHICLE_TRANSPORT` | `data/primitives/PARK_OR_RELEASE_VEHICLE.json` |
 | `PLACE` | Place | 운반한 대상을 목표 위치에 내려놓습니다. | destination_pose: Any<br>item: Any | result: dict | `LOAD_UNLOAD_TRANSFER_INTERFACE`<br>`TRANSFER` | `data/primitives/PLACE.json` |
 | `PREPARE_PACKAGING` | Prepare Packaging | `PREPARE_PACKAGING` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `LABEL_ITEM_OR_PACKAGE` | `data/primitives/PREPARE_PACKAGING.json` |
@@ -64,7 +62,6 @@
 | `RECORD_RESULT` | Record Result | `RECORD_RESULT` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `APPLY_MATERIAL`<br>`CREATE_FEATURE`<br>`CURE_MATERIAL`<br>`CUT_OR_TRIM_MATERIAL`<br>`FINISH_SURFACE`<br>`IDENTIFY_ITEM`<br>`INSPECT_PRODUCT`<br>`LABEL_ITEM_OR_PACKAGE`<br>`MARK_PART`<br>`MEASURE_FEATURE`<br>`PREPARE_SURFACE`<br>`REMOVE_APPLIED_MATERIAL`<br>`REMOVE_BURR_OR_FLASH`<br>`VERIFY_ASSEMBLY`<br>`VERIFY_MATERIAL_APPLICATION`<br>`VERIFY_PACKAGE` | `data/primitives/RECORD_RESULT.json` |
 | `RELEASE` | Release | 잡고 있던 대상을 놓습니다. | item: Any | result: dict | `CONNECT_COMPONENT`<br>`DISCONNECT_COMPONENT`<br>`FASTEN_COMPONENT`<br>`INSERT_COMPONENT`<br>`LOAD_UNLOAD_TRANSFER_INTERFACE`<br>`REMOVE_COMPONENT`<br>`TRANSFER`<br>`UNFASTEN_COMPONENT` | `data/primitives/RELEASE.json` |
 | `REPORT_RESULT` | Report Result | `REPORT_RESULT` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CLEAN_AREA`<br>`CLEAN_ASSET` | `data/primitives/REPORT_RESULT.json` |
-| `UNLOAD_ITEM` | Unload Item | `UNLOAD_ITEM` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | - | `data/primitives/UNLOAD_ITEM.json` |
 | `UPDATE_RECORD` | Update Record | 작업 결과나 재고 상태를 기록합니다. | - | result: dict | `REMOVE_MATERIAL`<br>`REPLENISH_MATERIAL` | `data/primitives/UPDATE_RECORD.json` |
 | `VERIFY_AREA_STATE` | Verify Area State | `VERIFY_AREA_STATE` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `CLEAN_AREA`<br>`CLEAN_ASSET` | `data/primitives/VERIFY_AREA_STATE.json` |
 | `VERIFY_AUTHORIZATION` | Verify Authorization | `VERIFY_AUTHORIZATION` 실행 단계를 나타내는 primitive skill입니다. | - | result: dict | `OPERATE_VEHICLE_TRANSPORT` | `data/primitives/VERIFY_AUTHORIZATION.json` |

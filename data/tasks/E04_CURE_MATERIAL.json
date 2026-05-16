@@ -299,33 +299,49 @@
       "used_for": "Adhesive, sealant, grease, lubricant, coating, masking, curing",
       "normalized_steps": [
         {
-          "raw": "LOCALIZE_SURFACE",
-          "call_code": "LOCALIZE_SURFACE",
-          "args": {}
-        },
-        {
           "raw": "PREPARE_SURFACE",
           "call_code": "PREPARE_SURFACE",
-          "args": {}
-        },
-        {
-          "raw": "OPERATE_TOOL_OR_DISPENSER",
-          "call_code": "OPERATE_TOOL_OR_DISPENSER",
-          "args": {}
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "surface": {
+              "derived_from_parent": "CURE_MATERIAL",
+              "field": "surface"
+            },
+            "preparation_spec": {
+              "derived_from_parent": "CURE_MATERIAL",
+              "field": "preparation_spec"
+            }
+          }
         },
         {
           "raw": "APPLY_MATERIAL",
           "call_code": "APPLY_MATERIAL",
-          "args": {}
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "material": "$inputs.material",
+            "target": "$inputs.target",
+            "application_spec": {
+              "derived_from_parent": "CURE_MATERIAL",
+              "field": "application_spec"
+            }
+          }
         },
         {
-          "raw": "VERIFY_COVERAGE_OR_AMOUNT",
-          "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
-          "args": {}
+          "raw": "VERIFY_MATERIAL_APPLICATION",
+          "call_code": "VERIFY_MATERIAL_APPLICATION",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "target": "$inputs.target",
+            "verification_spec": {
+              "derived_from_parent": "CURE_MATERIAL",
+              "field": "verification_spec"
+            }
+          }
         },
         {
           "raw": "RECORD_RESULT",
           "call_code": "RECORD_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

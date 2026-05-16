@@ -49,15 +49,6 @@
       "default": null,
       "unit": null,
       "allowed_values": []
-    },
-    {
-      "name": "vehicle",
-      "type_hint": "Any",
-      "required": false,
-      "description": "",
-      "default": null,
-      "unit": null,
-      "allowed_values": []
     }
   ],
   "outputs": [

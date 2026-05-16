@@ -247,31 +247,38 @@
       "used_for": "Cleaning, waste/scrap, spill response, audit, hazard reporting",
       "normalized_steps": [
         {
-          "raw": "NAVIGATE_TO(area)",
-          "call_code": "NAVIGATE_TO",
+          "raw": "CLEAN_ASSET",
+          "call_code": "CLEAN_ASSET",
+          "expected_level": "ATOMIC_TASK",
           "args": {
-            "area": "$inputs.area"
+            "asset": {
+              "derived_from_parent": "CONDUCT_EHS_OR_5S_AUDIT",
+              "field": "asset"
+            },
+            "cleaning_spec": {
+              "derived_from_parent": "CONDUCT_EHS_OR_5S_AUDIT",
+              "field": "cleaning_spec"
+            }
           }
         },
         {
-          "raw": "INSPECT_AREA",
-          "call_code": "INSPECT_AREA",
-          "args": {}
-        },
-        {
-          "raw": "CLEAN / COLLECT / RESPOND / AUDIT",
-          "call_code": "EXECUTE_EHS_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "VERIFY_AREA_STATE",
-          "call_code": "VERIFY_AREA_STATE",
-          "args": {}
-        },
-        {
-          "raw": "REPORT_RESULT",
-          "call_code": "REPORT_RESULT",
-          "args": {}
+          "raw": "REPORT_HAZARD",
+          "call_code": "REPORT_HAZARD",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "location": {
+              "derived_from_parent": "CONDUCT_EHS_OR_5S_AUDIT",
+              "field": "location"
+            },
+            "hazard_type": {
+              "derived_from_parent": "CONDUCT_EHS_OR_5S_AUDIT",
+              "field": "hazard_type"
+            },
+            "evidence": {
+              "derived_from_parent": "CONDUCT_EHS_OR_5S_AUDIT",
+              "field": "evidence"
+            }
+          }
         }
       ]
     },

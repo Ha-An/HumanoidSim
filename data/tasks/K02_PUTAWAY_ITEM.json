@@ -266,29 +266,29 @@
       "used_for": "Receiving, putaway, picking, counting, kit building, inventory update",
       "normalized_steps": [
         {
-          "raw": "IDENTIFY_ITEM",
-          "call_code": "IDENTIFY_ITEM",
-          "args": {}
-        },
-        {
-          "raw": "VERIFY_RECORD",
-          "call_code": "VERIFY_RECORD",
-          "args": {}
-        },
-        {
-          "raw": "PICK / PUTAWAY / COUNT / KIT",
-          "call_code": "EXECUTE_WAREHOUSE_ACTION",
-          "args": {}
+          "raw": "TRANSFER",
+          "call_code": "TRANSFER",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "item": "$inputs.item",
+            "source": {
+              "derived_from_parent": "PUTAWAY_ITEM",
+              "field": "source"
+            },
+            "destination": "$inputs.storage_location"
+          }
         },
         {
           "raw": "UPDATE_INVENTORY_RECORD",
           "call_code": "UPDATE_INVENTORY_RECORD",
-          "args": {}
-        },
-        {
-          "raw": "VERIFY_RECORD",
-          "call_code": "VERIFY_RECORD",
-          "args": {}
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "item": "$inputs.item",
+            "transaction": {
+              "derived_from_parent": "PUTAWAY_ITEM",
+              "field": "transaction"
+            }
+          }
         }
       ]
     },

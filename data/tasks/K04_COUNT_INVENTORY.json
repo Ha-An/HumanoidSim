@@ -299,28 +299,33 @@
       "used_for": "Receiving, putaway, picking, counting, kit building, inventory update",
       "normalized_steps": [
         {
-          "raw": "IDENTIFY_ITEM",
-          "call_code": "IDENTIFY_ITEM",
+          "raw": "PRIMITIVE_IDENTIFY_ITEM",
+          "call_code": "PRIMITIVE_IDENTIFY_ITEM",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_RECORD",
           "call_code": "VERIFY_RECORD",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "PICK / PUTAWAY / COUNT / KIT",
+          "raw": "EXECUTE_WAREHOUSE_ACTION",
           "call_code": "EXECUTE_WAREHOUSE_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "UPDATE_INVENTORY_RECORD",
-          "call_code": "UPDATE_INVENTORY_RECORD",
+          "raw": "PRIMITIVE_UPDATE_INVENTORY_RECORD",
+          "call_code": "PRIMITIVE_UPDATE_INVENTORY_RECORD",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_RECORD",
           "call_code": "VERIFY_RECORD",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

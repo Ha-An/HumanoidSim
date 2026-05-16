@@ -239,21 +239,25 @@
         {
           "raw": "READ_CONTEXT",
           "call_code": "READ_CONTEXT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "CREATE_OR_UPDATE_RECORD",
           "call_code": "CREATE_OR_UPDATE_RECORD",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_TRANSACTION",
           "call_code": "VERIFY_TRANSACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

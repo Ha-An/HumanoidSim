@@ -289,31 +289,25 @@
         {
           "raw": "CHECK_SAFETY_ZONE",
           "call_code": "CHECK_SAFETY_ZONE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_LOCKOUT_IF_REQUIRED",
           "call_code": "VERIFY_LOCKOUT_IF_REQUIRED",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "INSPECT_OR_DIAGNOSE",
           "call_code": "INSPECT_OR_DIAGNOSE",
-          "args": {}
-        },
-        {
-          "raw": "OPERATE_TOOL / REPLACE / SERVICE",
-          "call_code": "EXECUTE_MAINTENANCE_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "VERIFY_MACHINE_STATE",
-          "call_code": "VERIFY_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

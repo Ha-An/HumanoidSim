@@ -338,28 +338,33 @@
       "used_for": "QC inspection, measurement, ID verification, testing",
       "normalized_steps": [
         {
-          "raw": "IDENTIFY_ITEM",
-          "call_code": "IDENTIFY_ITEM",
+          "raw": "PRIMITIVE_IDENTIFY_ITEM",
+          "call_code": "PRIMITIVE_IDENTIFY_ITEM",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOCALIZE_OBJECT",
           "call_code": "LOCALIZE_OBJECT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "INSPECT / MEASURE / TEST",
+          "raw": "EXECUTE_QUALITY_ACTION",
           "call_code": "EXECUTE_QUALITY_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "CLASSIFY_RESULT",
           "call_code": "CLASSIFY_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "RECORD_RESULT",
           "call_code": "RECORD_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

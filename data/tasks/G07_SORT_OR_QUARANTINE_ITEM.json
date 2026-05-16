@@ -321,27 +321,48 @@
         {
           "raw": "IDENTIFY_ITEM",
           "call_code": "IDENTIFY_ITEM",
-          "args": {}
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "target": {
+              "derived_from_parent": "SORT_OR_QUARANTINE_ITEM",
+              "field": "target"
+            },
+            "id_spec": {
+              "derived_from_parent": "SORT_OR_QUARANTINE_ITEM",
+              "field": "id_spec"
+            }
+          }
         },
         {
-          "raw": "LOCALIZE_OBJECT",
-          "call_code": "LOCALIZE_OBJECT",
-          "args": {}
+          "raw": "INSPECT_PRODUCT",
+          "call_code": "INSPECT_PRODUCT",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "target": {
+              "derived_from_parent": "SORT_OR_QUARANTINE_ITEM",
+              "field": "target"
+            },
+            "inspection_plan": {
+              "derived_from_parent": "SORT_OR_QUARANTINE_ITEM",
+              "field": "inspection_plan"
+            }
+          }
         },
         {
-          "raw": "INSPECT / MEASURE / TEST",
-          "call_code": "EXECUTE_QUALITY_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "CLASSIFY_RESULT",
-          "call_code": "CLASSIFY_RESULT",
-          "args": {}
-        },
-        {
-          "raw": "RECORD_RESULT",
-          "call_code": "RECORD_RESULT",
-          "args": {}
+          "raw": "RECORD_QUALITY_RESULT",
+          "call_code": "RECORD_QUALITY_RESULT",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "target": {
+              "derived_from_parent": "SORT_OR_QUARANTINE_ITEM",
+              "field": "target"
+            },
+            "result": "$inputs.result",
+            "evidence": {
+              "derived_from_parent": "SORT_OR_QUARANTINE_ITEM",
+              "field": "evidence"
+            }
+          }
         }
       ]
     },

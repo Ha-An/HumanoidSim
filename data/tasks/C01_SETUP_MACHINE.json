@@ -339,33 +339,45 @@
         {
           "raw": "CHECK_SAFETY_ZONE",
           "call_code": "CHECK_SAFETY_ZONE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
-        },
-        {
-          "raw": "NAVIGATE_TO(machine)",
-          "call_code": "NAVIGATE_TO",
-          "args": {
-            "machine": "$inputs.machine"
-          }
         },
         {
           "raw": "READ_MACHINE_STATE",
           "call_code": "READ_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "OPERATE_INTERFACE / LOAD / UNLOAD",
-          "call_code": "EXECUTE_MACHINE_ACTION",
-          "args": {}
+          "raw": "LOAD_MACHINE",
+          "call_code": "LOAD_MACHINE",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "machine": "$inputs.machine",
+            "item": {
+              "derived_from_parent": "SETUP_MACHINE",
+              "field": "item"
+            },
+            "source": {
+              "derived_from_parent": "SETUP_MACHINE",
+              "field": "source"
+            },
+            "target_slot": {
+              "derived_from_parent": "SETUP_MACHINE",
+              "field": "target_slot"
+            }
+          }
         },
         {
           "raw": "VERIFY_MACHINE_STATE",
           "call_code": "VERIFY_MACHINE_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "LOG_RESULT",
           "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

@@ -119,7 +119,7 @@
         },
         {
           "raw": "TRANSFER or LOAD_UNLOAD_INTERFACE",
-          "call_code": "EXECUTE_REPLENISHMENT_ACTION",
+          "call_code": "TRANSFER",
           "args": {}
         },
         {

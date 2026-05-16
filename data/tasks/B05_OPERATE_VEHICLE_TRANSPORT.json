@@ -402,47 +402,31 @@
       "used_for": "Forklift, pallet jack, tugger, cart, AMR, elevator-assisted movement",
       "normalized_steps": [
         {
-          "raw": "NAVIGATE_TO(vehicle)",
-          "call_code": "NAVIGATE_TO",
-          "args": {
-            "vehicle": "$inputs.vehicle"
-          }
-        },
-        {
           "raw": "VERIFY_AUTHORIZATION",
           "call_code": "VERIFY_AUTHORIZATION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "OPERATE_VEHICLE",
-          "call_code": "OPERATE_VEHICLE",
-          "args": {}
-        },
-        {
-          "raw": "LOAD_ITEM",
-          "call_code": "LOAD_ITEM",
-          "args": {}
-        },
-        {
-          "raw": "MOVE_TO(destination)",
-          "call_code": "MOVE_TO",
+          "raw": "TRANSFER",
+          "call_code": "TRANSFER",
+          "expected_level": "ATOMIC_TASK",
           "args": {
+            "item": "$inputs.item",
+            "source": "$inputs.source",
             "destination": "$inputs.destination"
           }
         },
         {
-          "raw": "UNLOAD_ITEM",
-          "call_code": "UNLOAD_ITEM",
-          "args": {}
-        },
-        {
           "raw": "PARK_OR_RELEASE_VEHICLE",
           "call_code": "PARK_OR_RELEASE_VEHICLE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_PLACEMENT",
           "call_code": "VERIFY_PLACEMENT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

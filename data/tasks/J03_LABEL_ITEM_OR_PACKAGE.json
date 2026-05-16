@@ -292,26 +292,31 @@
         {
           "raw": "IDENTIFY_PRODUCT",
           "call_code": "IDENTIFY_PRODUCT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "PREPARE_PACKAGING",
           "call_code": "PREPARE_PACKAGING",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "PACK / LABEL / UNITIZE",
+          "raw": "EXECUTE_PACKAGING_ACTION",
           "call_code": "EXECUTE_PACKAGING_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "VERIFY_PACKAGE",
-          "call_code": "VERIFY_PACKAGE",
+          "raw": "PRIMITIVE_VERIFY_PACKAGE",
+          "call_code": "PRIMITIVE_VERIFY_PACKAGE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "RECORD_RESULT",
           "call_code": "RECORD_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

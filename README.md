@@ -112,12 +112,12 @@ State는 네 축으로 정의됩니다.
 - `data/task_catalog_core.json`: catalog index
 - `data/primitive_templates.json`: Excel primitive template 기록
 - `docs/tasks_reference.md`: task 전체 reference
-- `docs/primitives_reference.md`: primitive 전체 reference
+- `docs/primitives_reference.md`: task step에서 실제 참조되는 active primitive reference
 
 ## Reference
 
 - [Task Reference](docs/tasks_reference.md): 82개 task의 level, category, input, resource, nested sequence를 정리합니다.
-- [Primitive Reference](docs/primitives_reference.md): primitive skill과 사용 task를 정리합니다.
+- [Primitive Reference](docs/primitives_reference.md): task step에서 실제 참조되는 primitive skill과 사용 task를 정리합니다.
 
 ## 실행
 

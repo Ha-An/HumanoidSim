@@ -258,31 +258,29 @@
       "used_for": "Cleaning, waste/scrap, spill response, audit, hazard reporting",
       "normalized_steps": [
         {
-          "raw": "NAVIGATE_TO(area)",
-          "call_code": "NAVIGATE_TO",
+          "raw": "TRANSFER",
+          "call_code": "TRANSFER",
+          "expected_level": "ATOMIC_TASK",
           "args": {
-            "area": "$inputs.area"
+            "item": "$inputs.waste_or_scrap",
+            "source": "$inputs.source",
+            "destination": "$inputs.disposal_location"
           }
         },
         {
-          "raw": "INSPECT_AREA",
-          "call_code": "INSPECT_AREA",
-          "args": {}
-        },
-        {
-          "raw": "CLEAN / COLLECT / RESPOND / AUDIT",
-          "call_code": "EXECUTE_EHS_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "VERIFY_AREA_STATE",
-          "call_code": "VERIFY_AREA_STATE",
-          "args": {}
-        },
-        {
-          "raw": "REPORT_RESULT",
-          "call_code": "REPORT_RESULT",
-          "args": {}
+          "raw": "UPDATE_INVENTORY_RECORD",
+          "call_code": "UPDATE_INVENTORY_RECORD",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "item": {
+              "derived_from_parent": "COLLECT_WASTE_OR_SCRAP",
+              "field": "item"
+            },
+            "transaction": {
+              "derived_from_parent": "COLLECT_WASTE_OR_SCRAP",
+              "field": "transaction"
+            }
+          }
         }
       ]
     },

@@ -341,31 +341,37 @@
         {
           "raw": "LOCALIZE_SURFACE",
           "call_code": "LOCALIZE_SURFACE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "PREPARE_SURFACE",
-          "call_code": "PREPARE_SURFACE",
+          "raw": "PRIMITIVE_PREPARE_SURFACE",
+          "call_code": "PRIMITIVE_PREPARE_SURFACE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "OPERATE_TOOL_OR_DISPENSER",
           "call_code": "OPERATE_TOOL_OR_DISPENSER",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "APPLY_MATERIAL",
-          "call_code": "APPLY_MATERIAL",
+          "raw": "PRIMITIVE_APPLY_MATERIAL",
+          "call_code": "PRIMITIVE_APPLY_MATERIAL",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "VERIFY_COVERAGE_OR_AMOUNT",
           "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "RECORD_RESULT",
           "call_code": "RECORD_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

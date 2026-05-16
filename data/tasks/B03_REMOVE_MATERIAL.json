@@ -364,26 +364,35 @@
         {
           "raw": "CHECK_REQUEST",
           "call_code": "CHECK_REQUEST",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "IDENTIFY_ITEM",
-          "call_code": "IDENTIFY_ITEM",
+          "raw": "PRIMITIVE_IDENTIFY_ITEM",
+          "call_code": "PRIMITIVE_IDENTIFY_ITEM",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
-          "raw": "TRANSFER or LOAD_UNLOAD_INTERFACE",
-          "call_code": "EXECUTE_REPLENISHMENT_ACTION",
-          "args": {}
+          "raw": "TRANSFER",
+          "call_code": "TRANSFER",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "item": "$inputs.item",
+            "source": "$inputs.source",
+            "destination": "$inputs.destination"
+          }
         },
         {
           "raw": "VERIFY_LEVEL_OR_QUANTITY",
           "call_code": "VERIFY_LEVEL_OR_QUANTITY",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "UPDATE_RECORD",
           "call_code": "UPDATE_RECORD",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]

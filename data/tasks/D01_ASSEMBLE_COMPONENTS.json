@@ -258,39 +258,57 @@
       "used_for": "Assembly, disassembly, insertion, fastening, connection",
       "normalized_steps": [
         {
-          "raw": "LOCALIZE_COMPONENTS",
-          "call_code": "LOCALIZE_COMPONENTS",
-          "args": {}
+          "raw": "INSERT_COMPONENT",
+          "call_code": "INSERT_COMPONENT",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "component": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "component"
+            },
+            "target": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "target"
+            },
+            "insertion_spec": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "insertion_spec"
+            }
+          }
         },
         {
-          "raw": "REACH_TO",
-          "call_code": "REACH_TO",
-          "args": {}
-        },
-        {
-          "raw": "GRASP",
-          "call_code": "GRASP",
-          "args": {}
-        },
-        {
-          "raw": "ALIGN",
-          "call_code": "ALIGN",
-          "args": {}
-        },
-        {
-          "raw": "INSERT / FASTEN / CONNECT",
-          "call_code": "EXECUTE_ASSEMBLY_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "RELEASE",
-          "call_code": "RELEASE",
-          "args": {}
+          "raw": "FASTEN_COMPONENT",
+          "call_code": "FASTEN_COMPONENT",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "fastener": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "fastener"
+            },
+            "target": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "target"
+            },
+            "fastening_spec": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "fastening_spec"
+            }
+          }
         },
         {
           "raw": "VERIFY_ASSEMBLY",
           "call_code": "VERIFY_ASSEMBLY",
-          "args": {}
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "assembly": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "assembly"
+            },
+            "verification_plan": {
+              "derived_from_parent": "ASSEMBLE_COMPONENTS",
+              "field": "verification_plan"
+            }
+          }
         }
       ]
     },

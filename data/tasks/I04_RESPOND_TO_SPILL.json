@@ -238,31 +238,35 @@
       "used_for": "Cleaning, waste/scrap, spill response, audit, hazard reporting",
       "normalized_steps": [
         {
-          "raw": "NAVIGATE_TO(area)",
-          "call_code": "NAVIGATE_TO",
+          "raw": "CLEAN_AREA",
+          "call_code": "CLEAN_AREA",
+          "expected_level": "COMPOSITE_TASK",
           "args": {
-            "area": "$inputs.area"
+            "area": "$inputs.area",
+            "cleaning_spec": {
+              "derived_from_parent": "RESPOND_TO_SPILL",
+              "field": "cleaning_spec"
+            }
           }
         },
         {
-          "raw": "INSPECT_AREA",
-          "call_code": "INSPECT_AREA",
-          "args": {}
-        },
-        {
-          "raw": "CLEAN / COLLECT / RESPOND / AUDIT",
-          "call_code": "EXECUTE_EHS_ACTION",
-          "args": {}
-        },
-        {
-          "raw": "VERIFY_AREA_STATE",
-          "call_code": "VERIFY_AREA_STATE",
-          "args": {}
-        },
-        {
-          "raw": "REPORT_RESULT",
-          "call_code": "REPORT_RESULT",
-          "args": {}
+          "raw": "REPORT_HAZARD",
+          "call_code": "REPORT_HAZARD",
+          "expected_level": "ATOMIC_TASK",
+          "args": {
+            "location": {
+              "derived_from_parent": "RESPOND_TO_SPILL",
+              "field": "location"
+            },
+            "hazard_type": {
+              "derived_from_parent": "RESPOND_TO_SPILL",
+              "field": "hazard_type"
+            },
+            "evidence": {
+              "derived_from_parent": "RESPOND_TO_SPILL",
+              "field": "evidence"
+            }
+          }
         }
       ]
     },

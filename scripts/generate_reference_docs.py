@@ -153,24 +153,27 @@ def _write_primitives_reference(tasks: list[dict[str, Any]], primitives: list[di
         for step in task.get("steps", []):
             if step.get("expected_level") == "PRIMITIVE_SKILL":
                 used_by[step.get("call_code", "")].add(task["code"])
+    active_primitives = [primitive for primitive in primitives if used_by.get(primitive["code"])]
 
     lines = [
         "# Primitive Reference",
         "",
-        "이 문서는 `data/primitives/*.json`에 정의된 primitive skill을 정리한 reference입니다. Primitive는 task를 구성하는 가장 작은 실행 skill이며, `ATOMIC_TASK`와 `COMPOSITE_TASK`의 step에서 참조됩니다.",
+        "이 문서는 task step에서 실제로 참조되는 active primitive skill을 정리한 reference입니다. Primitive는 task를 구성하는 가장 작은 실행 skill이며, `ATOMIC_TASK`와 `COMPOSITE_TASK`의 step에서 참조됩니다.",
         "",
         "## 요약",
         "",
-        f"- Primitive 수: {len(primitives)}",
+        f"- Active primitive 수: {len(active_primitives)}",
+        f"- Registry primitive 수: {len(primitives)}",
         "- 원본 primitive 정의: `data/primitives/*.json`",
         "- Primitive template index: `data/primitive_templates.json`",
+        "- 이 표에는 현재 task catalog의 `steps`에서 참조되는 primitive만 표시합니다.",
         "",
-        "## 전체 Primitive 표",
+        "## Active Primitive 표",
         "",
         "| Code | Name | Description | Inputs | Outputs | Used by Tasks | Source |",
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
-    for primitive in primitives:
+    for primitive in active_primitives:
         code = primitive["code"]
         description = PRIMITIVE_DESCRIPTIONS.get(code, f"`{code}` 실행 단계를 나타내는 primitive skill입니다.")
         source = primitive["_path"].relative_to(ROOT).as_posix()

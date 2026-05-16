@@ -312,31 +312,37 @@
         {
           "raw": "LOCALIZE_PART",
           "call_code": "LOCALIZE_PART",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "FIX_OR_HOLD_PART",
           "call_code": "FIX_OR_HOLD_PART",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "OPERATE_TOOL",
           "call_code": "OPERATE_TOOL",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "PROCESS_FEATURE_OR_SURFACE",
           "call_code": "PROCESS_FEATURE_OR_SURFACE",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "INSPECT_RESULT",
           "call_code": "INSPECT_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         },
         {
           "raw": "RECORD_RESULT",
           "call_code": "RECORD_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
           "args": {}
         }
       ]
