@@ -138,36 +138,57 @@ Manipulation은 cargo와 동기화하는 것이 좋습니다. item pickup 이후
 ### Availability Transition
 
 ```mermaid
-stateDiagram-v2
-    [*] --> AVAILABLE
-    AVAILABLE --> ASSIGNED: task selected
-    ASSIGNED --> EXECUTING: first step or primitive starts
-    ASSIGNED --> WAITING: precondition temporarily missing
-    ASSIGNED --> BLOCKED: assignment cannot continue
+flowchart TB
+    start((start)) --> AVAILABLE
 
-    EXECUTING --> WAITING: temporary condition wait
-    WAITING --> EXECUTING: condition satisfied
-    WAITING --> BLOCKED: condition invalid or unexpected
+    subgraph OP["Operational states"]
+        direction LR
+        AVAILABLE
+        ASSIGNED
+        EXECUTING
+        WAITING
 
-    EXECUTING --> BLOCKED: task cannot continue
-    BLOCKED --> ASSIGNED: replanned or reassigned
-    BLOCKED --> AVAILABLE: cancelled or cleared
-    BLOCKED --> DISABLED: fault, safety, or power issue
+        AVAILABLE -->|task selected| ASSIGNED
+        ASSIGNED -->|first step or primitive starts| EXECUTING
+        ASSIGNED -->|precondition temporarily missing| WAITING
+        EXECUTING -->|temporary condition wait| WAITING
+        WAITING -->|condition satisfied| EXECUTING
+        EXECUTING -->|task completed| AVAILABLE
+        WAITING -->|task cancelled| AVAILABLE
+    end
 
-    EXECUTING --> AVAILABLE: task completed
-    WAITING --> AVAILABLE: task cancelled
+    subgraph IU["Unavailable states"]
+        direction LR
+        BLOCKED
+        DISABLED
+        OFFLINE
+    end
 
-    AVAILABLE --> OFFLINE: removed from operation
-    OFFLINE --> AVAILABLE: restored to operation
+    ASSIGNED -->|assignment cannot continue| BLOCKED
+    EXECUTING -->|task cannot continue| BLOCKED
+    WAITING -->|condition invalid or unexpected| BLOCKED
+    BLOCKED -->|replanned or reassigned| ASSIGNED
+    BLOCKED -->|cancelled or cleared| AVAILABLE
+    BLOCKED -->|fault, safety, or power issue| DISABLED
 
-    AVAILABLE --> DISABLED: fault or depletion
-    ASSIGNED --> DISABLED: fault or depletion
-    EXECUTING --> DISABLED: fault or depletion
-    WAITING --> DISABLED: fault or depletion
-    DISABLED --> AVAILABLE: recovered
+    AVAILABLE -->|removed from operation| OFFLINE
+    OFFLINE -->|restored to operation| AVAILABLE
+
+    AVAILABLE -->|fault or depletion| DISABLED
+    ASSIGNED -->|fault or depletion| DISABLED
+    EXECUTING -->|fault or depletion| DISABLED
+    WAITING -->|fault or depletion| DISABLED
+    DISABLED -->|recovered| AVAILABLE
+
+    classDef operational fill:#e8f5e9,stroke:#2e7d32,color:#102a14
+    classDef interruption fill:#fff3e0,stroke:#ef6c00,color:#2b1700
+    class AVAILABLE,ASSIGNED,EXECUTING,WAITING operational
+    class BLOCKED,DISABLED,OFFLINE interruption
 ```
 
-`WAITING`은 같은 task를 계속할 수 있는 조건 대기입니다. 반대로 `BLOCKED`는 현재 task의 전제가 깨져 재계획, task 취소, 외부 조치가 필요한 상태입니다.
+Availability state는 크게 두 성격으로 나눕니다. `AVAILABLE`, `ASSIGNED`, `EXECUTING`, `WAITING`은 정상적인 task-flow 안에서 움직이는 operational state입니다. 이 중 `WAITING`은 같은 task를 계속하기 위해 조건을 기다리는 상태입니다.
+
+반대로 `BLOCKED`, `DISABLED`, `OFFLINE`은 정상 task-flow 바깥의 interruption/unavailable state입니다. `BLOCKED`는 현재 task의 전제가 깨져 재계획, task 취소, 외부 조치가 필요한 상태이고, `DISABLED`는 방전/고장처럼 운용 가능성 자체가 사라진 상태이며, `OFFLINE`은 planner가 의도적으로 운용 대상에서 제외한 상태입니다.
 
 ### Mobility Transition
 
@@ -187,20 +208,40 @@ stateDiagram-v2
 ### Power Transition
 
 ```mermaid
-stateDiagram-v2
-    [*] --> POWER_NORMAL
-    POWER_NORMAL --> POWER_LOW: battery below low threshold
-    POWER_LOW --> POWER_CRITICAL: battery below critical threshold
-    POWER_CRITICAL --> DEPLETED: battery depleted
+flowchart TB
+    start((start)) --> POWER_NORMAL
 
-    POWER_NORMAL --> CHARGING: planned top-up
-    POWER_LOW --> CHARGING: charge requested
-    POWER_CRITICAL --> CHARGING: urgent charge requested
-    DEPLETED --> CHARGING: recovered to charger or battery swap
+    subgraph POWER_AVAILABLE["Operational power states"]
+        direction LR
+        POWER_NORMAL
+        POWER_LOW
+        POWER_CRITICAL
 
-    CHARGING --> POWER_NORMAL: charge complete
-    CHARGING --> POWER_LOW: charge interrupted
-    CHARGING --> POWER_CRITICAL: charge interrupted early
+        POWER_NORMAL -->|battery below low threshold| POWER_LOW
+        POWER_LOW -->|battery below critical threshold| POWER_CRITICAL
+    end
+
+    subgraph POWER_UNAVAILABLE["Charging / depleted states"]
+        direction LR
+        CHARGING
+        DEPLETED
+
+        DEPLETED -->|recovered to charger or battery swap| CHARGING
+    end
+
+    POWER_CRITICAL -->|battery depleted| DEPLETED
+    POWER_NORMAL -->|planned top-up| CHARGING
+    POWER_LOW -->|charge requested| CHARGING
+    POWER_CRITICAL -->|urgent charge requested| CHARGING
+
+    CHARGING -->|charge complete| POWER_NORMAL
+    CHARGING -->|charge interrupted| POWER_LOW
+    CHARGING -->|charge interrupted early| POWER_CRITICAL
+
+    classDef powerOperational fill:#e3f2fd,stroke:#1565c0,color:#0d2540
+    classDef powerUnavailable fill:#ffebee,stroke:#c62828,color:#3b0d0d
+    class POWER_NORMAL,POWER_LOW,POWER_CRITICAL powerOperational
+    class CHARGING,DEPLETED powerUnavailable
 ```
 
 Power threshold는 HumanoidSim이 직접 계산하지 않습니다. Runtime이 배터리 정책에 따라 `POWER_LOW`, `POWER_CRITICAL`, `DEPLETED`를 판단합니다. `DEPLETED`는 보통 `availability=DISABLED`와 함께 사용합니다.
@@ -208,14 +249,32 @@ Power threshold는 HumanoidSim이 직접 계산하지 않습니다. Runtime이 �
 ### Manipulation Transition
 
 ```mermaid
-stateDiagram-v2
-    [*] --> FREE
-    FREE --> REACHING: REACH_TO starts
-    REACHING --> HOLDING: GRASP or LIFT succeeds
-    REACHING --> FREE: reach cancelled or target unavailable
-    HOLDING --> PLACING: PLACE or RELEASE starts
-    PLACING --> FREE: release completed
-    HOLDING --> FREE: cargo cleared by runtime
+flowchart TB
+    start((start)) --> FREE
+
+    subgraph MANIP_FREE["Free state"]
+        FREE
+    end
+
+    subgraph MANIP_ACTIVE["Active manipulation states"]
+        direction LR
+        REACHING
+        HOLDING
+        PLACING
+
+        REACHING -->|GRASP or LIFT succeeds| HOLDING
+        HOLDING -->|PLACE or RELEASE starts| PLACING
+    end
+
+    FREE -->|REACH_TO starts| REACHING
+    REACHING -->|reach cancelled or target unavailable| FREE
+    PLACING -->|release completed| FREE
+    HOLDING -->|cargo cleared by runtime| FREE
+
+    classDef manipFree fill:#f3e5f5,stroke:#6a1b9a,color:#271033
+    classDef manipActive fill:#e0f2f1,stroke:#00796b,color:#052b26
+    class FREE manipFree
+    class REACHING,HOLDING,PLACING manipActive
 ```
 
 Manipulation state는 cargo 상태와 함께 갱신하는 것이 좋습니다. 예를 들어 pickup event 이후에는 `HOLDING`, dropoff event 이후에는 `FREE`가 되어야 합니다.
