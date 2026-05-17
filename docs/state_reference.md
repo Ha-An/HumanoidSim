@@ -25,20 +25,20 @@
 예를 들어 `TRANSFER` task를 수행하는 동안 휴머노이드가 이동 중이면 `availability=EXECUTING`, `mobility=NAVIGATING`, `manipulation=HOLDING`처럼 여러 축이 동시에 의미를 가집니다.
 
 
-## Code-defined Transition API
+## 코드 기반 Transition API
 
-HumanoidSim now defines state transitions in code and in `data/state_schema_core.json`.
+HumanoidSim은 state transition을 코드와 `data/state_schema_core.json`에서 함께 정의합니다.
 
-| API | Purpose |
+| API | 목적 |
 | --- | --- |
-| `get_primitive_state_profile(call_code)` | Reads the primitive's running availability, allowed states, and start/end effects. |
-| `validate_primitive_state_profile(profile)` | Checks that a primitive profile only uses states defined by the core state schema. |
-| `transition_humanoid_state(snapshot, event)` | Computes the next `HumanoidStateSnapshot` from task, primitive, cargo, power, waiting, blocked, or disabled events. |
-| `validate_state_transition(previous, next, event)` | Verifies that the axis transitions are allowed by the schema transition graph. |
+| `get_primitive_state_profile(call_code)` | primitive의 실행 중 availability, 허용 state, 시작/종료 effect를 읽습니다. |
+| `validate_primitive_state_profile(profile)` | primitive profile이 core state schema에 정의된 state만 사용하는지 검증합니다. |
+| `transition_humanoid_state(snapshot, event)` | task, primitive, cargo, power, waiting, blocked, disabled event를 기반으로 다음 `HumanoidStateSnapshot`을 계산합니다. |
+| `validate_state_transition(previous, next, event)` | 이전 snapshot에서 다음 snapshot으로의 축별 전이가 schema transition graph에서 허용되는지 검증합니다. |
 
-`StateTransitionEvent` is the event contract used by runtimes such as ManSim. Typical event types are `task_assigned`, `task_started`, `primitive_started`, `primitive_finished`, `task_completed`, `waiting`, `blocked`, `disabled`, and `cargo_changed`. The runtime reports what happened; HumanoidSim computes the state axes.
+`StateTransitionEvent`는 ManSim 같은 runtime이 HumanoidSim에 전달하는 event 계약입니다. 대표 event type은 `task_assigned`, `task_started`, `primitive_started`, `primitive_finished`, `task_completed`, `waiting`, `blocked`, `disabled`, `cargo_changed`입니다. Runtime은 어떤 일이 발생했는지만 보고하고, HumanoidSim은 그 event를 기반으로 state 축을 계산합니다.
 
-Primitive profiles use the `Allowed+Effects` structure.
+Primitive profile은 `Allowed+Effects` 구조를 사용합니다.
 
 ```json
 {
@@ -55,13 +55,13 @@ Primitive profiles use the `Allowed+Effects` structure.
 }
 ```
 
-For example, `NAVIGATE_TO` starts with `mobility=NAVIGATING` and ends with `mobility=STATIONARY`. `GRASP` and `LIFT` set `manipulation=HOLDING`. `PLACE` and `RELEASE` start with `manipulation=PLACING` and end with `manipulation=FREE`. Record/check primitives usually do not change manipulation directly; they allow the current cargo-related manipulation state to remain valid.
+예를 들어 `NAVIGATE_TO`는 시작 시 `mobility=NAVIGATING`, 종료 시 `mobility=STATIONARY`를 적용합니다. `GRASP`와 `LIFT`는 `manipulation=HOLDING`을 적용하고, `PLACE`와 `RELEASE`는 시작 시 `manipulation=PLACING`, 종료 시 `manipulation=FREE`를 적용합니다. 기록과 확인 계열 primitive는 보통 manipulation을 직접 바꾸지 않고, 현재 cargo 관련 manipulation state가 계속 유효하도록 허용합니다.
 
 ## Snapshot Schema
 
 `HumanoidStateSnapshot`은 runtime이 관찰하거나 저장해야 하는 표준 상태 payload입니다.
 
-| Field | Type | Required | 설명 |
+| 필드 | 타입 | 필수 여부 | 설명 |
 | --- | --- | --- | --- |
 | `humanoid_id` | `str` | Yes | 상태가 속한 휴머노이드 ID입니다. |
 | `availability` | `AvailabilityState` | Yes | 일을 받을 수 있는지, task lifecycle에서 어디에 있는지 나타냅니다. |
@@ -166,6 +166,8 @@ Manipulation은 cargo와 동기화하는 것이 좋습니다. item pickup 이후
 
 ## State Transition Diagrams
 
+> 기준 정의: 실행 가능한 transition graph는 `data/state_schema_core.json`입니다. 아래 다이어그램은 ManSim 같은 runtime이 사용하는 수준에서 이 graph를 사람이 읽기 쉽게 표현한 것입니다.
+
 아래 다이어그램은 HumanoidSim v0.1에서 권장하는 state transition 패턴입니다. 이 다이어그램은 schema validation이 강제하는 전체 상태기계라기보다, ManSim 같은 runtime이 상태를 기록할 때 따라야 할 표준 흐름입니다. 정책이나 시나리오별 예외가 있으면 `reason`과 `metadata`에 원인을 남깁니다.
 
 ### Availability Transition
@@ -181,13 +183,16 @@ flowchart TB
         EXECUTING
         WAITING
 
-        AVAILABLE -->|task selected| ASSIGNED
-        ASSIGNED -->|first step or primitive starts| EXECUTING
-        ASSIGNED -->|precondition temporarily missing| WAITING
-        EXECUTING -->|temporary condition wait| WAITING
-        WAITING -->|condition satisfied| EXECUTING
-        EXECUTING -->|task completed| AVAILABLE
-        WAITING -->|task cancelled| AVAILABLE
+        AVAILABLE -->|task 선택| ASSIGNED
+        AVAILABLE -->|즉시 실행| EXECUTING
+        AVAILABLE -->|할당 전 대기| WAITING
+        ASSIGNED -->|첫 step/primitive 시작| EXECUTING
+        ASSIGNED -->|일시적 선행조건 부족| WAITING
+        EXECUTING -->|일시 조건 대기| WAITING
+        WAITING -->|조건 충족| EXECUTING
+        WAITING -->|재계획 task 선택| ASSIGNED
+        EXECUTING -->|task 완료| AVAILABLE
+        WAITING -->|task 취소| AVAILABLE
     end
 
     subgraph IU["Unavailable states"]
@@ -197,21 +202,25 @@ flowchart TB
         OFFLINE
     end
 
-    ASSIGNED -->|assignment cannot continue| BLOCKED
-    EXECUTING -->|task cannot continue| BLOCKED
-    WAITING -->|condition invalid or unexpected| BLOCKED
-    BLOCKED -->|replanned or reassigned| ASSIGNED
-    BLOCKED -->|cancelled or cleared| AVAILABLE
-    BLOCKED -->|fault, safety, or power issue| DISABLED
+    ASSIGNED -->|할당 속행 불가| BLOCKED
+    EXECUTING -->|task 속행 불가| BLOCKED
+    WAITING -->|조건 무효/예상 밖 상황| BLOCKED
+    AVAILABLE -->|즉시 blocker 감지| BLOCKED
+    BLOCKED -->|재계획/재할당| ASSIGNED
+    BLOCKED -->|해소 후 재개| EXECUTING
+    BLOCKED -->|취소/해소| AVAILABLE
+    BLOCKED -->|고장/안전/전원 문제| DISABLED
 
-    AVAILABLE -->|removed from operation| OFFLINE
-    OFFLINE -->|restored to operation| AVAILABLE
+    AVAILABLE -->|운용 제외| OFFLINE
+    OFFLINE -->|운용 복귀| AVAILABLE
+    OFFLINE -->|offline 중 고장| DISABLED
 
-    AVAILABLE -->|fault or depletion| DISABLED
-    ASSIGNED -->|fault or depletion| DISABLED
-    EXECUTING -->|fault or depletion| DISABLED
-    WAITING -->|fault or depletion| DISABLED
-    DISABLED -->|recovered| AVAILABLE
+    AVAILABLE -->|고장/방전| DISABLED
+    ASSIGNED -->|고장/방전| DISABLED
+    EXECUTING -->|고장/방전| DISABLED
+    WAITING -->|고장/방전| DISABLED
+    DISABLED -->|복구 완료| AVAILABLE
+    DISABLED -->|중단 작업 재개| EXECUTING
 
     classDef operational fill:#e8f5e9,stroke:#2e7d32,color:#102a14
     classDef interruption fill:#fff3e0,stroke:#ef6c00,color:#2b1700
@@ -228,12 +237,12 @@ Availability state는 크게 두 성격으로 나눕니다. `AVAILABLE`, `ASSIGN
 ```mermaid
 stateDiagram-v2
     [*] --> STATIONARY
-    STATIONARY --> NAVIGATING: NAVIGATE_TO starts
-    NAVIGATING --> DOCKING: arrived near target and aligning
-    NAVIGATING --> STATIONARY: arrived, no fine alignment needed
-    DOCKING --> STATIONARY: alignment completed
-    STATIONARY --> DOCKING: local alignment starts
-    DOCKING --> NAVIGATING: alignment aborted or replanned
+    STATIONARY --> NAVIGATING: NAVIGATE_TO 시작
+    NAVIGATING --> DOCKING: 목표 근처 도착 후 정렬
+    NAVIGATING --> STATIONARY: 정렬 없이 도착
+    DOCKING --> STATIONARY: 정렬 완료
+    STATIONARY --> DOCKING: 국소 정렬 시작
+    DOCKING --> NAVIGATING: 정렬 중단 또는 재계획
 ```
 
 `NAVIGATING`은 목적지까지 이동하는 구간이고, `DOCKING`은 도착 후 기준 위치와 방향에 맞추는 구간입니다. 실제 작업을 수행할 만큼 정렬이 끝나면 `STATIONARY`가 됩니다.
@@ -250,8 +259,11 @@ flowchart TB
         POWER_LOW
         POWER_CRITICAL
 
-        POWER_NORMAL -->|battery below low threshold| POWER_LOW
-        POWER_LOW -->|battery below critical threshold| POWER_CRITICAL
+        POWER_NORMAL -->|low threshold 미만| POWER_LOW
+        POWER_LOW -->|critical threshold 미만| POWER_CRITICAL
+        POWER_LOW -->|low threshold 이상 회복| POWER_NORMAL
+        POWER_CRITICAL -->|critical threshold 이상 회복| POWER_LOW
+        POWER_CRITICAL -->|normal 수준 회복| POWER_NORMAL
     end
 
     subgraph POWER_UNAVAILABLE["Charging / depleted states"]
@@ -259,17 +271,21 @@ flowchart TB
         CHARGING
         DEPLETED
 
-        DEPLETED -->|recovered to charger or battery swap| CHARGING
+        DEPLETED -->|충전기 복귀/배터리 교체| CHARGING
+        DEPLETED -->|즉시 배터리 교체| POWER_NORMAL
     end
 
-    POWER_CRITICAL -->|battery depleted| DEPLETED
-    POWER_NORMAL -->|planned top-up| CHARGING
-    POWER_LOW -->|charge requested| CHARGING
-    POWER_CRITICAL -->|urgent charge requested| CHARGING
+    POWER_NORMAL -->|갑작스러운 방전| DEPLETED
+    POWER_LOW -->|방전| DEPLETED
+    POWER_CRITICAL -->|방전| DEPLETED
+    POWER_NORMAL -->|계획 충전| CHARGING
+    POWER_LOW -->|충전 요청| CHARGING
+    POWER_CRITICAL -->|긴급 충전 요청| CHARGING
 
-    CHARGING -->|charge complete| POWER_NORMAL
-    CHARGING -->|charge interrupted| POWER_LOW
-    CHARGING -->|charge interrupted early| POWER_CRITICAL
+    CHARGING -->|충전 완료| POWER_NORMAL
+    CHARGING -->|충전 중단| POWER_LOW
+    CHARGING -->|초기 중단| POWER_CRITICAL
+    CHARGING -->|충전 실패/방전| DEPLETED
 
     classDef powerOperational fill:#e3f2fd,stroke:#1565c0,color:#0d2540
     classDef powerUnavailable fill:#ffebee,stroke:#c62828,color:#3b0d0d
@@ -295,14 +311,20 @@ flowchart TB
         HOLDING
         PLACING
 
-        REACHING -->|GRASP or LIFT succeeds| HOLDING
-        HOLDING -->|PLACE or RELEASE starts| PLACING
+        REACHING -->|GRASP/LIFT 성공| HOLDING
+        REACHING -->|PLACE/RELEASE 시작| PLACING
+        REACHING -->|접근 취소/대상 없음| FREE
+        HOLDING -->|PLACE/RELEASE 시작| PLACING
+        HOLDING -->|운반 중 reach| REACHING
+        HOLDING -->|runtime cargo 해제| FREE
+        PLACING -->|cargo 유지/배치 중단| HOLDING
+        PLACING -->|다음 reach 시작| REACHING
     end
 
-    FREE -->|REACH_TO starts| REACHING
-    REACHING -->|reach cancelled or target unavailable| FREE
-    PLACING -->|release completed| FREE
-    HOLDING -->|cargo cleared by runtime| FREE
+    FREE -->|REACH_TO 시작| REACHING
+    FREE -->|GRASP/LIFT/pickup 성공| HOLDING
+    FREE -->|context 기반 PLACE/RELEASE 시작| PLACING
+    PLACING -->|release 완료| FREE
 
     classDef manipFree fill:#f3e5f5,stroke:#6a1b9a,color:#271033
     classDef manipActive fill:#e0f2f1,stroke:#00796b,color:#052b26
@@ -316,7 +338,7 @@ Manipulation state는 cargo 상태와 함께 갱신하는 것이 좋습니다. �
 
 `TaskContext`는 state와 task hierarchy를 연결하는 보조 정보입니다.
 
-| Field | Type | 설명 |
+| 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `task_code` | `str | null` | 현재 수행 중이거나 할당된 task code입니다. |
 | `task_instance_id` | `str | null` | runtime에서 생성한 task instance ID입니다. |
@@ -330,7 +352,7 @@ Task가 없는 `AVAILABLE` 상태에서는 `task_context=null`을 권장합니�
 
 `StateReason`은 대기, 차단, 비활성화 같은 상태의 원인을 기록합니다.
 
-| Field | Type | 설명 |
+| 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `code` | `str` | 원인 코드입니다. 예: `missing_item`, `traffic_wait`, `battery_depleted` |
 | `message` | `str` | 사람이 읽을 수 있는 설명입니다. |

@@ -11,7 +11,7 @@
 
 ### Level별 개수
 
-| Level | Count |
+| Level | 개수 |
 | --- | ---: |
 | `ATOMIC_TASK` | 50 |
 | `COMPOSITE_TASK` | 32 |
@@ -30,7 +30,7 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
 
 ### Category 설명
 
-| ID | Category | Count | 설명 |
+| ID | Category | 개수 | 설명 |
 | --- | --- | ---: | --- |
 | A | Robot Readiness & Self-Operation | 8 | 로봇 초기화, 자가 점검, 운용 모드, 작업 context, 전원 관리, fault recovery처럼 휴머노이드 자체 운용 준비를 다룹니다. |
 | B | Mobility, Intralogistics & Material Flow | 5 | 자재와 WIP의 이동, 보충, 제거, transfer interface, 차량 기반 운반처럼 라인 내부 물류 흐름을 다룹니다. |
@@ -48,7 +48,7 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
 
 ## 전체 Task 표
 
-| No | Code | Level | Description | Inputs | Capabilities | Resources | Risk | Step / Nested Sequence | Source |
+| No | Code | Level | 설명 | 입력 | Capabilities | Resources | Risk | Step / Nested Sequence | 원본 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A01 | `INITIALIZE_ROBOT` | `ATOMIC_TASK` | 휴머노이드 자체 운용 준비와 복구를 위한 task입니다. | robot*: EntityRef \| str<br>context*: Any | system_operation<br>digital_context<br>equipment_interaction | equipment:robot<br>equipment:charger<br>equipment:network | LOW | CHECK_CONTEXT<br>EXECUTE_SYSTEM_ACTION<br>VERIFY_ROBOT_STATE<br>LOG_RESULT | `data/tasks/A01_INITIALIZE_ROBOT.json` |
 | A02 | `SELF_CHECK` | `ATOMIC_TASK` | 휴머노이드 자체 운용 준비와 복구를 위한 task입니다. | robot*: EntityRef \| str<br>checklist*: Any | system_operation<br>digital_context<br>equipment_interaction | equipment:robot_diagnostics | LOW | CHECK_CONTEXT<br>EXECUTE_SYSTEM_ACTION<br>VERIFY_ROBOT_STATE<br>LOG_RESULT | `data/tasks/A02_SELF_CHECK.json` |
