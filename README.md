@@ -81,6 +81,8 @@ State는 네 축으로 정의됩니다.
 | Power | `POWER_NORMAL`, `POWER_LOW`, `POWER_CRITICAL`, `DEPLETED`, `CHARGING` |
 | Manipulation | `FREE`, `REACHING`, `HOLDING`, `PLACING` |
 
+상태 축, snapshot schema, lifecycle mapping, primitive state hint의 자세한 설명은 [State Reference](docs/state_reference.md)를 참고합니다.
+
 예시 snapshot:
 
 ```json
@@ -113,11 +115,21 @@ State는 네 축으로 정의됩니다.
 - `data/primitive_templates.json`: Excel primitive template 기록
 - `docs/tasks_reference.md`: task 전체 reference
 - `docs/primitives_reference.md`: task step에서 실제 참조되는 active primitive reference
+- `docs/state_reference.md`: humanoid state axis, snapshot, lifecycle, primitive hint reference
 
 ## Reference
 
 - [Task Reference](docs/tasks_reference.md): 82개 task의 level, category, input, resource, nested sequence를 정리합니다.
-- [Primitive Reference](docs/primitives_reference.md): task step에서 실제 참조되는 primitive skill과 사용 task를 정리합니다.
+- [Primitive Reference](docs/primitives_reference.md): active primitive와 registry primitive의 차이, 각 primitive skill, 사용 task를 정리합니다.
+- [State Reference](docs/state_reference.md): Availability, Mobility, Power, Manipulation 축과 `HumanoidStateSnapshot` 사용 규칙을 정리합니다.
+
+### Active Primitive와 Registry Primitive
+
+`Active primitive`는 현재 `data/tasks/*.json`의 step에서 `expected_level=PRIMITIVE_SKILL`로 직접 참조되는 primitive입니다. 즉 task sequence를 펼쳤을 때 실제 leaf step으로 등장할 수 있는 primitive입니다.
+
+`Registry primitive`는 `data/primitives/*.json`에 정의되어 HumanoidSim registry에 등록된 전체 primitive입니다. 아직 어떤 task에서 쓰지 않는 primitive도 registry에는 존재할 수 있습니다. 따라서 개념적으로는 `active primitive ⊆ registry primitive`입니다.
+
+현재 v0.1 catalog에서는 두 값이 모두 59개라 숫자는 같지만, 의미는 다릅니다. 새 primitive를 추가만 하고 task step에서 참조하지 않으면 registry primitive 수만 늘고 active primitive 표에는 나타나지 않습니다. ManSim 같은 runtime은 active primitive 중 실제 시뮬레이션에서 지원하는 subset을 executor에 연결합니다.
 
 ## 실행
 
