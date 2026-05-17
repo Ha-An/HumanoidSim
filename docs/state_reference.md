@@ -92,6 +92,20 @@ Mobility는 휴머노이드의 이동 상태를 나타냅니다.
 
 Mobility는 task 종류와 독립적입니다. 예를 들어 `INSPECT_PRODUCT` task 중에도 검사대까지 이동하는 구간은 `NAVIGATING`일 수 있고, 실제 검사 중에는 `STATIONARY`일 수 있습니다.
 
+### STATIONARY와 DOCKING의 차이
+
+`STATIONARY`는 단순히 움직이지 않는 상태입니다. 목적지에 도착해 작업을 수행하거나, 대기하거나, task가 없는 경우처럼 이동 primitive가 더 이상 실행 중이 아닐 때 사용합니다.
+
+`DOCKING`은 멈춰 있는 것과 달리 아직 정렬 동작이 진행 중인 상태입니다. 충전기, 설비 투입구, 검사대, 작업대처럼 특정 기준 위치와 방향에 몸을 맞추는 과정입니다. 따라서 `DOCKING`은 도착 후 실제 작업을 시작하기 전의 정밀 정렬 단계로 볼 수 있습니다.
+
+일반적인 흐름은 다음과 같습니다.
+
+```text
+NAVIGATING -> DOCKING -> STATIONARY
+```
+
+예를 들어 검사 task에서는 검사대까지 이동하는 동안 `NAVIGATING`, 검사대 중앙 또는 서비스 타일에 정렬하는 동안 `DOCKING`, 정렬 완료 후 실제 검사 primitive를 수행하는 동안 `STATIONARY`를 사용합니다. 정밀 정렬이 필요 없는 단순 이동은 `NAVIGATING -> STATIONARY`로 바로 전이할 수 있습니다.
+
 ## Power State
 
 Power는 배터리와 전원 관점의 상태입니다. HumanoidSim은 threshold를 직접 계산하지 않고, caller가 배터리 정책에 따라 값을 넣습니다.
@@ -116,6 +130,95 @@ Manipulation은 팔, 그리퍼, 적재 상태를 나타냅니다.
 | `PLACING` | 들고 있던 대상을 내려놓는 중입니다. | `PLACE`, `RELEASE` |
 
 Manipulation은 cargo와 동기화하는 것이 좋습니다. item pickup 이후에는 `HOLDING`, dropoff 이후에는 `FREE`로 전환하는 식입니다.
+
+## State Transition Diagrams
+
+아래 다이어그램은 HumanoidSim v0.1에서 권장하는 state transition 패턴입니다. 이 다이어그램은 schema validation이 강제하는 전체 상태기계라기보다, ManSim 같은 runtime이 상태를 기록할 때 따라야 할 표준 흐름입니다. 정책이나 시나리오별 예외가 있으면 `reason`과 `metadata`에 원인을 남깁니다.
+
+### Availability Transition
+
+```mermaid
+stateDiagram-v2
+    [*] --> AVAILABLE
+    AVAILABLE --> ASSIGNED: task selected
+    ASSIGNED --> EXECUTING: first step or primitive starts
+    ASSIGNED --> WAITING: precondition temporarily missing
+    ASSIGNED --> BLOCKED: assignment cannot continue
+
+    EXECUTING --> WAITING: temporary condition wait
+    WAITING --> EXECUTING: condition satisfied
+    WAITING --> BLOCKED: condition invalid or unexpected
+
+    EXECUTING --> BLOCKED: task cannot continue
+    BLOCKED --> ASSIGNED: replanned or reassigned
+    BLOCKED --> AVAILABLE: cancelled or cleared
+    BLOCKED --> DISABLED: fault, safety, or power issue
+
+    EXECUTING --> AVAILABLE: task completed
+    WAITING --> AVAILABLE: task cancelled
+
+    AVAILABLE --> OFFLINE: removed from operation
+    OFFLINE --> AVAILABLE: restored to operation
+
+    AVAILABLE --> DISABLED: fault or depletion
+    ASSIGNED --> DISABLED: fault or depletion
+    EXECUTING --> DISABLED: fault or depletion
+    WAITING --> DISABLED: fault or depletion
+    DISABLED --> AVAILABLE: recovered
+```
+
+`WAITING`은 같은 task를 계속할 수 있는 조건 대기입니다. 반대로 `BLOCKED`는 현재 task의 전제가 깨져 재계획, task 취소, 외부 조치가 필요한 상태입니다.
+
+### Mobility Transition
+
+```mermaid
+stateDiagram-v2
+    [*] --> STATIONARY
+    STATIONARY --> NAVIGATING: NAVIGATE_TO starts
+    NAVIGATING --> DOCKING: arrived near target and aligning
+    NAVIGATING --> STATIONARY: arrived, no fine alignment needed
+    DOCKING --> STATIONARY: alignment completed
+    STATIONARY --> DOCKING: local alignment starts
+    DOCKING --> NAVIGATING: alignment aborted or replanned
+```
+
+`NAVIGATING`은 목적지까지 이동하는 구간이고, `DOCKING`은 도착 후 기준 위치와 방향에 맞추는 구간입니다. 실제 작업을 수행할 만큼 정렬이 끝나면 `STATIONARY`가 됩니다.
+
+### Power Transition
+
+```mermaid
+stateDiagram-v2
+    [*] --> POWER_NORMAL
+    POWER_NORMAL --> POWER_LOW: battery below low threshold
+    POWER_LOW --> POWER_CRITICAL: battery below critical threshold
+    POWER_CRITICAL --> DEPLETED: battery depleted
+
+    POWER_NORMAL --> CHARGING: planned top-up
+    POWER_LOW --> CHARGING: charge requested
+    POWER_CRITICAL --> CHARGING: urgent charge requested
+    DEPLETED --> CHARGING: recovered to charger or battery swap
+
+    CHARGING --> POWER_NORMAL: charge complete
+    CHARGING --> POWER_LOW: charge interrupted
+    CHARGING --> POWER_CRITICAL: charge interrupted early
+```
+
+Power threshold는 HumanoidSim이 직접 계산하지 않습니다. Runtime이 배터리 정책에 따라 `POWER_LOW`, `POWER_CRITICAL`, `DEPLETED`를 판단합니다. `DEPLETED`는 보통 `availability=DISABLED`와 함께 사용합니다.
+
+### Manipulation Transition
+
+```mermaid
+stateDiagram-v2
+    [*] --> FREE
+    FREE --> REACHING: REACH_TO starts
+    REACHING --> HOLDING: GRASP or LIFT succeeds
+    REACHING --> FREE: reach cancelled or target unavailable
+    HOLDING --> PLACING: PLACE or RELEASE starts
+    PLACING --> FREE: release completed
+    HOLDING --> FREE: cargo cleared by runtime
+```
+
+Manipulation state는 cargo 상태와 함께 갱신하는 것이 좋습니다. 예를 들어 pickup event 이후에는 `HOLDING`, dropoff event 이후에는 `FREE`가 되어야 합니다.
 
 ## TaskContext
 
