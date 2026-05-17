@@ -9,14 +9,19 @@ from humanoidsim import (
     MobilityState,
     PowerState,
     StateReason,
+    StateTransitionError,
+    StateTransitionEvent,
     TaskContext,
     apply_primitive_state_hint,
     build_state_snapshot_for_task_lifecycle,
     default_humanoid_state,
     derive_availability_state,
+    get_primitive_state_profile,
     load_state_schema,
     parse_humanoid_state_snapshot,
     primitive_state_hint,
+    transition_humanoid_state,
+    validate_primitive_state_profile,
     validate_state_snapshot,
 )
 from humanoidsim.task_schema import ExecutionStatus
@@ -76,6 +81,20 @@ class StateSchemaTests(unittest.TestCase):
             PowerState.CHARGING,
         )
 
+    def test_primitive_state_profiles_define_allowed_and_effects(self) -> None:
+        schema = load_state_schema()
+        for call_code, profile in schema.primitive_state_profiles.items():
+            with self.subTest(call_code=call_code):
+                self.assertEqual(profile.availability_running, AvailabilityState.EXECUTING)
+                self.assertEqual(validate_primitive_state_profile(profile, schema=schema), [])
+                self.assertIn("mobility", profile.allowed)
+                self.assertIn("manipulation", profile.allowed)
+
+        navigate = get_primitive_state_profile("NAVIGATE_TO", schema=schema)
+        self.assertIn("NAVIGATING", navigate.allowed["mobility"])
+        self.assertEqual(navigate.effect_for().mobility, MobilityState.NAVIGATING)
+        self.assertEqual(navigate.effect_for(finished=True).mobility, MobilityState.STATIONARY)
+
     def test_apply_primitive_state_hint_updates_context_without_overriding_blocked(self) -> None:
         snapshot = HumanoidStateSnapshot(
             humanoid_id="H1",
@@ -94,6 +113,51 @@ class StateSchemaTests(unittest.TestCase):
         still_blocked = apply_primitive_state_hint(blocked, "NAVIGATE_TO")
         self.assertEqual(still_blocked.availability, AvailabilityState.BLOCKED)
         self.assertEqual(still_blocked.mobility, MobilityState.NAVIGATING)
+
+    def test_transition_api_drives_task_and_primitive_state(self) -> None:
+        snapshot = default_humanoid_state("H1")
+        assigned = transition_humanoid_state(
+            snapshot,
+            StateTransitionEvent(event_type="task_assigned", task_code="TRANSFER", task_instance_id="T1"),
+        )
+        self.assertEqual(assigned.availability, AvailabilityState.ASSIGNED)
+
+        started = transition_humanoid_state(
+            assigned,
+            StateTransitionEvent(event_type="task_started", task_code="TRANSFER", task_instance_id="T1"),
+        )
+        self.assertEqual(started.availability, AvailabilityState.EXECUTING)
+
+        moving = transition_humanoid_state(
+            started,
+            StateTransitionEvent(
+                event_type="primitive_started",
+                task_code="TRANSFER",
+                task_instance_id="T1",
+                step_id="s1",
+                primitive_call_code="NAVIGATE_TO",
+            ),
+        )
+        self.assertEqual(moving.availability, AvailabilityState.EXECUTING)
+        self.assertEqual(moving.mobility, MobilityState.NAVIGATING)
+
+        stopped = transition_humanoid_state(
+            moving,
+            StateTransitionEvent(
+                event_type="primitive_finished",
+                task_code="TRANSFER",
+                task_instance_id="T1",
+                step_id="s1",
+                primitive_call_code="NAVIGATE_TO",
+            ),
+        )
+        self.assertEqual(stopped.mobility, MobilityState.STATIONARY)
+
+        with self.assertRaises(StateTransitionError):
+            transition_humanoid_state(
+                stopped,
+                StateTransitionEvent(event_type="primitive_started", task_code="TRANSFER", primitive_call_code="UNKNOWN"),
+            )
 
     def test_task_lifecycle_availability_mapping(self) -> None:
         self.assertEqual(derive_availability_state(), AvailabilityState.AVAILABLE)

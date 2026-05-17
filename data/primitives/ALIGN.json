@@ -47,6 +47,39 @@
   ],
   "steps": [],
   "metadata": {
-    "generated_from": "primitive_templates"
+    "generated_from": "primitive_templates",
+    "state": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "DOCKING",
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "DOCKING"
+        },
+        "on_end": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Align or dock with equipment, charger, or workbench."
+    }
   }
 }

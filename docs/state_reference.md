@@ -24,6 +24,39 @@
 
 예를 들어 `TRANSFER` task를 수행하는 동안 휴머노이드가 이동 중이면 `availability=EXECUTING`, `mobility=NAVIGATING`, `manipulation=HOLDING`처럼 여러 축이 동시에 의미를 가집니다.
 
+
+## Code-defined Transition API
+
+HumanoidSim now defines state transitions in code and in `data/state_schema_core.json`.
+
+| API | Purpose |
+| --- | --- |
+| `get_primitive_state_profile(call_code)` | Reads the primitive's running availability, allowed states, and start/end effects. |
+| `validate_primitive_state_profile(profile)` | Checks that a primitive profile only uses states defined by the core state schema. |
+| `transition_humanoid_state(snapshot, event)` | Computes the next `HumanoidStateSnapshot` from task, primitive, cargo, power, waiting, blocked, or disabled events. |
+| `validate_state_transition(previous, next, event)` | Verifies that the axis transitions are allowed by the schema transition graph. |
+
+`StateTransitionEvent` is the event contract used by runtimes such as ManSim. Typical event types are `task_assigned`, `task_started`, `primitive_started`, `primitive_finished`, `task_completed`, `waiting`, `blocked`, `disabled`, and `cargo_changed`. The runtime reports what happened; HumanoidSim computes the state axes.
+
+Primitive profiles use the `Allowed+Effects` structure.
+
+```json
+{
+  "availability": { "running": "EXECUTING" },
+  "allowed": {
+    "mobility": ["NAVIGATING", "STATIONARY"],
+    "manipulation": ["FREE", "HOLDING"],
+    "power": ["POWER_NORMAL", "POWER_LOW", "POWER_CRITICAL", "DEPLETED", "CHARGING"]
+  },
+  "effects": {
+    "on_start": { "mobility": "NAVIGATING" },
+    "on_end": { "mobility": "STATIONARY" }
+  }
+}
+```
+
+For example, `NAVIGATE_TO` starts with `mobility=NAVIGATING` and ends with `mobility=STATIONARY`. `GRASP` and `LIFT` set `manipulation=HOLDING`. `PLACE` and `RELEASE` start with `manipulation=PLACING` and end with `manipulation=FREE`. Record/check primitives usually do not change manipulation directly; they allow the current cargo-related manipulation state to remain valid.
+
 ## Snapshot Schema
 
 `HumanoidStateSnapshot`은 runtime이 관찰하거나 저장해야 하는 표준 상태 payload입니다.
@@ -324,6 +357,8 @@ ManSim의 기본 observe mode에서는 traffic incident가 발생해도 worker s
 ## Primitive State Hints
 
 일부 primitive는 실행 시작 또는 종료 시 state 축을 바꾸는 hint를 제공합니다.
+
+정상적으로 실행 중인 모든 primitive의 Availability State는 `EXECUTING`입니다. Primitive별 Mobility/Manipulation 관계는 `data/primitives/*.json`의 `metadata.state`에 정의되어 있으며, 전체 표는 [Primitive Reference](primitives_reference.md)를 기준 문서로 사용합니다.
 
 | Primitive | 시작 시 hint | 종료 시 hint | 설명 |
 | --- | --- | --- | --- |

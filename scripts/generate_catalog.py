@@ -163,6 +163,86 @@ SPECIAL_CHILD_ARG_MAP = {
 }
 
 
+def _primitive_state_profile(code: str) -> dict[str, Any]:
+    call_code = str(code).upper()
+
+    def base(
+        *,
+        mobility: list[str] | None = None,
+        manipulation: list[str] | None = None,
+        power: list[str] | None = None,
+        effects: dict[str, dict[str, str]] | None = None,
+        description: str = "",
+    ) -> dict[str, Any]:
+        return {
+            "availability": {"running": "EXECUTING"},
+            "allowed": {
+                "mobility": mobility or ["STATIONARY"],
+                "manipulation": manipulation or ["FREE", "REACHING", "HOLDING", "PLACING"],
+                "power": power or ["POWER_NORMAL", "POWER_LOW", "POWER_CRITICAL", "DEPLETED", "CHARGING"],
+            },
+            "effects": effects or {"on_start": {"mobility": "STATIONARY"}},
+            **({"description": description} if description else {}),
+        }
+
+    if call_code == "NAVIGATE_TO":
+        return base(
+            mobility=["NAVIGATING", "STATIONARY"],
+            manipulation=["FREE", "HOLDING"],
+            effects={"on_start": {"mobility": "NAVIGATING"}, "on_end": {"mobility": "STATIONARY"}},
+            description="Move toward a target tile or object service tile.",
+        )
+    if call_code in {"ALIGN", "DOCK", "DOCK_TO_CHARGER", "ALIGN_TO_TARGET", "ALIGN_TO_WORKSTATION"}:
+        return base(
+            mobility=["DOCKING", "STATIONARY"],
+            manipulation=["FREE", "HOLDING"],
+            effects={"on_start": {"mobility": "DOCKING"}, "on_end": {"mobility": "STATIONARY"}},
+            description="Align or dock with equipment, charger, or workbench.",
+        )
+    if call_code == "REACH_TO":
+        return base(
+            mobility=["STATIONARY"],
+            manipulation=["REACHING", "FREE", "HOLDING"],
+            effects={"on_start": {"mobility": "STATIONARY", "manipulation": "REACHING"}, "on_end": {"manipulation": "FREE"}},
+            description="Reach an arm/gripper toward a nearby object.",
+        )
+    if call_code in {"GRASP", "LIFT"}:
+        return base(
+            mobility=["STATIONARY"],
+            manipulation=["HOLDING"],
+            effects={"on_start": {"mobility": "STATIONARY", "manipulation": "HOLDING"}, "on_end": {"manipulation": "HOLDING"}},
+            description="Acquire or support an item/tool with the manipulator.",
+        )
+    if call_code in {"PLACE", "RELEASE"}:
+        return base(
+            mobility=["STATIONARY"],
+            manipulation=["PLACING", "FREE", "HOLDING"],
+            effects={"on_start": {"mobility": "STATIONARY", "manipulation": "PLACING"}, "on_end": {"manipulation": "FREE"}},
+            description="Place or release a held item/tool.",
+        )
+    if call_code == "EXECUTE_HUMAN_COLLABORATION_ACTION":
+        return base(
+            mobility=["STATIONARY", "NAVIGATING", "DOCKING"],
+            manipulation=["FREE", "REACHING", "HOLDING", "PLACING"],
+            effects={"on_start": {"mobility": "STATIONARY"}},
+            description="Human/robot collaboration action; may remain active while shared movement continues.",
+        )
+    if (
+        call_code.startswith("EXECUTE_")
+        or call_code.startswith("OPERATE_")
+        or call_code.startswith("FIX_")
+        or call_code.startswith("PRIMITIVE_APPLY")
+        or call_code.startswith("PROCESS_")
+    ):
+        return base(
+            mobility=["STATIONARY"],
+            manipulation=["FREE", "REACHING", "HOLDING", "PLACING"],
+            effects={"on_start": {"mobility": "STATIONARY"}},
+            description="Stationary action primitive that may use arms/tools depending on task context.",
+        )
+    return base(description="Stationary primitive; keeps manipulation unless a caller cargo event changes it.")
+
+
 def main() -> int:
     for path in (TASKS, PRIMITIVES, ASSETS, EXAMPLES):
         path.mkdir(parents=True, exist_ok=True)
@@ -204,7 +284,7 @@ def main() -> int:
             inputs=[ParameterSpec(name=name, type_hint="Any", required=False) for name in sorted(primitive_codes[code])],
             outputs=[ParameterSpec(name="result", type_hint="dict", required=False)],
             success_criteria=[SuccessCriterion(metric="status", operator="==", value="SUCCESS")],
-            metadata={"generated_from": "primitive_templates"},
+            metadata={"generated_from": "primitive_templates", "state": _primitive_state_profile(code)},
         )
         rel = f"data/primitives/{code}.json"
         dump_json_file(spec, str(ROOT / rel))

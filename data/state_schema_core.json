@@ -130,6 +130,9 @@
     "NAVIGATE_TO": {
       "mobility": "NAVIGATING"
     },
+    "ALIGN": {
+      "mobility": "DOCKING"
+    },
     "REACH_TO": {
       "manipulation": "REACHING"
     },
@@ -184,5 +187,1908 @@
       "README.md의 Humanoid State Model 섹션을 갱신한다.",
       "tests/test_state_schema.py에 enum, schema validation, round-trip 테스트를 추가한다."
     ]
+  },
+  "primitive_state_profiles": {
+    "ALIGN": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "DOCKING",
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "DOCKING"
+        },
+        "on_end": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Align or dock with equipment, charger, or workbench."
+    },
+    "ANNOUNCE_INTENT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "CHECK_CONTEXT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "CHECK_REQUEST": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "CHECK_SAFETY_ZONE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "CLASSIFY_RESULT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "CONFIRM_OPERATOR_STATE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "CREATE_OR_UPDATE_RECORD": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "EXECUTE_ASSEMBLY_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_EHS_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_HUMAN_COLLABORATION_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY",
+          "NAVIGATING",
+          "DOCKING"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_MACHINE_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_MAINTENANCE_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_PACKAGING_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_QUALITY_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_SYSTEM_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "EXECUTE_WAREHOUSE_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "FIX_OR_HOLD_PART": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "GRASP": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "HOLDING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "manipulation": "HOLDING"
+        },
+        "on_end": {
+          "manipulation": "HOLDING"
+        }
+      },
+      "description": "Acquire or support an item/tool with the manipulator."
+    },
+    "IDENTIFY_PRODUCT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "INSPECT_AREA": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "INSPECT_OR_DIAGNOSE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "INSPECT_RESULT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "LIFT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "HOLDING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "manipulation": "HOLDING"
+        },
+        "on_end": {
+          "manipulation": "HOLDING"
+        }
+      },
+      "description": "Acquire or support an item/tool with the manipulator."
+    },
+    "LOCALIZE_COMPONENTS": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "LOCALIZE_OBJECT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "LOCALIZE_PART": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "LOCALIZE_SURFACE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "LOG_RESULT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "NAVIGATE_TO": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "NAVIGATING",
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "NAVIGATING"
+        },
+        "on_end": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Move toward a target tile or object service tile."
+    },
+    "OPERATE_TOOL": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "OPERATE_TOOL_OR_DISPENSER": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "PARK_OR_RELEASE_VEHICLE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PLACE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "PLACING",
+          "FREE",
+          "HOLDING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "manipulation": "PLACING"
+        },
+        "on_end": {
+          "manipulation": "FREE"
+        }
+      },
+      "description": "Place or release a held item/tool."
+    },
+    "PREPARE_PACKAGING": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PRIMITIVE_APPLY_MATERIAL": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "PRIMITIVE_IDENTIFY_ITEM": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PRIMITIVE_PREPARE_SURFACE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PRIMITIVE_UPDATE_INVENTORY_RECORD": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PRIMITIVE_VERIFY_ASSEMBLY": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PRIMITIVE_VERIFY_PACKAGE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "PROCESS_FEATURE_OR_SURFACE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "REACH_TO": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "REACHING",
+          "FREE",
+          "HOLDING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "manipulation": "REACHING"
+        },
+        "on_end": {
+          "manipulation": "FREE"
+        }
+      },
+      "description": "Reach an arm/gripper toward a nearby object."
+    },
+    "READ_CONTEXT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "READ_MACHINE_STATE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "RECORD_RESULT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "RELEASE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "PLACING",
+          "FREE",
+          "HOLDING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "manipulation": "PLACING"
+        },
+        "on_end": {
+          "manipulation": "FREE"
+        }
+      },
+      "description": "Place or release a held item/tool."
+    },
+    "REPORT_RESULT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "UPDATE_RECORD": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_AREA_STATE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_AUTHORIZATION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_COVERAGE_OR_AMOUNT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_LEVEL_OR_QUANTITY": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_LOCKOUT_IF_REQUIRED": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_MACHINE_STATE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_PLACEMENT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_RECORD": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_ROBOT_STATE": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "VERIFY_TRANSACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "EXECUTE_SYSTEM_ACTION:MANAGE_ROBOT_POWER": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "CHARGING",
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "power": "CHARGING"
+        },
+        "on_end": {
+          "power": "CHARGING"
+        }
+      },
+      "description": "Robot power-management action such as battery swap or charging."
+    }
+  },
+  "transitions": {
+    "availability": {
+      "AVAILABLE": [
+        "AVAILABLE",
+        "ASSIGNED",
+        "EXECUTING",
+        "WAITING",
+        "BLOCKED",
+        "OFFLINE",
+        "DISABLED"
+      ],
+      "ASSIGNED": [
+        "ASSIGNED",
+        "EXECUTING",
+        "WAITING",
+        "BLOCKED",
+        "AVAILABLE",
+        "OFFLINE",
+        "DISABLED"
+      ],
+      "EXECUTING": [
+        "EXECUTING",
+        "AVAILABLE",
+        "WAITING",
+        "BLOCKED",
+        "OFFLINE",
+        "DISABLED"
+      ],
+      "WAITING": [
+        "WAITING",
+        "EXECUTING",
+        "BLOCKED",
+        "AVAILABLE",
+        "ASSIGNED",
+        "OFFLINE",
+        "DISABLED"
+      ],
+      "BLOCKED": [
+        "BLOCKED",
+        "AVAILABLE",
+        "ASSIGNED",
+        "EXECUTING",
+        "OFFLINE",
+        "DISABLED"
+      ],
+      "OFFLINE": [
+        "OFFLINE",
+        "AVAILABLE",
+        "DISABLED"
+      ],
+      "DISABLED": [
+        "DISABLED",
+        "AVAILABLE",
+        "OFFLINE",
+        "EXECUTING"
+      ]
+    },
+    "mobility": {
+      "STATIONARY": [
+        "STATIONARY",
+        "NAVIGATING",
+        "DOCKING"
+      ],
+      "NAVIGATING": [
+        "NAVIGATING",
+        "STATIONARY",
+        "DOCKING"
+      ],
+      "DOCKING": [
+        "DOCKING",
+        "STATIONARY",
+        "NAVIGATING"
+      ]
+    },
+    "power": {
+      "POWER_NORMAL": [
+        "POWER_NORMAL",
+        "POWER_LOW",
+        "POWER_CRITICAL",
+        "DEPLETED",
+        "CHARGING"
+      ],
+      "POWER_LOW": [
+        "POWER_LOW",
+        "POWER_NORMAL",
+        "POWER_CRITICAL",
+        "DEPLETED",
+        "CHARGING"
+      ],
+      "POWER_CRITICAL": [
+        "POWER_CRITICAL",
+        "POWER_LOW",
+        "POWER_NORMAL",
+        "DEPLETED",
+        "CHARGING"
+      ],
+      "DEPLETED": [
+        "DEPLETED",
+        "CHARGING",
+        "POWER_NORMAL"
+      ],
+      "CHARGING": [
+        "CHARGING",
+        "POWER_NORMAL",
+        "POWER_LOW",
+        "POWER_CRITICAL",
+        "DEPLETED"
+      ]
+    },
+    "manipulation": {
+      "FREE": [
+        "FREE",
+        "REACHING",
+        "HOLDING",
+        "PLACING"
+      ],
+      "REACHING": [
+        "REACHING",
+        "HOLDING",
+        "FREE",
+        "PLACING"
+      ],
+      "HOLDING": [
+        "HOLDING",
+        "PLACING",
+        "FREE",
+        "REACHING"
+      ],
+      "PLACING": [
+        "PLACING",
+        "FREE",
+        "HOLDING",
+        "REACHING"
+      ]
+    }
   }
 }

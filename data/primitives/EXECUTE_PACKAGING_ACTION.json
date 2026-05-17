@@ -47,6 +47,35 @@
   ],
   "steps": [],
   "metadata": {
-    "generated_from": "primitive_templates"
+    "generated_from": "primitive_templates",
+    "state": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Stationary action primitive that may use arms/tools depending on task context."
+    }
   }
 }

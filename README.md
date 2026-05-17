@@ -83,6 +83,19 @@ State는 네 축으로 정의됩니다.
 
 상태 축, snapshot schema, lifecycle mapping, primitive state hint의 자세한 설명은 [State Reference](docs/state_reference.md)를 참고합니다.
 
+## Primitive State Relation
+
+HumanoidSim은 primitive별 state 의미도 함께 정의합니다. 정상적으로 실행 중인 모든 primitive는 Availability State에서 `EXECUTING`으로 표현됩니다. Mobility와 Manipulation은 primitive의 `metadata.state.allowed`와 `metadata.state.effects`에 따라 결정됩니다.
+
+- `NAVIGATE_TO`: 실행 중 `mobility=NAVIGATING`, 종료 후 `STATIONARY`
+- `ALIGN`: 정렬/도킹 중 `mobility=DOCKING`, 종료 후 `STATIONARY`
+- `REACH_TO`: 실행 중 `manipulation=REACHING`
+- `GRASP`, `LIFT`: 실행 중 `manipulation=HOLDING`
+- `PLACE`, `RELEASE`: 실행 중 `manipulation=PLACING`, 종료 후 `FREE`
+- 확인/기록 계열 primitive: 보통 `mobility=STATIONARY`이며 cargo 관련 manipulation state는 caller event에 따라 유지됩니다.
+
+전체 primitive별 Availability, Mobility, Manipulation 관계는 [Primitive Reference](docs/primitives_reference.md)에 표로 정리되어 있습니다.
+
 예시 snapshot:
 
 ```json
@@ -120,7 +133,7 @@ State는 네 축으로 정의됩니다.
 ## Reference
 
 - [Task Reference](docs/tasks_reference.md): 82개 task의 level, category, input, resource, nested sequence를 정리합니다.
-- [Primitive Reference](docs/primitives_reference.md): active primitive와 registry primitive의 차이, 각 primitive skill, 사용 task를 정리합니다.
+- [Primitive Reference](docs/primitives_reference.md): active/registry primitive 차이, 각 primitive의 Availability/Mobility/Manipulation 관계, 사용 task를 정리합니다.
 - [State Reference](docs/state_reference.md): Availability, Mobility, Power, Manipulation 축과 `HumanoidStateSnapshot` 사용 규칙을 정리합니다.
 
 ### Active Primitive와 Registry Primitive

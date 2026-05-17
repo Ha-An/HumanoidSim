@@ -93,6 +93,39 @@
   ],
   "steps": [],
   "metadata": {
-    "generated_from": "primitive_templates"
+    "generated_from": "primitive_templates",
+    "state": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "NAVIGATING",
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "NAVIGATING"
+        },
+        "on_end": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Move toward a target tile or object service tile."
+    }
   }
 }

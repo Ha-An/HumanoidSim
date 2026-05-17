@@ -137,6 +137,103 @@ class PrimitiveStateHint:
 
 
 @dataclass
+class PrimitiveStateProfile:
+    call_code: str
+    availability_running: AvailabilityState = AvailabilityState.EXECUTING
+    allowed: dict[str, list[str]] = field(default_factory=dict)
+    effects: dict[str, PrimitiveStateHint] = field(default_factory=dict)
+    description: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, call_code: str, data: dict[str, Any] | None) -> "PrimitiveStateProfile":
+        payload = dict(data or {})
+        availability_payload = payload.get("availability", {})
+        if isinstance(availability_payload, dict):
+            running = availability_payload.get("running", AvailabilityState.EXECUTING.value)
+        else:
+            running = availability_payload or AvailabilityState.EXECUTING.value
+        effects_payload = payload.get("effects", {})
+        return cls(
+            call_code=str(call_code).upper(),
+            availability_running=AvailabilityState(str(running)),
+            allowed={
+                str(axis): [str(value) for value in values]
+                for axis, values in (payload.get("allowed", {}) or {}).items()
+                if isinstance(values, list)
+            },
+            effects={
+                str(name): _hint_from_dict(effect)
+                for name, effect in (effects_payload or {}).items()
+                if isinstance(effect, dict)
+            },
+            description=str(payload.get("description", "")),
+            metadata=dict(payload.get("metadata", {})),
+        )
+
+    def effect_for(self, *, finished: bool = False) -> PrimitiveStateHint:
+        return self.effects.get("on_end" if finished else "on_start", PrimitiveStateHint())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "availability": {"running": self.availability_running.value},
+            "allowed": _jsonable(self.allowed),
+            "effects": {name: hint.to_dict() for name, hint in self.effects.items()},
+            **({"description": self.description} if self.description else {}),
+            **({"metadata": _jsonable(self.metadata)} if self.metadata else {}),
+        }
+
+
+@dataclass
+class StateTransitionEvent:
+    event_type: str
+    task_code: str | None = None
+    task_instance_id: str | None = None
+    step_id: str | None = None
+    primitive_call_code: str | None = None
+    execution_status: ExecutionStatus | str | None = None
+    reason: StateReason | dict[str, Any] | None = None
+    timestamp_s: float | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "StateTransitionEvent":
+        return cls(
+            event_type=str(data.get("event_type", "")),
+            task_code=_optional_str(data.get("task_code")),
+            task_instance_id=_optional_str(data.get("task_instance_id")),
+            step_id=_optional_str(data.get("step_id")),
+            primitive_call_code=_optional_str(data.get("primitive_call_code")),
+            execution_status=data.get("execution_status"),
+            reason=data.get("reason"),
+            timestamp_s=data.get("timestamp_s"),
+            metadata=dict(data.get("metadata", {})),
+        )
+
+    def normalized_type(self) -> str:
+        return str(self.event_type or "").strip().lower().replace("-", "_")
+
+    def reason_obj(self) -> StateReason | None:
+        if isinstance(self.reason, StateReason):
+            return self.reason
+        if isinstance(self.reason, dict):
+            return StateReason.from_dict(self.reason)
+        reason_code = str(self.metadata.get("reason_code", "") or "").strip()
+        if reason_code:
+            return StateReason(
+                code=reason_code,
+                message=str(self.metadata.get("reason_message", "")),
+                source=str(self.metadata.get("source", "")),
+                metadata=dict(self.metadata.get("reason_metadata", {}) or {}),
+            )
+        return None
+
+
+class StateTransitionError(ValueError):
+    """Raised when a HumanoidStateSnapshot transition violates HumanoidSim schema."""
+
+
+@dataclass
 class StateDefinition:
     value: str
     description: str = ""
@@ -191,10 +288,19 @@ class StateSchema:
     name: str
     axes: dict[str, StateAxisDefinition]
     primitive_state_hints: dict[str, dict[str, str]] = field(default_factory=dict)
+    primitive_state_profiles: dict[str, PrimitiveStateProfile] = field(default_factory=dict)
+    transitions: dict[str, dict[str, list[str]]] = field(default_factory=dict)
     customization: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "StateSchema":
+        profiles = {
+            str(call_code).upper(): PrimitiveStateProfile.from_dict(str(call_code), payload)
+            for call_code, payload in data.get("primitive_state_profiles", {}).items()
+        }
+        for call_code, payload in data.get("primitive_state_hints", {}).items():
+            key = str(call_code).upper()
+            profiles.setdefault(key, _profile_from_legacy_hint(key, payload if isinstance(payload, dict) else {}))
         return cls(
             schema_version=str(data.get("schema_version", "0.1.0")),
             name=str(data.get("name", "Humanoid State Schema")),
@@ -205,6 +311,16 @@ class StateSchema:
             primitive_state_hints={
                 str(call_code): {str(key): str(value) for key, value in payload.items()}
                 for call_code, payload in data.get("primitive_state_hints", {}).items()
+            },
+            primitive_state_profiles=profiles,
+            transitions={
+                str(axis): {
+                    str(source): [str(target) for target in targets]
+                    for source, targets in axis_transitions.items()
+                    if isinstance(targets, list)
+                }
+                for axis, axis_transitions in data.get("transitions", {}).items()
+                if isinstance(axis_transitions, dict)
             },
             customization=dict(data.get("customization", {})),
         )
@@ -234,14 +350,79 @@ class StateSchema:
 
         return issues
 
+    def primitive_profile(self, primitive_call_code: str, *, task_code: str | None = None) -> PrimitiveStateProfile:
+        call_code = str(primitive_call_code or "").upper()
+        scoped_key = f"{call_code}:{str(task_code or '').upper()}" if task_code else ""
+        if scoped_key and scoped_key in self.primitive_state_profiles:
+            return self.primitive_state_profiles[scoped_key]
+        if call_code in self.primitive_state_profiles:
+            return self.primitive_state_profiles[call_code]
+        raise KeyError(f"Primitive state profile is not defined for {call_code!r}.")
+
+    def validate_profile(self, profile: PrimitiveStateProfile) -> list[StateValidationIssue]:
+        issues: list[StateValidationIssue] = []
+        if profile.availability_running != AvailabilityState.EXECUTING:
+            issues.append(
+                StateValidationIssue(
+                    f"primitive_state_profiles.{profile.call_code}.availability.running",
+                    "INVALID_RUNNING_AVAILABILITY",
+                    "All running primitives must use availability=EXECUTING.",
+                )
+            )
+        for axis, values in profile.allowed.items():
+            definition = self.axes.get(axis)
+            if definition is None:
+                issues.append(
+                    StateValidationIssue(
+                        f"primitive_state_profiles.{profile.call_code}.allowed.{axis}",
+                        "UNKNOWN_AXIS",
+                        f"{axis!r} is not a known state axis.",
+                    )
+                )
+                continue
+            for value in values:
+                if not definition.has_state(str(value)):
+                    issues.append(
+                        StateValidationIssue(
+                            f"primitive_state_profiles.{profile.call_code}.allowed.{axis}",
+                            "UNKNOWN_STATE",
+                            f"{value!r} is not defined for {axis}.",
+                        )
+                    )
+        for effect_name, hint in profile.effects.items():
+            for axis, value in hint.to_dict().items():
+                if value is None:
+                    continue
+                definition = self.axes.get(axis)
+                if definition is None:
+                    issues.append(
+                        StateValidationIssue(
+                            f"primitive_state_profiles.{profile.call_code}.effects.{effect_name}.{axis}",
+                            "UNKNOWN_AXIS",
+                            f"{axis!r} is not a known state axis.",
+                        )
+                    )
+                elif not definition.has_state(str(value)):
+                    issues.append(
+                        StateValidationIssue(
+                            f"primitive_state_profiles.{profile.call_code}.effects.{effect_name}.{axis}",
+                            "UNKNOWN_STATE",
+                            f"{value!r} is not defined for {axis}.",
+                        )
+                    )
+        return issues
+
 
 DEFAULT_HUMANOID_STATE = HumanoidStateSnapshot(humanoid_id="HUMANOID-01")
 
-_NAVIGATION_PRIMITIVES = {"NAVIGATE_TO"}
-_DOCKING_PRIMITIVES = {"DOCK", "DOCK_TO_CHARGER", "ALIGN", "ALIGN_TO_TARGET", "ALIGN_TO_WORKSTATION"}
-_REACHING_PRIMITIVES = {"REACH_TO"}
-_HOLDING_PRIMITIVES = {"GRASP", "LIFT"}
-_PLACING_PRIMITIVES = {"PLACE", "RELEASE"}
+_AXIS_ENUMS = {
+    "availability": AvailabilityState,
+    "mobility": MobilityState,
+    "power": PowerState,
+    "manipulation": ManipulationState,
+}
+
+_TERMINAL_AVAILABILITY = {AvailabilityState.OFFLINE, AvailabilityState.DISABLED, AvailabilityState.BLOCKED}
 
 
 def default_humanoid_state(humanoid_id: str = "HUMANOID-01") -> HumanoidStateSnapshot:
@@ -336,29 +517,11 @@ def primitive_state_hint(
     task_code: str | None = None,
     primitive_finished: bool = False,
 ) -> PrimitiveStateHint:
-    call_code = primitive_call_code.upper()
-    task_code = (task_code or "").upper()
-
-    if primitive_finished:
-        if call_code in _NAVIGATION_PRIMITIVES or call_code in _DOCKING_PRIMITIVES:
-            return PrimitiveStateHint(mobility=MobilityState.STATIONARY)
-        if call_code in _PLACING_PRIMITIVES:
-            return PrimitiveStateHint(manipulation=ManipulationState.FREE)
+    try:
+        profile = get_primitive_state_profile(primitive_call_code, task_code=task_code)
+    except KeyError:
         return PrimitiveStateHint()
-
-    if call_code in _NAVIGATION_PRIMITIVES:
-        return PrimitiveStateHint(mobility=MobilityState.NAVIGATING)
-    if call_code in _DOCKING_PRIMITIVES:
-        return PrimitiveStateHint(mobility=MobilityState.DOCKING)
-    if call_code in _REACHING_PRIMITIVES:
-        return PrimitiveStateHint(manipulation=ManipulationState.REACHING)
-    if call_code in _HOLDING_PRIMITIVES:
-        return PrimitiveStateHint(manipulation=ManipulationState.HOLDING)
-    if call_code in _PLACING_PRIMITIVES:
-        return PrimitiveStateHint(manipulation=ManipulationState.PLACING)
-    if call_code == "EXECUTE_SYSTEM_ACTION" and task_code == "MANAGE_ROBOT_POWER":
-        return PrimitiveStateHint(power=PowerState.CHARGING)
-    return PrimitiveStateHint()
+    return profile.effect_for(finished=primitive_finished)
 
 
 def apply_primitive_state_hint(
@@ -368,28 +531,273 @@ def apply_primitive_state_hint(
     task_code: str | None = None,
     primitive_finished: bool = False,
 ) -> HumanoidStateSnapshot:
-    hint = primitive_state_hint(
-        primitive_call_code,
+    event = StateTransitionEvent(
+        event_type="primitive_finished" if primitive_finished else "primitive_started",
         task_code=task_code or (snapshot.task_context.task_code if snapshot.task_context else None),
-        primitive_finished=primitive_finished,
-    )
-    context = snapshot.task_context or TaskContext()
-    context = replace(
-        context,
-        task_code=task_code or context.task_code,
+        task_instance_id=snapshot.task_context.task_instance_id if snapshot.task_context else None,
+        step_id=snapshot.task_context.step_id if snapshot.task_context else None,
         primitive_call_code=primitive_call_code,
+        execution_status=ExecutionStatus.SUCCESS if primitive_finished else ExecutionStatus.RUNNING,
+        timestamp_s=snapshot.timestamp_s,
+        metadata={"strict": False},
+    )
+    return transition_humanoid_state(snapshot, event)
+
+
+def get_primitive_state_profile(
+    primitive_call_code: str,
+    *,
+    task_code: str | None = None,
+    schema: StateSchema | None = None,
+) -> PrimitiveStateProfile:
+    return (schema or load_state_schema()).primitive_profile(primitive_call_code, task_code=task_code)
+
+
+def validate_primitive_state_profile(
+    profile: PrimitiveStateProfile | dict[str, Any],
+    *,
+    call_code: str | None = None,
+    schema: StateSchema | None = None,
+) -> list[StateValidationIssue]:
+    loaded_schema = schema or load_state_schema()
+    profile_obj = profile if isinstance(profile, PrimitiveStateProfile) else PrimitiveStateProfile.from_dict(call_code or "", profile)
+    return loaded_schema.validate_profile(profile_obj)
+
+
+def transition_humanoid_state(
+    snapshot: HumanoidStateSnapshot | dict[str, Any],
+    event: StateTransitionEvent | dict[str, Any],
+    *,
+    schema: StateSchema | None = None,
+    strict: bool = True,
+) -> HumanoidStateSnapshot:
+    loaded_schema = schema or load_state_schema()
+    previous = snapshot if isinstance(snapshot, HumanoidStateSnapshot) else HumanoidStateSnapshot.from_dict(snapshot)
+    transition_event = event if isinstance(event, StateTransitionEvent) else StateTransitionEvent.from_dict(event)
+    event_type = transition_event.normalized_type()
+    metadata = dict(previous.metadata)
+    metadata.update(dict(transition_event.metadata or {}))
+    timestamp_s = transition_event.timestamp_s if transition_event.timestamp_s is not None else previous.timestamp_s
+    reason = transition_event.reason_obj()
+
+    next_snapshot = replace(previous, timestamp_s=timestamp_s, metadata=metadata)
+
+    if event_type in {"task_assigned", "assigned"}:
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.ASSIGNED,
+            task_context=_event_context(transition_event, default_status=ExecutionStatus.PENDING),
+            reason=None,
+        )
+    elif event_type in {"task_started", "task_start"}:
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.EXECUTING,
+            task_context=_event_context(transition_event, default_status=ExecutionStatus.RUNNING),
+            reason=None,
+        )
+    elif event_type in {"task_completed", "task_finished", "available"}:
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.AVAILABLE,
+            mobility=MobilityState.STATIONARY,
+            power=PowerState.POWER_NORMAL if metadata.get("power_normal", True) else next_snapshot.power,
+            manipulation=ManipulationState.HOLDING if _metadata_bool(metadata, "cargo_present") else ManipulationState.FREE,
+            task_context=None,
+            reason=None,
+        )
+    elif event_type in {"task_failed", "blocked", "task_blocked"}:
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.BLOCKED,
+            mobility=MobilityState.STATIONARY if event_type == "task_failed" else next_snapshot.mobility,
+            task_context=_event_context(transition_event, default_status=ExecutionStatus.FAILED),
+            reason=reason or StateReason(code=str(metadata.get("reason_code") or "blocked"), source=str(metadata.get("source", ""))),
+        )
+    elif event_type in {"waiting", "task_waiting"}:
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.WAITING,
+            task_context=_event_context(transition_event, default_status=ExecutionStatus.RUNNING) or next_snapshot.task_context,
+            reason=reason or StateReason(code=str(metadata.get("reason_code") or "waiting"), source=str(metadata.get("source", ""))),
+        )
+    elif event_type in {"disabled", "battery_depleted"}:
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.DISABLED,
+            mobility=MobilityState.STATIONARY,
+            power=PowerState.DEPLETED,
+            reason=reason or StateReason(code=str(metadata.get("reason_code") or "disabled"), source=str(metadata.get("source", ""))),
+        )
+    elif event_type == "offline":
+        next_snapshot = replace(
+            next_snapshot,
+            availability=AvailabilityState.OFFLINE,
+            mobility=MobilityState.STATIONARY,
+            reason=reason,
+        )
+    elif event_type in {"cargo_changed", "cargo_picked", "cargo_dropped"}:
+        cargo_present = event_type == "cargo_picked" or _metadata_bool(metadata, "cargo_present")
+        if event_type == "cargo_dropped":
+            cargo_present = False
+        next_snapshot = replace(
+            next_snapshot,
+            manipulation=ManipulationState.HOLDING if cargo_present else ManipulationState.FREE,
+            reason=reason,
+        )
+    elif event_type in {"primitive_started", "primitive_start", "primitive_finished", "primitive_end"}:
+        finished = event_type in {"primitive_finished", "primitive_end"}
+        next_snapshot = _transition_primitive(next_snapshot, transition_event, loaded_schema, finished=finished)
+    elif event_type in {"power_charging"}:
+        next_snapshot = replace(next_snapshot, power=PowerState.CHARGING, reason=reason)
+    elif event_type in {"power_normal"}:
+        next_snapshot = replace(next_snapshot, power=PowerState.POWER_NORMAL, reason=reason)
+    else:
+        raise StateTransitionError(f"Unknown humanoid state transition event_type={transition_event.event_type!r}.")
+
+    validate_state_transition(previous, next_snapshot, transition_event, schema=loaded_schema, strict=strict)
+    return next_snapshot
+
+
+def validate_state_transition(
+    previous: HumanoidStateSnapshot | dict[str, Any],
+    next_snapshot: HumanoidStateSnapshot | dict[str, Any],
+    event: StateTransitionEvent | dict[str, Any],
+    *,
+    schema: StateSchema | None = None,
+    strict: bool = True,
+) -> list[StateValidationIssue]:
+    loaded_schema = schema or load_state_schema()
+    prev = previous if isinstance(previous, HumanoidStateSnapshot) else HumanoidStateSnapshot.from_dict(previous)
+    nxt = next_snapshot if isinstance(next_snapshot, HumanoidStateSnapshot) else HumanoidStateSnapshot.from_dict(next_snapshot)
+    transition_event = event if isinstance(event, StateTransitionEvent) else StateTransitionEvent.from_dict(event)
+    issues = loaded_schema.validate_snapshot(nxt)
+    for axis in ("availability", "mobility", "power", "manipulation"):
+        source = getattr(prev, axis).value
+        target = getattr(nxt, axis).value
+        if source == target:
+            continue
+        allowed = loaded_schema.transitions.get(axis, {}).get(source)
+        if allowed is not None and target not in allowed:
+            issues.append(
+                StateValidationIssue(
+                    axis,
+                    "INVALID_STATE_TRANSITION",
+                    f"{axis} cannot transition from {source} to {target} for event {transition_event.event_type}.",
+                )
+            )
+
+    event_type = transition_event.normalized_type()
+    if event_type in {"primitive_started", "primitive_start", "primitive_finished", "primitive_end"}:
+        try:
+            profile = loaded_schema.primitive_profile(
+                transition_event.primitive_call_code or "",
+                task_code=transition_event.task_code,
+            )
+        except KeyError as exc:
+            issues.append(StateValidationIssue("primitive_call_code", "UNKNOWN_PRIMITIVE_PROFILE", str(exc)))
+        else:
+            issues.extend(loaded_schema.validate_profile(profile))
+            if nxt.availability not in _TERMINAL_AVAILABILITY and nxt.availability != profile.availability_running:
+                issues.append(
+                    StateValidationIssue(
+                        "availability",
+                        "INVALID_PRIMITIVE_AVAILABILITY",
+                        f"{profile.call_code} must run with availability={profile.availability_running.value}.",
+                    )
+                )
+            for axis, values in profile.allowed.items():
+                current_value = getattr(nxt, axis).value
+                if current_value not in values:
+                    issues.append(
+                        StateValidationIssue(
+                            axis,
+                            "PRIMITIVE_STATE_NOT_ALLOWED",
+                            f"{profile.call_code} does not allow {axis}={current_value}.",
+                        )
+                    )
+
+    if issues and strict:
+        message = "; ".join(f"{issue.field}:{issue.code}:{issue.message}" for issue in issues)
+        raise StateTransitionError(message)
+    return issues
+
+
+def _transition_primitive(
+    snapshot: HumanoidStateSnapshot,
+    event: StateTransitionEvent,
+    schema: StateSchema,
+    *,
+    finished: bool,
+) -> HumanoidStateSnapshot:
+    try:
+        profile = schema.primitive_profile(event.primitive_call_code or "", task_code=event.task_code)
+    except KeyError as exc:
+        raise StateTransitionError(str(exc)) from exc
+    context = _event_context(
+        event,
+        default_status=ExecutionStatus.SUCCESS if finished else ExecutionStatus.RUNNING,
     )
     availability = snapshot.availability
-    if availability not in {AvailabilityState.OFFLINE, AvailabilityState.DISABLED, AvailabilityState.BLOCKED}:
-        availability = AvailabilityState.EXECUTING
+    if availability not in _TERMINAL_AVAILABILITY:
+        availability = profile.availability_running
+    hint = profile.effect_for(finished=finished)
     return replace(
         snapshot,
         availability=availability,
         mobility=hint.mobility or snapshot.mobility,
         power=hint.power or snapshot.power,
         manipulation=hint.manipulation or snapshot.manipulation,
-        task_context=context,
+        task_context=context or snapshot.task_context,
+        reason=None if availability == AvailabilityState.EXECUTING else snapshot.reason,
     )
+
+
+def _event_context(event: StateTransitionEvent, *, default_status: ExecutionStatus | None) -> TaskContext | None:
+    if not any([event.task_code, event.task_instance_id, event.step_id, event.primitive_call_code, event.execution_status, default_status]):
+        return None
+    return TaskContext(
+        task_code=event.task_code,
+        task_instance_id=event.task_instance_id,
+        step_id=event.step_id,
+        primitive_call_code=event.primitive_call_code,
+        execution_status=_execution_status(event.execution_status) or default_status,
+    )
+
+
+def _metadata_bool(metadata: dict[str, Any], key: str) -> bool:
+    value = metadata.get(key)
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _hint_from_dict(payload: dict[str, Any]) -> PrimitiveStateHint:
+    return PrimitiveStateHint(
+        mobility=MobilityState(payload["mobility"]) if payload.get("mobility") else None,
+        power=PowerState(payload["power"]) if payload.get("power") else None,
+        manipulation=ManipulationState(payload["manipulation"]) if payload.get("manipulation") else None,
+    )
+
+
+def _profile_from_legacy_hint(call_code: str, payload: dict[str, str]) -> PrimitiveStateProfile:
+    return PrimitiveStateProfile(
+        call_code=str(call_code).upper(),
+        allowed=_default_allowed_for_primitive(str(call_code).upper(), payload),
+        effects={"on_start": _hint_from_dict(payload)},
+    )
+
+
+def _default_allowed_for_primitive(call_code: str, effect: dict[str, str] | None = None) -> dict[str, list[str]]:
+    effect = effect or {}
+    mobility = [MobilityState.STATIONARY.value]
+    manipulation = [state.value for state in ManipulationState]
+    power = [state.value for state in PowerState]
+    if effect.get("mobility"):
+        mobility = [str(effect["mobility"])]
+    if effect.get("manipulation"):
+        manipulation = [str(effect["manipulation"])]
+    return {"mobility": mobility, "manipulation": manipulation, "power": power}
 
 
 def load_state_schema(path: Path | str | None = None) -> StateSchema:
@@ -437,18 +845,25 @@ __all__ = [
     "MobilityState",
     "PowerState",
     "PrimitiveStateHint",
+    "PrimitiveStateProfile",
     "StateAxisDefinition",
     "StateDefinition",
     "StateReason",
     "StateSchema",
+    "StateTransitionError",
+    "StateTransitionEvent",
     "StateValidationIssue",
     "TaskContext",
     "apply_primitive_state_hint",
     "build_state_snapshot_for_task_lifecycle",
     "default_humanoid_state",
     "derive_availability_state",
+    "get_primitive_state_profile",
     "load_state_schema",
     "parse_humanoid_state_snapshot",
     "primitive_state_hint",
+    "transition_humanoid_state",
+    "validate_primitive_state_profile",
     "validate_state_snapshot",
+    "validate_state_transition",
 ]

@@ -57,6 +57,38 @@
   ],
   "steps": [],
   "metadata": {
-    "generated_from": "primitive_templates"
+    "generated_from": "primitive_templates",
+    "state": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "REACHING",
+          "FREE",
+          "HOLDING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY",
+          "manipulation": "REACHING"
+        },
+        "on_end": {
+          "manipulation": "FREE"
+        }
+      },
+      "description": "Reach an arm/gripper toward a nearby object."
+    }
   }
 }
