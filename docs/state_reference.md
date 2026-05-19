@@ -350,31 +350,39 @@ Task가 없는 `AVAILABLE` 상태에서는 `task_context=null`을 권장합니�
 
 ## StateReason
 
-`StateReason`은 대기, 차단, 비활성화 같은 상태의 원인을 기록합니다.
+`StateReason`은 `WAITING`, `BLOCKED`, `DISABLED`처럼 원인이 중요한 상태에서 왜 그 상태가 되었는지를 기록합니다.
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
-| `code` | `str` | 원인 코드입니다. 예: `missing_item`, `traffic_wait`, `battery_depleted` |
+| `code` | `str` | 원인 code입니다. 예: `TRAFFIC_WAIT`, `RESOURCE_PREEMPTED`, `GRIP_FAILED` |
 | `message` | `str` | 사람이 읽을 수 있는 설명입니다. |
 | `source` | `str` | reason을 만든 runtime 또는 module입니다. |
-| `metadata` | `dict` | 관련 item, machine, route, worker pair 같은 보조 정보입니다. |
+| `metadata` | `dict` | 관련 item, machine, route, worker pair, incident category 같은 보조 정보입니다. |
 
-`WAITING`, `BLOCKED`, `DISABLED`는 `reason.code`가 필요합니다. 다만 `reason.code`의 전체 목록은 고정 enum이 아니라 runtime 확장을 허용합니다.
+`WAITING`, `BLOCKED`, `DISABLED`는 반드시 `reason.code`를 가져야 합니다. Reason code는 고정 enum은 아니지만, HumanoidSim은 core runtime과 replay/KPI가 공통으로 사용할 수 있는 표준 reason code를 제공합니다.
 
 ## Standard Reason Codes
 
-`data/state_schema_core.json`은 traffic 관찰을 위한 표준 reason code도 제공합니다.
+`data/state_schema_core.json`은 traffic 관찰과 incident 표현을 위한 표준 reason code를 제공합니다. Incident code는 정의 단계부터 uppercase canonical code를 사용합니다.
 
 | Code | 설명 | 권장 사용 |
 | --- | --- | --- |
-| `path_overlap` | 두 worker의 계획 경로가 같은 tile 또는 edge를 공유합니다. | 관찰 event 또는 warning |
+| `path_overlap` | 두 worker의 planned path가 같은 tile 또는 edge를 공유합니다. | 관찰 event 또는 warning |
 | `tile_conflict` | 같은 시간 구간에 같은 tile에 진입하거나 점유합니다. | traffic conflict event |
 | `edge_conflict` | 같은 edge를 반대 방향으로 동시에 통과합니다. | collision 또는 near miss 판단 |
-| `near_miss` | tile/edge 통과 간격이 headway 기준보다 짧습니다. | 안전 KPI, replay overlay |
-| `collision` | tile conflict 또는 reverse edge conflict가 실제 이동 구간에서 겹칩니다. | incident event |
-| `traffic_wait` | reservation 또는 traffic policy 때문에 이동을 기다립니다. | `WAITING` reason |
+| `NEAR_MISS` | tile/edge 통과 간격이 headway 기준보다 짧습니다. | incident event, 안전 KPI, replay overlay |
+| `COLLISION` | tile conflict 또는 reverse edge conflict가 실제 이동 구간에서 겹칩니다. | incident event |
+| `TRAFFIC_WAIT` | reservation 또는 traffic policy 때문에 이동을 기다립니다. | `WAITING` reason |
+| `OBJECT_RECOGNITION_FAILED` | 대상 물체 인식에 실패했습니다. | `BLOCKED` incident reason |
+| `GRIP_FAILED` | 대상 item/tool grip에 실패했습니다. | `BLOCKED` incident reason |
+| `ITEM_DROPPED` | 운반 또는 조작 중 item을 떨어뜨렸습니다. | `BLOCKED` incident reason |
+| `RESOURCE_PREEMPTED` | 예상한 resource를 다른 actor가 먼저 사용하거나 예약했습니다. | `BLOCKED` incident reason |
+| `RESOURCE_MISSING` | 필요한 item/tool/resource가 없습니다. | `BLOCKED` incident reason |
+| `UNKNOWN` | 원인을 특정할 수 없는 돌발상황입니다. | `BLOCKED` incident reason |
 
-ManSim의 기본 observe mode에서는 traffic incident가 발생해도 worker state를 곧바로 `BLOCKED`로 바꾸지 않을 수 있습니다. 이 경우 event의 reason으로만 남기고, axes는 `EXECUTING / NAVIGATING`을 유지할 수 있습니다.
+전체 incident reason code는 [Incident Reference](incident_reference.md)를 기준으로 합니다.
+
+ManSim의 `strict_reservation` 모드에서는 `TRAFFIC_WAIT`이 실제 worker availability를 `WAITING`으로 바꿉니다. `observe_conflicts` 모드에서는 traffic incident가 발생해도 설정에 따라 worker를 즉시 `BLOCKED`로 바꾸지 않고 event reason으로만 남길 수 있습니다.
 
 ## Primitive State Hints
 

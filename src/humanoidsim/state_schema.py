@@ -290,6 +290,7 @@ class StateSchema:
     primitive_state_hints: dict[str, dict[str, str]] = field(default_factory=dict)
     primitive_state_profiles: dict[str, PrimitiveStateProfile] = field(default_factory=dict)
     transitions: dict[str, dict[str, list[str]]] = field(default_factory=dict)
+    standard_reason_codes: list[dict[str, str]] = field(default_factory=list)
     customization: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -322,6 +323,11 @@ class StateSchema:
                 for axis, axis_transitions in data.get("transitions", {}).items()
                 if isinstance(axis_transitions, dict)
             },
+            standard_reason_codes=[
+                {"code": str(row.get("code", "")), "description": str(row.get("description", ""))}
+                for row in data.get("standard_reason_codes", [])
+                if isinstance(row, dict)
+            ],
             customization=dict(data.get("customization", {})),
         )
 

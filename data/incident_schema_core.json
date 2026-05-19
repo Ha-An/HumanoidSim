@@ -1,0 +1,521 @@
+{
+  "version": "0.1.0",
+  "description": "General humanoid incident taxonomy. Incidents are represented as StateReason plus recovery protocol, not as new state enum values.",
+  "categories": [
+    {
+      "id": "perception_identification",
+      "name": "Perception & Identification",
+      "description": "Target detection, identity, pose, marker, and presence problems."
+    },
+    {
+      "id": "manipulation_payload",
+      "name": "Manipulation & Payload",
+      "description": "Grip, lift, placement, payload stability, and carried item problems."
+    },
+    {
+      "id": "resource_environment",
+      "name": "Resource & Environment",
+      "description": "Missing/preempted resources, blocked workspace, contamination, or inaccessible environment."
+    },
+    {
+      "id": "motion_traffic",
+      "name": "Motion & Traffic",
+      "description": "Navigation, traffic, docking, collision, and route execution problems."
+    },
+    {
+      "id": "power_hardware",
+      "name": "Power & Hardware",
+      "description": "Battery, power, sensor, actuator, tool, or end-effector problems."
+    },
+    {
+      "id": "system_communication",
+      "name": "System & Communication",
+      "description": "Network, command, context, map, and record synchronization problems."
+    },
+    {
+      "id": "safety_human_interaction",
+      "name": "Safety & Human Interaction",
+      "description": "Safety stop, human/robot zone conflict, operator readiness, and handover problems."
+    },
+    {
+      "id": "unknown",
+      "name": "Unknown",
+      "description": "Unexpected or unclassified interruption with insufficient cause evidence."
+    }
+  ],
+  "incidents": [
+    {
+      "code": "OBJECT_RECOGNITION_FAILED",
+      "category": "perception_identification",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The humanoid cannot recognize the expected target object.",
+      "trigger_primitives": ["LOCALIZE_OBJECT", "PRIMITIVE_IDENTIFY_ITEM", "IDENTIFY_PRODUCT"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "LOCALIZE_OBJECT"},
+        {"kind": "primitive", "code": "PRIMITIVE_IDENTIFY_ITEM"},
+        {"kind": "task", "code": "IDENTIFY_ITEM"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "POSE_ESTIMATION_FAILED",
+      "category": "perception_identification",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The target exists but its pose or approach direction cannot be estimated.",
+      "trigger_primitives": ["LOCALIZE_OBJECT", "LOCALIZE_COMPONENTS", "LOCALIZE_PART", "LOCALIZE_SURFACE"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "LOCALIZE_OBJECT"},
+        {"kind": "primitive", "code": "ALIGN"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "LABEL_OR_MARKER_UNREADABLE",
+      "category": "perception_identification",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A barcode, QR code, label, marker, OCR text, serial, or lot identifier cannot be read.",
+      "trigger_primitives": ["PRIMITIVE_IDENTIFY_ITEM", "IDENTIFY_PRODUCT", "READ_MACHINE_STATE"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "IDENTIFY_ITEM"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "TARGET_NOT_FOUND",
+      "category": "perception_identification",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The expected target is not present at the planned location.",
+      "trigger_primitives": ["LOCALIZE_OBJECT", "PRIMITIVE_IDENTIFY_ITEM"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "LOCALIZE_OBJECT"},
+        {"kind": "task", "code": "IDENTIFY_ITEM"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "GRIP_FAILED",
+      "category": "manipulation_payload",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The humanoid cannot acquire the item or tool with its gripper.",
+      "trigger_primitives": ["GRASP"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "REACH_TO"},
+        {"kind": "primitive", "code": "GRASP"},
+        {"kind": "primitive", "code": "LIFT"},
+        {"kind": "task", "code": "SELF_CHECK", "optional": true},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "LIFT_FAILED",
+      "category": "manipulation_payload",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The humanoid grips the item but cannot lift it safely.",
+      "trigger_primitives": ["LIFT"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "GRASP"},
+        {"kind": "primitive", "code": "LIFT"},
+        {"kind": "task", "code": "HANDOVER_ITEM", "optional": true},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "ITEM_DROPPED",
+      "category": "manipulation_payload",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The carried item is dropped during transport or handling.",
+      "trigger_primitives": ["NAVIGATE_TO", "PLACE", "RELEASE"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "LOCALIZE_OBJECT"},
+        {"kind": "primitive", "code": "PRIMITIVE_IDENTIFY_ITEM"},
+        {"kind": "task", "code": "TRANSFER"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "ITEM_SLIPPED",
+      "category": "manipulation_payload",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The payload becomes unstable or slips while still partially controlled.",
+      "trigger_primitives": ["GRASP", "LIFT", "NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "REACH_TO"},
+        {"kind": "primitive", "code": "GRASP"},
+        {"kind": "primitive", "code": "LIFT"}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "PLACEMENT_FAILED",
+      "category": "manipulation_payload",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The humanoid cannot place or release the item at the required target.",
+      "trigger_primitives": ["PLACE", "RELEASE", "VERIFY_PLACEMENT"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "PLACE"},
+        {"kind": "primitive", "code": "RELEASE"},
+        {"kind": "primitive", "code": "VERIFY_PLACEMENT"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.1}
+    },
+    {
+      "code": "PAYLOAD_OVER_LIMIT",
+      "category": "manipulation_payload",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The payload exceeds the humanoid's configured carry capability.",
+      "trigger_primitives": ["GRASP", "LIFT"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "HANDOVER_ITEM"},
+        {"kind": "task", "code": "TRANSFER", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "RESOURCE_PREEMPTED",
+      "category": "resource_environment",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The expected resource was taken or reserved by another actor before use.",
+      "trigger_primitives": ["PRIMITIVE_IDENTIFY_ITEM", "LOCALIZE_OBJECT", "GRASP"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "PRIMITIVE_IDENTIFY_ITEM"},
+        {"kind": "task", "code": "TRANSFER", "optional": true},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "RESOURCE_MISSING",
+      "category": "resource_environment",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A required item, tool, vehicle, equipment, or consumable is unavailable.",
+      "trigger_primitives": ["CHECK_REQUEST", "PRIMITIVE_IDENTIFY_ITEM", "LOCALIZE_OBJECT"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "CHECK_REQUEST"},
+        {"kind": "task", "code": "REPLENISH_MATERIAL", "optional": true},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "PATH_BLOCKED",
+      "category": "resource_environment",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The planned route cannot be followed because the path is blocked.",
+      "trigger_primitives": ["NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "NAVIGATE_TO"},
+        {"kind": "task", "code": "REPORT_HAZARD", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "WORKSPACE_OBSTRUCTED",
+      "category": "resource_environment",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The local work area or service tile is obstructed.",
+      "trigger_primitives": ["CHECK_SAFETY_ZONE", "REACH_TO", "ALIGN"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "CLEAN_AREA", "optional": true},
+        {"kind": "task", "code": "REPORT_HAZARD", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "SURFACE_OR_AREA_CONTAMINATED",
+      "category": "resource_environment",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A floor, surface, workstation, or shared area is contaminated or unsafe for the current task.",
+      "trigger_primitives": ["CHECK_SAFETY_ZONE", "INSPECT_AREA"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "CLEAN_AREA"},
+        {"kind": "task", "code": "REPORT_HAZARD", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "TRAFFIC_WAIT",
+      "category": "motion_traffic",
+      "severity": "info",
+      "default_availability": "WAITING",
+      "description": "The humanoid is waiting because of traffic policy or reservation.",
+      "trigger_primitives": ["NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "NAVIGATE_TO"}
+      ],
+      "retry_policy": {"max_local_retries": 2, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "NEAR_MISS",
+      "category": "motion_traffic",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A tile or edge timing headway is too small and should be reviewed.",
+      "trigger_primitives": ["NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "NAVIGATE_TO"},
+        {"kind": "task", "code": "REPORT_HAZARD", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "COLLISION",
+      "category": "motion_traffic",
+      "severity": "error",
+      "default_availability": "BLOCKED",
+      "description": "A tile or edge collision was detected.",
+      "trigger_primitives": ["NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "REPORT_HAZARD"},
+        {"kind": "task", "code": "SELF_CHECK", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "NAVIGATION_DRIFT",
+      "category": "motion_traffic",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The actual humanoid location does not match the expected route or tile.",
+      "trigger_primitives": ["NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "LOAD_WORK_CONTEXT"},
+        {"kind": "primitive", "code": "NAVIGATE_TO"}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "DOCKING_FAILED",
+      "category": "motion_traffic",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The humanoid cannot align to a charger, workbench, equipment, or docking target.",
+      "trigger_primitives": ["ALIGN"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "ALIGN"},
+        {"kind": "primitive", "code": "NAVIGATE_TO"}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.2}
+    },
+    {
+      "code": "POWER_LOW_UNEXPECTED",
+      "category": "power_hardware",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "Battery level drops faster than expected for the current plan.",
+      "trigger_primitives": ["EXECUTE_SYSTEM_ACTION", "NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "MANAGE_ROBOT_POWER"}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "POWER_INTERRUPTION",
+      "category": "power_hardware",
+      "severity": "error",
+      "default_availability": "DISABLED",
+      "description": "A power interruption prevents safe task execution.",
+      "trigger_primitives": ["EXECUTE_SYSTEM_ACTION", "NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "MANAGE_ROBOT_POWER"},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "DEPLETED",
+      "category": "power_hardware",
+      "severity": "error",
+      "default_availability": "DISABLED",
+      "description": "The humanoid battery is DEPLETED.",
+      "trigger_primitives": ["NAVIGATE_TO", "EXECUTE_SYSTEM_ACTION"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "MANAGE_ROBOT_POWER"}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "SENSOR_DEGRADED",
+      "category": "power_hardware",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A sensor is degraded enough to reduce task reliability.",
+      "trigger_primitives": ["LOCALIZE_OBJECT", "READ_MACHINE_STATE"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "SELF_CHECK"},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "TOOL_OR_END_EFFECTOR_FAULT",
+      "category": "power_hardware",
+      "severity": "error",
+      "default_availability": "DISABLED",
+      "description": "A tool or end-effector fault prevents safe manipulation.",
+      "trigger_primitives": ["GRASP", "LIFT", "PLACE", "RELEASE"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "CHANGE_END_EFFECTOR"},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT"}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "ACTUATOR_FAULT",
+      "category": "power_hardware",
+      "severity": "error",
+      "default_availability": "DISABLED",
+      "description": "A joint or actuator fault prevents safe motion or manipulation.",
+      "trigger_primitives": ["NAVIGATE_TO", "REACH_TO", "GRASP", "LIFT"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "SELF_CHECK"},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT"}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "COMMUNICATION_LOST",
+      "category": "system_communication",
+      "severity": "warning",
+      "default_availability": "WAITING",
+      "description": "Communication with a controller or external system is temporarily unavailable.",
+      "trigger_primitives": ["CREATE_OR_UPDATE_RECORD", "READ_MACHINE_STATE", "EXECUTE_SYSTEM_ACTION"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "LOAD_WORK_CONTEXT"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 2, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "COMMAND_TIMEOUT",
+      "category": "system_communication",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A command or external operation did not respond within the expected time.",
+      "trigger_primitives": ["EXECUTE_SYSTEM_ACTION", "EXECUTE_MACHINE_ACTION", "CREATE_OR_UPDATE_RECORD"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "CHECK_CONTEXT"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "MAP_OR_CONTEXT_STALE",
+      "category": "system_communication",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "The active map, work context, or task context is stale.",
+      "trigger_primitives": ["CHECK_CONTEXT", "NAVIGATE_TO"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "LOAD_WORK_CONTEXT"},
+        {"kind": "primitive", "code": "CHECK_CONTEXT"}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "RECORD_UPDATE_FAILED",
+      "category": "system_communication",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A MES, WMS, log, or evidence record update failed.",
+      "trigger_primitives": ["LOG_RESULT", "UPDATE_RECORD", "CREATE_OR_UPDATE_RECORD", "RECORD_RESULT"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "CREATE_OR_UPDATE_RECORD"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "SAFETY_STOP",
+      "category": "safety_human_interaction",
+      "severity": "error",
+      "default_availability": "DISABLED",
+      "description": "A safety stop or interlock prevents operation.",
+      "trigger_primitives": ["CHECK_SAFETY_ZONE", "NAVIGATE_TO", "EXECUTE_MACHINE_ACTION"],
+      "recovery_protocol": [
+        {"kind": "task", "code": "REPORT_HAZARD"},
+        {"kind": "task", "code": "SELF_CHECK", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    },
+    {
+      "code": "HUMAN_IN_WORK_ZONE",
+      "category": "safety_human_interaction",
+      "severity": "warning",
+      "default_availability": "WAITING",
+      "description": "A person or another robot enters the active work zone.",
+      "trigger_primitives": ["CHECK_SAFETY_ZONE", "NAVIGATE_TO", "REACH_TO"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "CHECK_SAFETY_ZONE"},
+        {"kind": "primitive", "code": "ANNOUNCE_INTENT"},
+        {"kind": "task", "code": "REPORT_HAZARD", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 2, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "HANDOVER_FAILED",
+      "category": "safety_human_interaction",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "A human/robot or robot/robot handover cannot be completed safely.",
+      "trigger_primitives": ["ANNOUNCE_INTENT", "CONFIRM_OPERATOR_STATE", "EXECUTE_HUMAN_COLLABORATION_ACTION"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "ANNOUNCE_INTENT"},
+        {"kind": "primitive", "code": "CONFIRM_OPERATOR_STATE"},
+        {"kind": "task", "code": "HANDOVER_ITEM"}
+      ],
+      "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "OPERATOR_NOT_READY",
+      "category": "safety_human_interaction",
+      "severity": "info",
+      "default_availability": "WAITING",
+      "description": "The operator or collaborating actor is not ready for the next interaction.",
+      "trigger_primitives": ["CONFIRM_OPERATOR_STATE", "ANNOUNCE_INTENT"],
+      "recovery_protocol": [
+        {"kind": "primitive", "code": "CONFIRM_OPERATOR_STATE"},
+        {"kind": "primitive", "code": "ANNOUNCE_INTENT"}
+      ],
+      "retry_policy": {"max_local_retries": 2, "retry_delay_min": 0.5}
+    },
+    {
+      "code": "UNKNOWN",
+      "category": "unknown",
+      "severity": "warning",
+      "default_availability": "BLOCKED",
+      "description": "An unexpected interruption occurred but the cause is not known.",
+      "trigger_primitives": [],
+      "recovery_protocol": [
+        {"kind": "task", "code": "SELF_CHECK"},
+        {"kind": "task", "code": "CREATE_EXCEPTION_REPORT"},
+        {"kind": "task", "code": "RECOVER_FROM_FAULT", "optional": true}
+      ],
+      "retry_policy": {"max_local_retries": 0, "retry_delay_min": 0.0}
+    }
+  ]
+}
+
+

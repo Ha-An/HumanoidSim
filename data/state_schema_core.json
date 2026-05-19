@@ -166,16 +166,144 @@
       "description": "두 worker가 같은 시간 구간에 같은 edge를 반대 방향으로 통과한다."
     },
     {
-      "code": "near_miss",
+      "code": "NEAR_MISS",
       "description": "두 worker의 tile/edge 통과 간격이 traffic headway 기준보다 짧다."
     },
     {
-      "code": "collision",
+      "code": "COLLISION",
       "description": "tile conflict 또는 reverse edge conflict가 실제 이동 구간에서 겹친다."
     },
     {
-      "code": "traffic_wait",
+      "code": "TRAFFIC_WAIT",
       "description": "traffic policy 또는 reservation 때문에 이동을 대기한다."
+    },
+    {
+      "code": "OBJECT_RECOGNITION_FAILED",
+      "description": "The humanoid cannot recognize the expected target object."
+    },
+    {
+      "code": "POSE_ESTIMATION_FAILED",
+      "description": "The target exists but its pose or approach direction cannot be estimated."
+    },
+    {
+      "code": "LABEL_OR_MARKER_UNREADABLE",
+      "description": "A barcode, QR code, label, marker, OCR text, serial, or lot marker cannot be read."
+    },
+    {
+      "code": "TARGET_NOT_FOUND",
+      "description": "The expected target is not present at the planned location."
+    },
+    {
+      "code": "GRIP_FAILED",
+      "description": "The gripper failed to grasp the target item or tool."
+    },
+    {
+      "code": "LIFT_FAILED",
+      "description": "The target could not be lifted safely."
+    },
+    {
+      "code": "ITEM_DROPPED",
+      "description": "The carried or manipulated item was dropped."
+    },
+    {
+      "code": "ITEM_SLIPPED",
+      "description": "The payload slipped or became unstable while being carried."
+    },
+    {
+      "code": "PLACEMENT_FAILED",
+      "description": "The item could not be placed or released at the target location."
+    },
+    {
+      "code": "PAYLOAD_OVER_LIMIT",
+      "description": "The payload exceeds the humanoid carry limit."
+    },
+    {
+      "code": "RESOURCE_PREEMPTED",
+      "description": "The expected resource was already taken or reserved by another actor."
+    },
+    {
+      "code": "RESOURCE_MISSING",
+      "description": "The required item, tool, vehicle, equipment, or consumable is unavailable."
+    },
+    {
+      "code": "PATH_BLOCKED",
+      "description": "The planned path cannot be continued."
+    },
+    {
+      "code": "WORKSPACE_OBSTRUCTED",
+      "description": "The workspace or service tile is obstructed."
+    },
+    {
+      "code": "SURFACE_OR_AREA_CONTAMINATED",
+      "description": "The surface, floor, workstation, or shared area is contaminated or unsafe."
+    },
+    {
+      "code": "NAVIGATION_DRIFT",
+      "description": "The actual position no longer matches the planned path or expected tile."
+    },
+    {
+      "code": "DOCKING_FAILED",
+      "description": "The humanoid failed to align with a charger, workbench, equipment, or docking target."
+    },
+    {
+      "code": "POWER_LOW_UNEXPECTED",
+      "description": "Battery level dropped faster than expected."
+    },
+    {
+      "code": "POWER_INTERRUPTION",
+      "description": "A power interruption made safe execution impossible."
+    },
+    {
+      "code": "DEPLETED",
+      "description": "The battery is depleted."
+    },
+    {
+      "code": "SENSOR_DEGRADED",
+      "description": "Sensor degradation reduced task reliability."
+    },
+    {
+      "code": "TOOL_OR_END_EFFECTOR_FAULT",
+      "description": "A tool or end-effector fault makes manipulation unsafe."
+    },
+    {
+      "code": "ACTUATOR_FAULT",
+      "description": "A joint or actuator fault makes motion or manipulation unsafe."
+    },
+    {
+      "code": "COMMUNICATION_LOST",
+      "description": "Communication with a controller or external system was lost."
+    },
+    {
+      "code": "COMMAND_TIMEOUT",
+      "description": "A command or external operation timed out."
+    },
+    {
+      "code": "MAP_OR_CONTEXT_STALE",
+      "description": "The active map, work context, or task context is stale."
+    },
+    {
+      "code": "RECORD_UPDATE_FAILED",
+      "description": "MES, WMS, log, or evidence record update failed."
+    },
+    {
+      "code": "SAFETY_STOP",
+      "description": "A safety stop or interlock interrupted operation."
+    },
+    {
+      "code": "HUMAN_IN_WORK_ZONE",
+      "description": "A human or another robot entered the active work zone."
+    },
+    {
+      "code": "HANDOVER_FAILED",
+      "description": "A human-robot or robot-robot handover could not be completed safely."
+    },
+    {
+      "code": "OPERATOR_NOT_READY",
+      "description": "The operator or collaborating actor is not ready for the next interaction."
+    },
+    {
+      "code": "UNKNOWN",
+      "description": "An unexpected interruption occurred but the cause is not known."
     }
   ],
   "customization": {
