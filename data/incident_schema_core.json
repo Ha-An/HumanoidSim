@@ -106,6 +106,7 @@
       "severity": "warning",
       "default_availability": "BLOCKED",
       "description": "The humanoid cannot acquire the item or tool with its gripper.",
+      "aliases": ["material_carry_failed"],
       "trigger_primitives": ["GRASP"],
       "recovery_protocol": [
         {"kind": "primitive", "code": "REACH_TO"},
@@ -194,6 +195,7 @@
       "severity": "warning",
       "default_availability": "BLOCKED",
       "description": "The expected resource was taken or reserved by another actor before use.",
+      "aliases": ["material_supply_owner_changed", "material_shelf_slot_empty", "stale_precondition"],
       "trigger_primitives": ["PRIMITIVE_IDENTIFY_ITEM", "LOCALIZE_OBJECT", "GRASP"],
       "recovery_protocol": [
         {"kind": "primitive", "code": "PRIMITIVE_IDENTIFY_ITEM"},
@@ -208,6 +210,7 @@
       "severity": "warning",
       "default_availability": "BLOCKED",
       "description": "A required item, tool, vehicle, equipment, or consumable is unavailable.",
+      "aliases": ["material_shelf_empty", "precondition_failed"],
       "trigger_primitives": ["CHECK_REQUEST", "PRIMITIVE_IDENTIFY_ITEM", "LOCALIZE_OBJECT"],
       "recovery_protocol": [
         {"kind": "primitive", "code": "CHECK_REQUEST"},
@@ -222,6 +225,7 @@
       "severity": "warning",
       "default_availability": "BLOCKED",
       "description": "The planned route cannot be followed because the path is blocked.",
+      "aliases": ["material_shelf_pickup_unreachable", "material_supply_dropoff_unreachable"],
       "trigger_primitives": ["NAVIGATE_TO"],
       "recovery_protocol": [
         {"kind": "primitive", "code": "NAVIGATE_TO"},

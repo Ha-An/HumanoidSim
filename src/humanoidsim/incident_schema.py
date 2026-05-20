@@ -74,6 +74,7 @@ class IncidentProfile:
     severity: str = "warning"
     default_availability: AvailabilityState = AvailabilityState.BLOCKED
     description: str = ""
+    aliases: list[str] = field(default_factory=list)
     trigger_primitives: list[str] = field(default_factory=list)
     recovery_protocol: list[RecoveryStep] = field(default_factory=list)
     retry_policy: IncidentRetryPolicy = field(default_factory=IncidentRetryPolicy)
@@ -86,6 +87,7 @@ class IncidentProfile:
             severity=str(data.get("severity", "warning")).strip().lower() or "warning",
             default_availability=AvailabilityState(str(data.get("default_availability", AvailabilityState.BLOCKED.value))),
             description=str(data.get("description", "")),
+            aliases=[str(item).strip() for item in data.get("aliases", []) if str(item).strip()],
             trigger_primitives=[str(item).strip() for item in data.get("trigger_primitives", []) if str(item).strip()],
             recovery_protocol=[RecoveryStep.from_dict(row) for row in data.get("recovery_protocol", [])],
             retry_policy=IncidentRetryPolicy.from_dict(data.get("retry_policy")),
@@ -115,15 +117,24 @@ class IncidentSchema:
     categories: dict[str, IncidentCategory]
     incidents: dict[str, IncidentProfile]
     root: Path
+    aliases: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any], *, root: Path) -> "IncidentSchema":
         categories = {row.id: row for row in (IncidentCategory.from_dict(item) for item in data.get("categories", []))}
         incidents = {row.code: row for row in (IncidentProfile.from_dict(item) for item in data.get("incidents", []))}
-        return cls(version=str(data.get("version", "0.1.0")), categories=categories, incidents=incidents, root=root)
+        aliases: dict[str, str] = {}
+        for code, profile in incidents.items():
+            aliases[_normalize_lookup_key(code)] = code
+            for alias in profile.aliases:
+                alias_key = _normalize_lookup_key(alias)
+                if alias_key:
+                    aliases[alias_key] = code
+        return cls(version=str(data.get("version", "0.1.0")), categories=categories, incidents=incidents, root=root, aliases=aliases)
 
     def get(self, code: str) -> IncidentProfile:
-        normalized = str(code or "").strip().upper()
+        normalized = _normalize_lookup_key(code)
+        normalized = self.aliases.get(normalized, normalized)
         if normalized not in self.incidents:
             raise KeyError(f"Unknown humanoid incident code: {code}")
         return self.incidents[normalized]
@@ -145,6 +156,9 @@ class IncidentSchema:
                 issues.append(IncidentValidationIssue(f"incidents.{code}.category", "UNKNOWN_CATEGORY", f"Unknown incident category {profile.category}."))
             if not profile.recovery_protocol:
                 issues.append(IncidentValidationIssue(f"incidents.{code}.recovery_protocol", "MISSING_RECOVERY_PROTOCOL", "Recovery protocol is required."))
+            for alias in profile.aliases:
+                if not _normalize_lookup_key(alias):
+                    issues.append(IncidentValidationIssue(f"incidents.{code}.aliases", "EMPTY_ALIAS", "Incident alias must not be empty."))
             for primitive in profile.trigger_primitives:
                 if primitive not in primitive_codes:
                     issues.append(IncidentValidationIssue(f"incidents.{code}.trigger_primitives", "UNKNOWN_PRIMITIVE", f"Unknown trigger primitive {primitive}."))
@@ -171,8 +185,16 @@ def load_incident_schema(root: Path | str | None = None) -> IncidentSchema:
     return IncidentSchema.from_dict(json.loads(path.read_text(encoding="utf-8")), root=project_root)
 
 
+def _normalize_lookup_key(value: str) -> str:
+    return str(value or "").strip().upper()
+
+
 def get_incident_profile(code: str, *, schema: IncidentSchema | None = None) -> IncidentProfile:
     return (schema or load_incident_schema()).get(code)
+
+
+def resolve_incident_code(code_or_alias: str, *, schema: IncidentSchema | None = None) -> str:
+    return get_incident_profile(code_or_alias, schema=schema).code
 
 
 def recovery_protocol_for_incident(code: str, *, schema: IncidentSchema | None = None) -> list[RecoveryStep]:
@@ -250,5 +272,6 @@ __all__ = [
     "get_incident_profile",
     "load_incident_schema",
     "recovery_protocol_for_incident",
+    "resolve_incident_code",
     "validate_incident_schema",
 ]

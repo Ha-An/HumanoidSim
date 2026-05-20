@@ -104,6 +104,8 @@ Incident taxonomy는 제조 환경에만 묶이지 않도록 perception/identifi
 
 Recovery protocol의 모든 step은 기존 HumanoidSim primitive 또는 task를 참조해야 합니다. 이 관계는 `validate_incident_schema()`에서 검증됩니다.
 
+Runtime이 관찰한 세부 실패 reason은 `IncidentProfile.aliases`로 canonical incident code에 연결할 수 있습니다. 예를 들어 ManSim의 `material_shelf_slot_empty` reason은 HumanoidSim alias resolution을 통해 `RESOURCE_PREEMPTED`로 해석됩니다.
+
 ## 구성
 
 - `src/humanoidsim/task_schema.py`: task, step, resource, registry validation schema

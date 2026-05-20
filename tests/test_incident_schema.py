@@ -89,6 +89,12 @@ class IncidentSchemaTests(unittest.TestCase):
         self.assertEqual(profile.category, "perception_identification")
         self.assertIn("LOCALIZE_OBJECT", profile.trigger_primitives)
 
+    def test_incident_aliases_resolve_to_canonical_codes(self) -> None:
+        self.assertEqual(get_incident_profile("material_shelf_slot_empty", schema=self.schema).code, "RESOURCE_PREEMPTED")
+        self.assertEqual(get_incident_profile("material_shelf_empty", schema=self.schema).code, "RESOURCE_MISSING")
+        self.assertEqual(get_incident_profile("material_supply_dropoff_unreachable", schema=self.schema).code, "PATH_BLOCKED")
+        self.assertEqual(get_incident_profile("material_carry_failed", schema=self.schema).code, "GRIP_FAILED")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -19,6 +19,7 @@ from .incident_schema import (
     get_incident_profile,
     load_incident_schema,
     recovery_protocol_for_incident,
+    resolve_incident_code,
     validate_incident_schema,
 )
 from .state_schema import (
@@ -97,6 +98,7 @@ __all__ = [
     "parse_humanoid_state_snapshot",
     "primitive_state_hint",
     "recovery_protocol_for_incident",
+    "resolve_incident_code",
     "transition_humanoid_state",
     "simulate_task_sequence",
     "task_spec_from_dict",
