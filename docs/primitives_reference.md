@@ -10,6 +10,7 @@
 - Primitive template index: `data/primitive_templates.json`
 - State relation 원본: 각 primitive JSON의 `metadata.state`, `data/state_schema_core.json`의 `primitive_state_profiles`
 - 정상적으로 실행 중인 모든 primitive는 Availability State 중 `EXECUTING`으로 표현됩니다.
+- Incident recovery protocol 안에서 실행되는 primitive는 예외적으로 `BLOCKED` 상태를 유지합니다. 이때 primitive code는 `task_context.primitive_call_code`에 기록되며, UI에서는 `CODE (RECOVERY)`처럼 표시할 수 있습니다.
 
 ## Active Primitive와 Registry Primitive
 

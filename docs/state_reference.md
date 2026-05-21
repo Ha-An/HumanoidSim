@@ -390,6 +390,8 @@ ManSim의 `strict_reservation` 모드에서는 `TRAFFIC_WAIT`이 실제 worker a
 
 정상적으로 실행 중인 모든 primitive의 Availability State는 `EXECUTING`입니다. Primitive별 Mobility/Manipulation 관계는 `data/primitives/*.json`의 `metadata.state`에 정의되어 있으며, 전체 표는 [Primitive Reference](primitives_reference.md)를 기준 문서로 사용합니다.
 
+단, incident recovery protocol 안에서 실행되는 primitive는 예외입니다. 이 경우 primitive 자체는 `task_context.primitive_call_code`에 기록되지만, Availability는 incident로 막힌 상태를 나타내기 위해 `BLOCKED`를 유지합니다. 즉 recovery primitive는 “정상 작업 실행”이 아니라 “blocked 상태에서의 복구 절차”로 해석합니다.
+
 | Primitive | 시작 시 hint | 종료 시 hint | 설명 |
 | --- | --- | --- | --- |
 | `NAVIGATE_TO` | `mobility=NAVIGATING` | `mobility=STATIONARY` | 목적지까지 이동합니다. |

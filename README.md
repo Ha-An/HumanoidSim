@@ -83,7 +83,7 @@ State는 네 축으로 정의합니다.
 
 ## Primitive State Relation
 
-HumanoidSim은 primitive별 state 의미를 정의합니다. 정상적으로 실행 중인 모든 primitive는 Availability State에서 `EXECUTING`입니다. Mobility와 Manipulation은 primitive의 `metadata.state.allowed`와 `metadata.state.effects`에 따라 결정됩니다.
+HumanoidSim은 primitive별 state 의미를 정의합니다. 정상적으로 실행 중인 모든 primitive는 Availability State에서 `EXECUTING`입니다. Mobility와 Manipulation은 primitive의 `metadata.state.allowed`와 `metadata.state.effects`에 따라 결정됩니다. 단, incident recovery protocol 안에서 실행되는 primitive는 blocked 상태의 복구 절차이므로 Availability를 `BLOCKED`로 유지하고, 현재 primitive code만 `task_context`에 기록합니다.
 
 - `NAVIGATE_TO`: 실행 중 `mobility=NAVIGATING`, 종료 후 `STATIONARY`
 - `ALIGN`: 정렬/도킹 중 `mobility=DOCKING`, 종료 후 `STATIONARY`
@@ -105,6 +105,8 @@ Incident taxonomy는 제조 환경에만 묶이지 않도록 perception/identifi
 Recovery protocol의 모든 step은 기존 HumanoidSim primitive 또는 task를 참조해야 합니다. 이 관계는 `validate_incident_schema()`에서 검증됩니다.
 
 Runtime이 관찰한 세부 실패 reason은 `IncidentProfile.aliases`로 canonical incident code에 연결할 수 있습니다. 예를 들어 ManSim의 `material_shelf_slot_empty` reason은 HumanoidSim alias resolution을 통해 `RESOURCE_PREEMPTED`로 해석됩니다.
+
+Recovery protocol을 실행하는 동안 Availability는 `BLOCKED`를 유지합니다. Recovery step이 task 또는 primitive code를 참조하더라도 이는 정상 작업의 `EXECUTING`이 아니라 blocked 상태에서 수행되는 복구 절차이며, 현재 step은 `task_context`에 기록됩니다.
 
 ## 구성
 

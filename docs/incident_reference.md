@@ -508,6 +508,8 @@ Recovery protocol의 각 step은 `kind=primitive` 또는 `kind=task`를 갖습�
 
 현재 v0.1 schema 기준 recovery step은 총 86개이며, 모두 정의된 primitive 또는 task를 참조합니다.
 
+Recovery protocol은 incident로 인해 막힌 상태를 해소하기 위한 절차입니다. 따라서 recovery step이 task 또는 primitive를 실행하더라도 Availability는 정상 작업의 `EXECUTING`으로 바꾸지 않고 `BLOCKED`를 유지합니다. 현재 수행 중인 recovery step은 `task_context.task_code` 또는 `task_context.primitive_call_code`에 기록하고, UI나 replay에서는 `CODE (RECOVERY)`처럼 일반 작업과 구분해서 표시합니다. Recovery protocol이 끝나면 runtime은 task 취소, 재할당, 재시도 같은 후속 정책에 따라 `AVAILABLE`, `ASSIGNED`, 또는 계속 `BLOCKED` 중 하나로 전이시킬 수 있습니다.
+
 ## State Transition
 
 Incident는 주로 Availability 축에 영향을 줍니다. Mobility, Manipulation, Power는 incident 순간의 물리 상태를 유지하거나 power/hardware incident처럼 명확한 경우에만 함께 바뀝니다.
@@ -532,11 +534,12 @@ flowchart TB
   WAITING -->|timeout or condition changed| BLOCKED
   EXECUTING -->|perception/manipulation/resource/COLLISION/UNKNOWN| BLOCKED
   EXECUTING -->|DEPLETED, severe hardware, safety interlock| DISABLED
-  BLOCKED -->|recovery task assigned| ASSIGNED
+  BLOCKED -->|recovery protocol step runs| BLOCKED
+  BLOCKED -->|recovery completed and replan needed| AVAILABLE
+  BLOCKED -->|recovery completed and retry assigned| ASSIGNED
   DISABLED -->|maintenance or power recovery assigned| ASSIGNED
   ASSIGNED --> EXECUTING
   EXECUTING -->|task completed| AVAILABLE
-  BLOCKED -->|task canceled| AVAILABLE
   OFFLINE -->|returned to operation| AVAILABLE
 ```
 
