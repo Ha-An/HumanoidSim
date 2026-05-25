@@ -588,6 +588,11 @@ def transition_humanoid_state(
 
     next_snapshot = replace(previous, timestamp_s=timestamp_s, metadata=metadata)
 
+    def _axis_reason() -> StateReason | None:
+        # Axis-only events such as power or cargo changes must not erase the
+        # reason for an unresolved WAITING/BLOCKED/DISABLED availability state.
+        return reason if reason is not None else next_snapshot.reason
+
     if event_type in {"task_assigned", "assigned"}:
         next_snapshot = replace(
             next_snapshot,
@@ -649,15 +654,19 @@ def transition_humanoid_state(
         next_snapshot = replace(
             next_snapshot,
             manipulation=ManipulationState.HOLDING if cargo_present else ManipulationState.FREE,
-            reason=reason,
+            reason=_axis_reason(),
         )
     elif event_type in {"primitive_started", "primitive_start", "primitive_finished", "primitive_end"}:
         finished = event_type in {"primitive_finished", "primitive_end"}
         next_snapshot = _transition_primitive(next_snapshot, transition_event, loaded_schema, finished=finished)
     elif event_type in {"power_charging"}:
-        next_snapshot = replace(next_snapshot, power=PowerState.CHARGING, reason=reason)
+        next_snapshot = replace(next_snapshot, power=PowerState.CHARGING, reason=_axis_reason())
     elif event_type in {"power_normal"}:
-        next_snapshot = replace(next_snapshot, power=PowerState.POWER_NORMAL, reason=reason)
+        next_snapshot = replace(next_snapshot, power=PowerState.POWER_NORMAL, reason=_axis_reason())
+    elif event_type in {"power_low"}:
+        next_snapshot = replace(next_snapshot, power=PowerState.POWER_LOW, reason=_axis_reason())
+    elif event_type in {"power_critical"}:
+        next_snapshot = replace(next_snapshot, power=PowerState.POWER_CRITICAL, reason=_axis_reason())
     else:
         raise StateTransitionError(f"Unknown humanoid state transition event_type={transition_event.event_type!r}.")
 

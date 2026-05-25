@@ -153,6 +153,13 @@ class StateSchemaTests(unittest.TestCase):
         )
         self.assertEqual(stopped.mobility, MobilityState.STATIONARY)
 
+        low_power = transition_humanoid_state(stopped, StateTransitionEvent(event_type="power_low"))
+        self.assertEqual(low_power.power, PowerState.POWER_LOW)
+        critical_power = transition_humanoid_state(low_power, StateTransitionEvent(event_type="power_critical"))
+        self.assertEqual(critical_power.power, PowerState.POWER_CRITICAL)
+        normal_power = transition_humanoid_state(critical_power, StateTransitionEvent(event_type="power_normal"))
+        self.assertEqual(normal_power.power, PowerState.POWER_NORMAL)
+
         with self.assertRaises(StateTransitionError):
             transition_humanoid_state(
                 stopped,
