@@ -1,5 +1,11 @@
 # Task Reference
 
+## Generic Item Request
+
+일부 task 입력의 `item`은 반드시 concrete item id일 필요가 없습니다. 예를 들어 `REPLENISH_MATERIAL`은 “특정 `MAT-WH-*`를 가져오라”가 아니라 “source에서 사용 가능한 material 하나를 찾아 destination을 target level까지 보충하라”는 generic request로 실행될 수 있습니다. 이 경우 task input은 `entity_type=material`, `selection_policy=available_material_from_source` 같은 request를 담고, concrete item instance는 `PRIMITIVE_IDENTIFY_ITEM` 단계에서 확정됩니다.
+
+`TRANSFER`, `INSPECT_PRODUCT`, `SETUP_MACHINE`처럼 특정 queue item이나 machine output이 task 의미의 핵심인 경우에는 concrete item id를 task 생성 시점에 줄 수 있습니다.
+
 이 문서는 `data/tasks/*.json`에 정의된 HumanoidSim core task를 사람이 읽기 쉽게 정리한 reference입니다. JSON 파일이 원본이고, 이 문서는 검색과 검토를 위한 요약입니다.
 
 ## 요약

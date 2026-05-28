@@ -4,6 +4,10 @@ HumanoidSim은 휴머노이드 로봇을 위한 task, primitive, state, incident
 
 ![HumanoidSim overview](assets/IMG.png)
 
+## Generic Item Request
+
+Task input의 `item`은 concrete item id일 수도 있고 generic request일 수도 있습니다. 예를 들어 `REPLENISH_MATERIAL`은 `entity_type=material`, `selection_policy=available_material_from_source` 형태로 “사용 가능한 material 하나”를 요청할 수 있습니다. 이 경우 concrete item instance는 task 생성 시점이 아니라 `PRIMITIVE_IDENTIFY_ITEM` 단계에서 확정됩니다.
+
 ## 역할
 
 HumanoidSim은 휴머노이드가 수행할 수 있는 일을 `TaskSpec`으로 정의하고, task를 이루는 실행 단계를 `StepCall`과 `Primitive Skill`로 정의합니다. ManSim 같은 시뮬레이션 runtime은 이 정의를 import해서 특정 환경과 시나리오에서 실제로 어떤 일이 벌어지는지 관찰합니다.

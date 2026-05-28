@@ -1,5 +1,11 @@
 # Primitive Reference
 
+## Generic Request Resolution
+
+`PRIMITIVE_IDENTIFY_ITEM`은 이미 정해진 item id를 확인하는 데에도 쓰이고, generic item request를 concrete item instance로 확정하는 데에도 쓰입니다. 예를 들어 `REPLENISH_MATERIAL`이 `entity_type=material`, `selection_policy=available_material_from_source`를 입력으로 받으면, 이 primitive 단계에서 실제로 집을 수 있는 material slot과 `MAT-WH-*` item id를 선택합니다.
+
+이 primitive는 task 의미를 바꾸지 않습니다. Task는 “material 보충”이라는 목표를 유지하고, primitive는 그 목표를 실행 가능한 concrete 대상에 연결합니다.
+
 이 문서는 task step에서 실제로 참조되는 active primitive skill과 primitive registry를 정리한 reference입니다. Primitive는 task를 구성하는 가장 작은 실행 skill이며, `ATOMIC_TASK`와 `COMPOSITE_TASK`의 step에서 참조됩니다.
 
 ## 요약

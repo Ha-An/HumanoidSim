@@ -9,7 +9,7 @@
       "name": "item",
       "type_hint": "EntityRef | str",
       "required": true,
-      "description": "Catalog input parameter: item.",
+      "description": "Material item request. This may be a concrete item id or a generic request such as entity_type=material with selection_policy=available_material_from_source; the concrete item can be resolved during PRIMITIVE_IDENTIFY_ITEM.",
       "default": null,
       "unit": null,
       "allowed_values": []

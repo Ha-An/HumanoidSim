@@ -3,7 +3,7 @@
   "level": "PRIMITIVE_SKILL",
   "version": "1.0.0",
   "name": "Primitive Identify Item",
-  "description": "Primitive skill generated from manufacturing humanoid primitive templates for PRIMITIVE_IDENTIFY_ITEM.",
+  "description": "Identify a requested item or resolve a generic item request into a concrete item instance that can be manipulated.",
   "inputs": [],
   "outputs": [
     {
