@@ -22,6 +22,8 @@ from .incident_schema import (
     resolve_incident_code,
     validate_incident_schema,
 )
+from .interactive_lab_ui import LabUiConfig, LabUiRuntime, launch_gazebo_validation, run_lab_ui
+from .interactive_trace import InteractiveTraceConfig, InteractiveTraceResult, run_incident_trace, run_task_trace, trace_to_json
 from .state_schema import (
     AvailabilityState,
     DEFAULT_HUMANOID_STATE,
@@ -52,6 +54,7 @@ from .state_schema import (
     validate_state_snapshot,
     validate_state_transition,
 )
+from .validation_lab import LabIssue, ValidationLabConfig, ValidationLabResult, run_validation_lab
 from .viewer import export_validation_viewer
 
 __all__ = [
@@ -64,6 +67,11 @@ __all__ = [
     "IncidentRetryPolicy",
     "IncidentSchema",
     "IncidentValidationIssue",
+    "InteractiveTraceConfig",
+    "InteractiveTraceResult",
+    "LabIssue",
+    "LabUiConfig",
+    "LabUiRuntime",
     "ManipulationState",
     "MobilityState",
     "PowerState",
@@ -81,6 +89,8 @@ __all__ = [
     "TaskCatalog",
     "TaskContext",
     "TaskValidationIssue",
+    "ValidationLabConfig",
+    "ValidationLabResult",
     "apply_primitive_state_hint",
     "build_incident_transition_event",
     "build_state_snapshot_for_task_lifecycle",
@@ -92,6 +102,7 @@ __all__ = [
     "get_incident_profile",
     "get_primitive_state_profile",
     "load_state_schema",
+    "launch_gazebo_validation",
     "load_sequence_file",
     "load_incident_schema",
     "load_task_catalog",
@@ -99,9 +110,14 @@ __all__ = [
     "primitive_state_hint",
     "recovery_protocol_for_incident",
     "resolve_incident_code",
+    "run_validation_lab",
+    "run_incident_trace",
+    "run_lab_ui",
+    "run_task_trace",
     "transition_humanoid_state",
     "simulate_task_sequence",
     "task_spec_from_dict",
+    "trace_to_json",
     "validate_primitive_state_profile",
     "validate_state_snapshot",
     "validate_state_transition",

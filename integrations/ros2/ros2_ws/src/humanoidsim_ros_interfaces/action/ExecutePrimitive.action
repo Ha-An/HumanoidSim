@@ -1,0 +1,13 @@
+string humanoid_id
+string task_code
+string task_instance_id
+string step_id
+string primitive_call_code
+string context_json
+---
+bool success
+string final_state_json
+string message
+---
+string state_json
+float32 progress

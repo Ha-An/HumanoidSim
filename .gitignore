@@ -4,3 +4,6 @@ __pycache__/
 .pytest_cache/
 outputs/
 *.egg-info/
+integrations/ros2/ros2_ws/build/
+integrations/ros2/ros2_ws/install/
+integrations/ros2/ros2_ws/log/

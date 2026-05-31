@@ -1,0 +1,6 @@
+string task_code
+string args_json
+---
+bool success
+string steps_json
+string message

@@ -83,7 +83,6 @@ COMPOSITE_STEP_OVERRIDES = {
     "REPLENISH_MATERIAL": ["CHECK_REQUEST", "PRIMITIVE_IDENTIFY_ITEM", "TRANSFER", "VERIFY_LEVEL_OR_QUANTITY", "UPDATE_RECORD"],
     "REMOVE_MATERIAL": ["CHECK_REQUEST", "PRIMITIVE_IDENTIFY_ITEM", "TRANSFER", "VERIFY_LEVEL_OR_QUANTITY", "UPDATE_RECORD"],
     "OPERATE_VEHICLE_TRANSPORT": ["VERIFY_AUTHORIZATION", "TRANSFER", "PARK_OR_RELEASE_VEHICLE", "VERIFY_PLACEMENT"],
-    "SETUP_MACHINE": ["CHECK_SAFETY_ZONE", "READ_MACHINE_STATE", "LOAD_MACHINE", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
     "CHANGE_MACHINE_CONFIGURATION": ["CHECK_SAFETY_ZONE", "OPERATE_MACHINE_INTERFACE", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
     "CLEAR_MACHINE_FAULT": ["CHECK_SAFETY_ZONE", "OPERATE_MACHINE_INTERFACE", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
     "ASSEMBLE_COMPONENTS": ["INSERT_COMPONENT", "FASTEN_COMPONENT", "VERIFY_ASSEMBLY"],
@@ -115,19 +114,14 @@ COMPOSITE_STEP_OVERRIDES = {
 
 ATOMIC_STEP_OVERRIDES = {
     "INSPECT_MACHINE": ["CHECK_SAFETY_ZONE", "VERIFY_LOCKOUT_IF_REQUIRED", "INSPECT_OR_DIAGNOSE", "LOG_RESULT"],
+    "SETUP_MACHINE": ["CHECK_SAFETY_ZONE", "NAVIGATE_TO", "READ_MACHINE_STATE", "EXECUTE_MACHINE_ACTION", "VERIFY_MACHINE_STATE", "LOG_RESULT"],
 }
 
 SPECIAL_CHILD_ARG_MAP = {
     ("REPLENISH_MATERIAL", "TRANSFER"): {"item": "$inputs.item", "source": "$inputs.source", "destination": "$inputs.destination"},
     ("REMOVE_MATERIAL", "TRANSFER"): {"item": "$inputs.item", "source": "$inputs.source", "destination": "$inputs.destination"},
-    ("SETUP_MACHINE", "LOAD_MACHINE"): {
-        "machine": "$inputs.machine",
-        "item": {"derived_from_parent": "SETUP_MACHINE", "field": "item"},
-        "source": {"derived_from_parent": "SETUP_MACHINE", "field": "source"},
-        "target_slot": {"derived_from_parent": "SETUP_MACHINE", "field": "target_slot"},
-    },
     ("REPAIR_MACHINE", "INSPECT_MACHINE"): {"machine": "$inputs.machine", "inspection_plan": "$inputs.fault"},
-    ("DIAGNOSE_MACHINE", "INSPECT_MACHINE"): {"machine": "$inputs.machine", "inspection_plan": "$inputs.symptom"},
+    ("DIAGNOSE_MACHINE", "INSPECT_MACHINE"): {"machine": "$inputs.machine", "inspection_plan": "$inputs.symptoms"},
     ("PREVENTIVE_MAINTENANCE", "INSPECT_MACHINE"): {"machine": "$inputs.asset", "inspection_plan": "$inputs.checklist"},
     ("FETCH_FOR_OPERATOR", "TRANSFER"): {
         "item": "$inputs.request",
@@ -143,7 +137,12 @@ SPECIAL_CHILD_ARG_MAP = {
     ("ASSIST_OPERATOR_MOVE_OR_LIFT", "HANDOVER_ITEM"): {
         "item": "$inputs.item",
         "recipient": "$inputs.operator",
-        "handover_spec": "$inputs.assist_spec",
+        "handover_spec": {
+            "assist_type": "move_or_lift",
+            "operator": "$inputs.operator",
+            "item": "$inputs.item",
+            "destination": "$inputs.destination",
+        },
     },
     ("PUTAWAY_ITEM", "TRANSFER"): {
         "item": "$inputs.item",
@@ -156,9 +155,9 @@ SPECIAL_CHILD_ARG_MAP = {
         "destination": {"derived_from_parent": "PICK_INVENTORY", "field": "destination"},
     },
     ("COLLECT_WASTE_OR_SCRAP", "TRANSFER"): {
-        "item": "$inputs.waste_or_scrap",
+        "item": "$inputs.items",
         "source": "$inputs.source",
-        "destination": "$inputs.disposal_location",
+        "destination": "$inputs.destination",
     },
 }
 
@@ -261,6 +260,7 @@ def main() -> int:
         )
         for row in rows
     }
+    task_levels["SETUP_MACHINE"] = TaskLevel.ATOMIC_TASK
     task_inputs = {str(row["Task Code"]): _split_csv(str(row.get("Primary Inputs", ""))) for row in rows}
     primitive_codes: dict[str, set[str]] = {}
     task_paths: list[str] = []

@@ -1,0 +1,8 @@
+string humanoid_id
+string incident_code
+string context_json
+---
+bool accepted
+string state_json
+string recovery_protocol_json
+string message

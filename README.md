@@ -1,80 +1,43 @@
-# HumanoidSim_v0.1
+# HumanoidSim
 
-HumanoidSim은 휴머노이드 로봇을 위한 task, primitive, state, incident 정의 및 검증 라이브러리입니다.
+HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident`, `Recovery protocol`을 도메인 독립적으로 정의하고 검증하는 라이브러리입니다. ManSim 같은 시뮬레이터는 HumanoidSim의 정의를 import해서 사용할 수 있지만, HumanoidSim 자체는 ManSim에 의존하지 않습니다.
 
 ![HumanoidSim overview](assets/IMG.png)
 
-## Generic Item Request
+## 핵심 원칙
 
-Task input의 `item`은 concrete item id일 수도 있고 generic request일 수도 있습니다. 예를 들어 `REPLENISH_MATERIAL`은 `entity_type=material`, `selection_policy=available_material_from_source` 형태로 “사용 가능한 material 하나”를 요청할 수 있습니다. 이 경우 concrete item instance는 task 생성 시점이 아니라 `PRIMITIVE_IDENTIFY_ITEM` 단계에서 확정됩니다.
+- Humanoid의 기본 의미 정의는 HumanoidSim이 소유합니다.
+- Task는 목표 작업, Primitive는 최소 실행 단위, State는 특정 시점의 상태 snapshot입니다.
+- Incident는 새 state가 아니라 `StateReason + recovery protocol`입니다.
+- Composite task는 child task를 직접 포함하는 workflow입니다.
+- Recovery protocol step은 기존 primitive 또는 task를 참조해야 합니다.
+- Validation Lab과 ROS adapter는 HumanoidSim 독립 검증 도구이며 ManSim hub나 ManSim artifact에 연결하지 않습니다.
 
-## 역할
+## 현재 카탈로그
 
-HumanoidSim은 휴머노이드가 수행할 수 있는 일을 `TaskSpec`으로 정의하고, task를 이루는 실행 단계를 `StepCall`과 `Primitive Skill`로 정의합니다. ManSim 같은 시뮬레이션 runtime은 이 정의를 import해서 특정 환경과 시나리오에서 실제로 어떤 일이 벌어지는지 관찰합니다.
-
-현재 버전은 `v0.1`이며 제조 core task 82개와 primitive skill 59개를 포함합니다.
+| 항목 | 개수 | 설명 |
+| --- | ---: | --- |
+| Task | 82 | 제조 및 범용 휴머노이드 작업 카탈로그입니다. |
+| Atomic Task | 51 | Primitive sequence만으로 실행되는 단일 task입니다. |
+| Composite Task | 31 | 하나 이상의 child task call을 포함하는 workflow task입니다. |
+| Primitive | 59 | Task를 구성하는 최소 실행 skill입니다. |
+| Incident | 35 | 범용 휴머노이드 돌발상황 taxonomy입니다. |
 
 ## Task 구조
 
 | Level | 의미 | 구조 규칙 |
 | --- | --- | --- |
 | `PRIMITIVE_SKILL` | 더 이상 쪼개지지 않는 최소 실행 skill | child step을 갖지 않습니다. |
-| `ATOMIC_TASK` | primitive skill만으로 구성된 실행 가능한 단일 task | 모든 `StepCall.call_code`가 primitive를 참조해야 합니다. |
-| `COMPOSITE_TASK` | 하위 task를 직접 포함하는 workflow | 최소 1개 이상의 child task call을 포함해야 합니다. orchestration primitive를 함께 가질 수 있습니다. |
+| `ATOMIC_TASK` | primitive skill만으로 구성되는 실행 가능한 task | 모든 `StepCall.call_code`가 primitive를 참조합니다. |
+| `COMPOSITE_TASK` | 하위 task를 직접 포함하는 workflow | 최소 1개 이상의 child task call을 포함합니다. orchestration primitive를 함께 가질 수 있습니다. |
 
-`COMPOSITE_TASK`는 단순히 긴 primitive sequence가 아닙니다. 예를 들어 `REPLENISH_MATERIAL`은 `CHECK_REQUEST -> PRIMITIVE_IDENTIFY_ITEM -> TRANSFER -> VERIFY_LEVEL_OR_QUANTITY -> UPDATE_RECORD` 구조이고, 여기서 `TRANSFER`는 primitive가 아니라 `ATOMIC_TASK` child call입니다.
+`StepCall.call_code`는 primitive code뿐 아니라 task code도 참조할 수 있습니다. 이때 `expected_level`은 `PRIMITIVE_SKILL`, `ATOMIC_TASK`, `COMPOSITE_TASK` 중 실제 참조 대상의 level과 일치해야 합니다.
 
-`StepCall.call_code`는 primitive code뿐 아니라 task code도 참조할 수 있습니다. 이때 `expected_level`은 필수이며 `PRIMITIVE_SKILL`, `ATOMIC_TASK`, `COMPOSITE_TASK` 중 실제 참조 대상의 level과 일치해야 합니다.
+예를 들어 `REPLENISH_MATERIAL`은 generic material request를 받은 뒤 `PRIMITIVE_IDENTIFY_ITEM` 단계에서 실제 material instance를 식별하고, child task인 `TRANSFER`로 운반을 수행합니다.
 
-## Task 분류
+## State 모델
 
-82개 task는 13개 제조 운영 category로 분류됩니다.
-
-| ID | Category | Count |
-| --- | --- | ---: |
-| A | Robot Readiness & Self-Operation | 8 |
-| B | Mobility, Intralogistics & Material Flow | 5 |
-| C | Machine Tending & Equipment Operation | 7 |
-| D | Assembly, Fastening & Connection | 9 |
-| E | Material Application, Dispensing & Sealing | 5 |
-| F | Processing, Rework & Surface Treatment | 5 |
-| G | Quality Inspection, Measurement & Testing | 7 |
-| H | Maintenance, Repair & Calibration | 7 |
-| I | Cleaning, 5S, EHS & Safety Patrol | 6 |
-| J | Packaging, Unitization & Shipping | 5 |
-| K | Warehouse, Inventory & Material Control | 6 |
-| L | MES, Traceability & Digital Operations | 6 |
-| M | Human Collaboration & Operator Assistance | 6 |
-
-Level 기준으로는 `ATOMIC_TASK` 50개, `COMPOSITE_TASK` 32개입니다.
-
-## Public API
-
-대표 API는 다음과 같습니다.
-
-```python
-from humanoidsim import (
-    HumanoidProfile,
-    load_task_catalog,
-    validate_task_sequence,
-    simulate_task_sequence,
-    expand_task_steps,
-)
-```
-
-`expand_task_steps(task_code, args, catalog=...)`는 nested composite task를 펼쳐 parent task, child task, primitive leaf를 모두 포함한 plan row를 반환합니다. 각 row에는 `path`, `depth`, `parent_task_code`, `call_code`, `call_level`, `step_id`, `args`, `depends_on`이 들어갑니다.
-
-## Humanoid State Model
-
-Task와 State는 분리합니다.
-
-| 개념 | 의미 |
-| --- | --- |
-| Task | 휴머노이드가 달성해야 하는 목표 작업입니다. 예: `TRANSFER`, `INSPECT_PRODUCT`, `REPLENISH_MATERIAL` |
-| Primitive | Task를 이루는 실행 단계입니다. 예: `NAVIGATE_TO`, `GRASP`, `PLACE` |
-| State | 특정 시점의 휴머노이드 운용 상태입니다. 예: `availability=EXECUTING`, `mobility=NAVIGATING` |
-
-State는 네 축으로 정의합니다.
+Task와 State는 분리됩니다. 예를 들어 `TRANSFER` 수행 중인 휴머노이드는 `availability=EXECUTING`, `mobility=NAVIGATING`일 수 있고, task 정보는 `task_context`에 기록됩니다.
 
 | 축 | 상태 |
 | --- | --- |
@@ -83,112 +46,148 @@ State는 네 축으로 정의합니다.
 | Power | `POWER_NORMAL`, `POWER_LOW`, `POWER_CRITICAL`, `DEPLETED`, `CHARGING` |
 | Manipulation | `FREE`, `REACHING`, `HOLDING`, `PLACING` |
 
-상태 축, snapshot schema, lifecycle mapping, primitive state hint는 [State Reference](docs/state_reference.md)를 참고합니다.
+정상적으로 실행 중인 모든 primitive는 Availability State에서 `EXECUTING`입니다. Incident recovery protocol 안에서 실행되는 task/primitive는 예외 처리 절차이므로 Availability를 `BLOCKED`로 유지하고, 현재 recovery step은 `task_context`에 기록합니다.
 
-## Primitive State Relation
+## Incident 모델
 
-HumanoidSim은 primitive별 state 의미를 정의합니다. 정상적으로 실행 중인 모든 primitive는 Availability State에서 `EXECUTING`입니다. Mobility와 Manipulation은 primitive의 `metadata.state.allowed`와 `metadata.state.effects`에 따라 결정됩니다. 단, incident recovery protocol 안에서 실행되는 primitive는 blocked 상태의 복구 절차이므로 Availability를 `BLOCKED`로 유지하고, 현재 primitive code만 `task_context`에 기록합니다.
+Incident는 perception, manipulation, resource, traffic, power, communication, safety, unknown 계열로 분류됩니다. 예시는 다음과 같습니다.
 
-- `NAVIGATE_TO`: 실행 중 `mobility=NAVIGATING`, 종료 후 `STATIONARY`
-- `ALIGN`: 정렬/도킹 중 `mobility=DOCKING`, 종료 후 `STATIONARY`
-- `REACH_TO`: 실행 중 `manipulation=REACHING`
-- `GRASP`, `LIFT`: 실행 중 `manipulation=HOLDING`
-- `PLACE`, `RELEASE`: 실행 중 `manipulation=PLACING`, 종료 후 `FREE`
-- 확인/기록 계열 primitive: 보통 `mobility=STATIONARY`이며 cargo 관련 manipulation state는 caller event에 따라 유지됩니다.
+- `OBJECT_RECOGNITION_FAILED`
+- `GRIP_FAILED`
+- `ITEM_DROPPED`
+- `RESOURCE_PREEMPTED`
+- `PATH_BLOCKED`
+- `TRAFFIC_WAIT`
+- `UNKNOWN`
 
-전체 primitive별 Availability, Mobility, Manipulation 관계는 [Primitive Reference](docs/primitives_reference.md)에 정리되어 있습니다.
+Runtime이 관찰한 domain-specific reason은 alias resolution을 통해 canonical incident code로 연결할 수 있습니다. 예를 들어 `material_shelf_slot_empty` 같은 외부 reason은 `RESOURCE_PREEMPTED` 또는 `RESOURCE_MISSING`으로 해석될 수 있습니다.
 
-## Humanoid Incident Model
+## Generic Item Request
 
-Incident는 새로운 state가 아니라 `StateReason + recovery protocol`입니다. 예를 들어 `GRIP_FAILED`가 발생하면 Availability는 `BLOCKED`로 전이되고, reason에는 incident code/category/severity/recovery protocol이 함께 기록됩니다. 짧은 traffic wait나 operator readiness처럼 예상 가능한 대기는 `WAITING`, 방전이나 심각한 hardware fault처럼 로봇 자체가 작업 불가인 경우는 `DISABLED`를 사용합니다.
+Task input의 `item`은 concrete item id일 수도 있고 generic request일 수도 있습니다. 예를 들어 `REPLENISH_MATERIAL`은 `entity_type=material`, `selection_policy=available_material_from_source` 형태로 “사용 가능한 material 하나”를 요청할 수 있습니다. 이 경우 concrete item instance는 task 후보 생성 시점이 아니라 `PRIMITIVE_IDENTIFY_ITEM` 실행 단계에서 확정됩니다.
 
-Incident code는 정의 단계부터 uppercase canonical code를 사용합니다. 예: `OBJECT_RECOGNITION_FAILED`, `GRIP_FAILED`, `ITEM_DROPPED`, `RESOURCE_PREEMPTED`, `UNKNOWN`
+## Public API
 
-Incident taxonomy는 제조 환경에만 묶이지 않도록 perception/identification, manipulation/payload, resource/environment, motion/traffic, power/hardware, system/communication, safety/human interaction, unknown으로 나뉩니다. 자세한 code와 복구 절차는 [Incident Reference](docs/incident_reference.md)를 참고합니다.
+```python
+from humanoidsim import (
+    HumanoidProfile,
+    load_task_catalog,
+    validate_task_sequence,
+    simulate_task_sequence,
+    expand_task_steps,
+    transition_humanoid_state,
+    run_task_trace,
+    run_incident_trace,
+)
+```
 
-Recovery protocol의 모든 step은 기존 HumanoidSim primitive 또는 task를 참조해야 합니다. 이 관계는 `validate_incident_schema()`에서 검증됩니다.
-
-Runtime이 관찰한 세부 실패 reason은 `IncidentProfile.aliases`로 canonical incident code에 연결할 수 있습니다. 예를 들어 ManSim의 `material_shelf_slot_empty` reason은 HumanoidSim alias resolution을 통해 `RESOURCE_PREEMPTED`로 해석됩니다.
-
-Recovery protocol을 실행하는 동안 Availability는 `BLOCKED`를 유지합니다. Recovery step이 task 또는 primitive code를 참조하더라도 이는 정상 작업의 `EXECUTING`이 아니라 blocked 상태에서 수행되는 복구 절차이며, 현재 step은 `task_context`에 기록됩니다.
-
-## 구성
-
-- `src/humanoidsim/task_schema.py`: task, step, resource, registry validation schema
-- `src/humanoidsim/state_schema.py`: humanoid state enum, snapshot, primitive state profile, transition API
-- `src/humanoidsim/incident_schema.py`: incident taxonomy, recovery protocol, incident transition event
-- `src/humanoidsim/catalog.py`: task catalog loader
-- `src/humanoidsim/execution.py`: profile validation, nested expansion, sequence simulation
-- `src/humanoidsim/viewer.py`: task sequence HTML viewer export
-- `data/tasks/`: 82개 core task JSON
-- `data/primitives/`: primitive skill JSON
-- `data/task_catalog_core.json`: catalog index
-- `data/state_schema_core.json`: state axis, primitive state profile, transition graph
-- `data/incident_schema_core.json`: incident taxonomy와 recovery protocol
-- `docs/tasks_reference.md`: task 전체 reference
-- `docs/primitives_reference.md`: active/registry primitive reference
-- `docs/state_reference.md`: state axis, snapshot, lifecycle, transition reference
-- `docs/incident_reference.md`: incident taxonomy, state reason, recovery protocol reference
-
-## Reference
-
-- [Task Reference](docs/tasks_reference.md): 82개 task의 level, category, input, resource, nested sequence를 정리합니다.
-- [Primitive Reference](docs/primitives_reference.md): active/registry primitive 차이, primitive별 state relation, 사용 task를 정리합니다.
-- [State Reference](docs/state_reference.md): Availability, Mobility, Power, Manipulation 축과 `HumanoidStateSnapshot` 사용 규칙을 정리합니다.
-- [Incident Reference](docs/incident_reference.md): incident taxonomy, 기본 state transition, recovery protocol을 정리합니다.
+`expand_task_steps(task_code, args, catalog=...)`는 nested composite task를 parent task, child task, primitive leaf까지 보존한 plan row로 반환합니다.
 
 ## 실행
 
-가상환경을 활성화합니다.
+가상환경을 활성화하고 editable package로 설치합니다.
 
 ```powershell
 cd C:\Github\HumanoidSim
 .\.venv\Scripts\Activate.ps1
-```
-
-editable package로 설치합니다.
-
-```powershell
 .\.venv\Scripts\python.exe -m pip install -e C:\Github\HumanoidSim
 ```
 
-catalog를 검증합니다.
+카탈로그와 sequence를 검증합니다.
 
 ```powershell
 .\.venv\Scripts\python.exe -m humanoidsim validate-catalog
-```
-
-예제 sequence를 검증합니다.
-
-```powershell
 .\.venv\Scripts\python.exe -m humanoidsim validate-sequence examples\manufacturing_sequence.json
 ```
 
-viewer를 생성합니다.
+정적 task sequence viewer를 생성합니다.
 
 ```powershell
 .\.venv\Scripts\python.exe -m humanoidsim export-viewer examples\manufacturing_sequence.json --out outputs\task_sequence_viewer.html
 ```
 
-테스트를 실행합니다.
+## Standalone Validation Lab
+
+전체 validation lab을 실행합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m humanoidsim validate-lab --all --out outputs\validation\latest
+```
+
+이 명령은 catalog/schema validation, mock primitive executor 기반 task/recovery 실행, state transition coverage, fuzz validation을 수행하고 `validation_dashboard.html`을 생성합니다.
+
+## Interactive Validation UI
+
+브라우저에서 Task 또는 Incident를 선택해 실행 trace를 바로 관찰할 수 있습니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m humanoidsim lab-ui --host 127.0.0.1 --port 8765
+```
+
+ROS 2/RViz와 Gazebo 버튼까지 표시하려면 다음처럼 실행합니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m humanoidsim lab-ui --ros --gazebo --wsl-distro Ubuntu-24.04
+```
+
+Interactive UI는 다음을 제공합니다.
+
+- Task category -> Task 선택 흐름
+- Incident 선택 및 context JSON 입력
+- Step timeline과 state axes 동기화
+- WebGL 기반 Browser 3D Viewer
+- viewer 확대, 회전, pan, reset controls
+- primitive별 이동, 팔/다리/그리퍼 scripted motion
+- recovery step의 `CODE (RECOVERY)` 표시
+- RViz launch와 `PlayTrace` 연동
+- Gazebo physics validation launch
+
+Browser 3D Viewer는 ROS 없이 `motion_hint`와 `manipulation_hint`를 즉시 재생하는 빠른 검증 경로입니다. RViz는 같은 trace를 ROS 2 `/tf`, `/joint_states`, marker로 publish해 minimal humanoid URDF 움직임을 비교합니다. Gazebo는 minimal humanoid model이 physics scene에 spawn되는지 확인하는 별도 validation mode입니다.
+
+Gazebo physics validation만 직접 실행할 수도 있습니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m humanoidsim physics-validation --wsl-distro Ubuntu-24.04
+```
+
+## ROS 2 / RViz / Gazebo Adapter
+
+ROS 2 연동은 HumanoidSim core와 분리된 adapter로 제공합니다. 기준 환경은 WSL2 Ubuntu 24.04 + ROS 2 Jazzy + Gazebo Harmonic입니다.
+
+자세한 설치와 실행 방법은 [ROS 2 Adapter](integrations/ros2/README.md)를 참고합니다.
+
+## Reference
+
+- [Task Reference](docs/tasks_reference.md): task level, category, input, resource, nested sequence를 정리합니다.
+- [Primitive Reference](docs/primitives_reference.md): primitive group, state relation, 사용 task를 정리합니다.
+- [State Reference](docs/state_reference.md): Availability, Mobility, Power, Manipulation 축과 transition diagram을 정리합니다.
+- [Incident Reference](docs/incident_reference.md): incident taxonomy, state reason, recovery protocol을 정리합니다.
+- [Validation Lab](docs/validation_lab.md): standalone validation, interactive UI, ROS/RViz/Gazebo 검증 방법을 정리합니다.
+
+## 주요 파일
+
+- `src/humanoidsim/task_schema.py`: task, step, resource, registry validation schema
+- `src/humanoidsim/state_schema.py`: humanoid state enum, snapshot, primitive state profile, transition API
+- `src/humanoidsim/incident_schema.py`: incident taxonomy, recovery protocol, incident transition event
+- `src/humanoidsim/interactive_trace.py`: browser/RViz용 task and incident trace runner
+- `src/humanoidsim/interactive_lab_ui.py`: standalone local web UI
+- `src/humanoidsim/validation_lab.py`: batch validation lab runner and dashboard generator
+- `integrations/ros2/`: ROS 2/RViz/Gazebo adapter
+- `data/tasks/`: task JSON catalog
+- `data/primitives/`: primitive JSON catalog
+- `data/state_schema_core.json`: state axes, primitive state profile, transition graph
+- `data/incident_schema_core.json`: incident taxonomy and recovery protocol
+
+## 테스트
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests
 ```
 
-## Task 커스터마이즈
+## Customization
 
-1. 기존 task JSON을 복사해 새 task code를 부여합니다.
-2. `TaskSpec.level`을 선택합니다.
-   - primitive만 참조하면 `ATOMIC_TASK`
-   - child task를 직접 포함하면 `COMPOSITE_TASK`
-3. `StepCall.call_code`, `expected_level`, `args`, `depends_on`을 정의합니다.
-4. 필요한 tool, vehicle, equipment requirement를 추가합니다.
-5. `data/task_catalog_core.json` index에 등록합니다.
-6. `validate-catalog`와 unit test를 실행합니다.
-
-## State / Incident 커스터마이즈
+Task를 추가할 때는 task JSON을 만들고 `data/task_catalog_core.json`에 등록한 뒤 `validate-catalog`와 unit test를 실행합니다.
 
 State를 추가할 때는 enum, `data/state_schema_core.json`, primitive profile, 문서, 테스트를 함께 갱신합니다.
 
-Incident를 추가할 때는 `data/incident_schema_core.json`에 uppercase canonical code를 추가하고, category, severity, default availability, trigger primitives, recovery protocol, retry policy를 정의합니다. Recovery protocol은 반드시 기존 primitive 또는 task를 참조해야 합니다.
+Incident를 추가할 때는 `data/incident_schema_core.json`에 uppercase canonical code를 추가하고 category, severity, default availability, trigger primitives, recovery protocol, retry policy를 정의합니다. Recovery protocol은 반드시 기존 primitive 또는 task를 참조해야 합니다.

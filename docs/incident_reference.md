@@ -540,6 +540,7 @@ flowchart TB
   DISABLED -->|maintenance or power recovery assigned| ASSIGNED
   ASSIGNED --> EXECUTING
   EXECUTING -->|task completed| AVAILABLE
+  BLOCKED -->|task canceled| AVAILABLE
   OFFLINE -->|returned to operation| AVAILABLE
 ```
 

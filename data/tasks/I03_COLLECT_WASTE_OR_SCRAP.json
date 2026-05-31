@@ -191,9 +191,9 @@
       "step_id": "s01_transfer",
       "call_code": "TRANSFER",
       "args": {
-        "item": "$inputs.waste_or_scrap",
+        "item": "$inputs.items",
         "source": "$inputs.source",
-        "destination": "$inputs.disposal_location"
+        "destination": "$inputs.destination"
       },
       "expected_level": "ATOMIC_TASK",
       "depends_on": [],
@@ -214,14 +214,8 @@
       "step_id": "s02_update_inventory_record",
       "call_code": "UPDATE_INVENTORY_RECORD",
       "args": {
-        "item": {
-          "derived_from_parent": "COLLECT_WASTE_OR_SCRAP",
-          "field": "item"
-        },
-        "transaction": {
-          "derived_from_parent": "COLLECT_WASTE_OR_SCRAP",
-          "field": "transaction"
-        }
+        "item": "$inputs.items",
+        "transaction": "$inputs.sorting_rule"
       },
       "expected_level": "ATOMIC_TASK",
       "depends_on": [

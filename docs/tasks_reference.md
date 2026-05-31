@@ -4,7 +4,7 @@
 
 일부 task 입력의 `item`은 반드시 concrete item id일 필요가 없습니다. 예를 들어 `REPLENISH_MATERIAL`은 “특정 `MAT-WH-*`를 가져오라”가 아니라 “source에서 사용 가능한 material 하나를 찾아 destination을 target level까지 보충하라”는 generic request로 실행될 수 있습니다. 이 경우 task input은 `entity_type=material`, `selection_policy=available_material_from_source` 같은 request를 담고, concrete item instance는 `PRIMITIVE_IDENTIFY_ITEM` 단계에서 확정됩니다.
 
-`TRANSFER`, `INSPECT_PRODUCT`, `SETUP_MACHINE`처럼 특정 queue item이나 machine output이 task 의미의 핵심인 경우에는 concrete item id를 task 생성 시점에 줄 수 있습니다.
+`LOAD_MACHINE`, `INSPECT_PRODUCT`, 일반 `TRANSFER`처럼 특정 queue item이나 machine output이 task 의미의 핵심인 경우에는 concrete item id를 task 생성 시점에 줄 수 있습니다. `SETUP_MACHINE`은 item을 고르거나 운반하지 않고, 이미 machine에 적재된 input을 바탕으로 setup만 수행합니다.
 
 이 문서는 `data/tasks/*.json`에 정의된 HumanoidSim core task를 사람이 읽기 쉽게 정리한 reference입니다. JSON 파일이 원본이고, 이 문서는 검색과 검토를 위한 요약입니다.
 
@@ -31,11 +31,11 @@
   <tbody>
     <tr>
       <td><code>ATOMIC_TASK</code></td>
-      <td>50</td>
+      <td>51</td>
     </tr>
     <tr>
       <td><code>COMPOSITE_TASK</code></td>
-      <td>32</td>
+      <td>31</td>
     </tr>
   </tbody>
 </table>
@@ -71,7 +71,7 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
     <tr>
       <td><code>COMPOSITE_TASK</code></td>
       <td>최소 1개 이상의 child task call을 직접 포함하는 workflow입니다. orchestration용 primitive step을 함께 가질 수 있습니다.</td>
-      <td><code>REPLENISH_MATERIAL</code> -> <code>TRANSFER</code>, <code>SETUP_MACHINE</code> -> <code>LOAD_MACHINE</code></td>
+      <td><code>REPLENISH_MATERIAL</code> -> <code>TRANSFER</code>, <code>FETCH_FOR_OPERATOR</code> -> <code>HANDOVER_ITEM</code></td>
     </tr>
   </tbody>
 </table>
@@ -366,13 +366,13 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
     <tr>
       <td>C01</td>
       <td><code>SETUP_MACHINE</code></td>
-      <td><code>COMPOSITE_TASK</code></td>
+      <td><code>ATOMIC_TASK</code></td>
       <td>설비를 준비, 조작, 적재, 하역, 복구하는 task입니다.</td>
       <td>machine*: EntityRef | str<br>setup_spec*: Any</td>
       <td>machine_interface<br>safety_zone_check<br>manipulation<br>tool_use<br>equipment_interaction<br>high_risk_task</td>
       <td>tool:scanner<br>tool:setup_tools<br>equipment:machine<br>equipment:fixture<br>equipment:hmi<br>equipment:program<br>equipment:recipe</td>
       <td>HIGH</td>
-      <td><code>CHECK_SAFETY_ZONE</code><br><code>READ_MACHINE_STATE</code><br><code>LOAD_MACHINE</code> [ATOMIC_TASK]<br><code>VERIFY_MACHINE_STATE</code><br><code>LOG_RESULT</code></td>
+      <td><code>CHECK_SAFETY_ZONE</code><br><code>NAVIGATE_TO</code><br><code>READ_MACHINE_STATE</code><br><code>EXECUTE_MACHINE_ACTION</code><br><code>VERIFY_MACHINE_STATE</code><br><code>LOG_RESULT</code></td>
       <td><code>data/tasks/C01_SETUP_MACHINE.json</code></td>
     </tr>
     <tr>

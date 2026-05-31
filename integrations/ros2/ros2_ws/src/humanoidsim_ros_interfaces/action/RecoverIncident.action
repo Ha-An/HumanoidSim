@@ -1,0 +1,13 @@
+string humanoid_id
+string incident_code
+string task_code
+string task_instance_id
+string context_json
+---
+bool success
+string final_state_json
+string message
+---
+string current_recovery_step_code
+string state_json
+float32 progress

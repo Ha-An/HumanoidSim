@@ -468,7 +468,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CONTROL_MACHINE_CYCLE</code><br><code>LOAD_MACHINE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>UNLOAD_MACHINE</code></td>
+      <td><code>CONTROL_MACHINE_CYCLE</code><br><code>LOAD_MACHINE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>SETUP_MACHINE</code><br><code>UNLOAD_MACHINE</code></td>
       <td><code>data/primitives/EXECUTE_MACHINE_ACTION.json</code></td>
     </tr>
     <tr>
@@ -684,7 +684,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>area: Any<br>destination: Any<br>machine: Any<br>operator: Any<br>source: Any</td>
       <td>result: dict</td>
-      <td><code>CLEAN_ASSET</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>HANDOVER_ITEM</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>LOAD_MACHINE</code><br><code>LOAD_UNLOAD_TRANSFER_INTERFACE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>RECEIVE_FROM_OPERATOR</code><br><code>TRANSFER</code><br><code>UNLOAD_MACHINE</code></td>
+      <td><code>CLEAN_ASSET</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>HANDOVER_ITEM</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>LOAD_MACHINE</code><br><code>LOAD_UNLOAD_TRANSFER_INTERFACE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>RECEIVE_FROM_OPERATOR</code><br><code>SETUP_MACHINE</code><br><code>TRANSFER</code><br><code>UNLOAD_MACHINE</code></td>
       <td><code>data/primitives/NAVIGATE_TO.json</code></td>
     </tr>
     <tr>

@@ -1,0 +1,7 @@
+string humanoid_id
+string trace_json
+float32 speed
+bool reset_scene
+---
+bool accepted
+string message

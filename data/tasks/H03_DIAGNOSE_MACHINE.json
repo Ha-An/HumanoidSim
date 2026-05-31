@@ -184,7 +184,7 @@
       "call_code": "INSPECT_MACHINE",
       "args": {
         "machine": "$inputs.machine",
-        "inspection_plan": "$inputs.symptom"
+        "inspection_plan": "$inputs.symptoms"
       },
       "expected_level": "ATOMIC_TASK",
       "depends_on": [
@@ -253,7 +253,7 @@
           "expected_level": "ATOMIC_TASK",
           "args": {
             "machine": "$inputs.machine",
-            "inspection_plan": "$inputs.symptom"
+            "inspection_plan": "$inputs.symptoms"
           }
         },
         {

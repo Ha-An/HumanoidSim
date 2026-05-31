@@ -218,7 +218,12 @@
       "args": {
         "item": "$inputs.item",
         "recipient": "$inputs.operator",
-        "handover_spec": "$inputs.assist_spec"
+        "handover_spec": {
+          "assist_type": "move_or_lift",
+          "operator": "$inputs.operator",
+          "item": "$inputs.item",
+          "destination": "$inputs.destination"
+        }
       },
       "expected_level": "ATOMIC_TASK",
       "depends_on": [
@@ -271,7 +276,12 @@
           "args": {
             "item": "$inputs.item",
             "recipient": "$inputs.operator",
-            "handover_spec": "$inputs.assist_spec"
+            "handover_spec": {
+              "assist_type": "move_or_lift",
+              "operator": "$inputs.operator",
+              "item": "$inputs.item",
+              "destination": "$inputs.destination"
+            }
           }
         }
       ]

@@ -1,0 +1,7 @@
+string previous_state_json
+string event_json
+---
+bool valid
+string next_state_json
+string issues_json
+string message
