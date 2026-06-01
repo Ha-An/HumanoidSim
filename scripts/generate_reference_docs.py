@@ -28,6 +28,7 @@ CATEGORY_DESCRIPTIONS = {
     "K": "입고, putaway, picking, 재고 count/audit, kit 구성, inventory record 갱신을 다룹니다.",
     "L": "work order, operation result, traceability, exception report, evidence/status capture 같은 digital operation을 다룹니다.",
     "M": "operator 지원, item/tool handover, operator로부터 수령, 작업 중 지지/정렬, 공동 lifting/move를 다룹니다.",
+    "S": "조선소 선박 section 또는 exterior surface tile의 용접, 표면처리, sealant 적용, 도장, 품질 확인 작업을 다룹니다.",
 }
 
 
@@ -45,6 +46,7 @@ TASK_DESCRIPTIONS = {
     "K": "창고, 재고, picking, putaway, kit 구성, inventory record 갱신을 수행하는 task입니다.",
     "L": "MES, WMS, traceability, work order, evidence 기록을 수행하는 digital task입니다.",
     "M": "operator나 다른 휴머노이드와 handover, 수령, 협업, 보조 운반을 수행하는 task입니다.",
+    "S": "선박 section 또는 exterior surface tile을 대상으로 용접, 표면처리, sealant 적용, 도장, 품질 확인을 수행하는 shipyard task입니다.",
 }
 
 

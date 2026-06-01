@@ -10,7 +10,7 @@
 
 ## 요약
 
-- Task 수: 82
+- Task 수: 86
 - 원본 task 정의: `data/tasks/*.json`
 - 통합 index: `data/task_catalog_core.json`
 - Primitive template index: `data/primitive_templates.json`
@@ -31,7 +31,7 @@
   <tbody>
     <tr>
       <td><code>ATOMIC_TASK</code></td>
-      <td>51</td>
+      <td>55</td>
     </tr>
     <tr>
       <td><code>COMPOSITE_TASK</code></td>
@@ -173,6 +173,12 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
       <td>Human Collaboration &amp; Operator Assistance</td>
       <td>6</td>
       <td>operator 지원, item/tool handover, operator로부터 수령, 작업 중 지지/정렬, 공동 lifting/move를 다룹니다.</td>
+    </tr>
+    <tr>
+      <td>S</td>
+      <td>Shipyard Construction, Coating &amp; Verification</td>
+      <td>4</td>
+      <td>조선소 선박 section 또는 exterior surface tile의 용접, 표면처리, sealant 적용, 도장, 품질 확인 작업을 다룹니다.</td>
     </tr>
   </tbody>
 </table>
@@ -1190,6 +1196,54 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
       <td>HIGH</td>
       <td><code>TRANSFER</code> [ATOMIC_TASK]<br><code>HANDOVER_ITEM</code> [ATOMIC_TASK]</td>
       <td><code>data/tasks/M06_ASSIST_OPERATOR_MOVE_OR_LIFT.json</code></td>
+    </tr>
+    <tr>
+      <td>S01</td>
+      <td><code>WELD_SEAM</code></td>
+      <td><code>ATOMIC_TASK</code></td>
+      <td>선박 section 또는 exterior surface tile을 대상으로 용접, 표면처리, sealant 적용, 도장, 품질 확인을 수행하는 shipyard task입니다.</td>
+      <td>ship_section*: Any<br>weld_spec*: Any</td>
+      <td>welding<br>surface_localization<br>tool_use<br>inspection<br>digital_recording</td>
+      <td>tool:welding_tool<br>tool:inspection_camera<br>equipment:ship_section<br>equipment:fixture</td>
+      <td>HIGH</td>
+      <td><code>CHECK_SAFETY_ZONE</code><br><code>LOCALIZE_SURFACE</code><br><code>FIX_OR_HOLD_PART</code><br><code>OPERATE_TOOL</code><br><code>PROCESS_FEATURE_OR_SURFACE</code><br><code>INSPECT_RESULT</code><br><code>RECORD_RESULT</code></td>
+      <td><code>data/tasks/S01_WELD_SEAM.json</code></td>
+    </tr>
+    <tr>
+      <td>S02</td>
+      <td><code>PAINT_SURFACE</code></td>
+      <td><code>ATOMIC_TASK</code></td>
+      <td>선박 section 또는 exterior surface tile을 대상으로 용접, 표면처리, sealant 적용, 도장, 품질 확인을 수행하는 shipyard task입니다.</td>
+      <td>ship_section*: Any<br>paint_spec*: Any</td>
+      <td>material_application<br>surface_preparation<br>tool_use<br>equipment_interaction<br>digital_recording</td>
+      <td>tool:paint_dispenser<br>tool:coverage_sensor<br>equipment:ship_section<br>equipment:paint_supply</td>
+      <td>MEDIUM</td>
+      <td><code>LOCALIZE_SURFACE</code><br><code>PRIMITIVE_PREPARE_SURFACE</code><br><code>OPERATE_TOOL_OR_DISPENSER</code><br><code>PRIMITIVE_APPLY_MATERIAL</code><br><code>VERIFY_COVERAGE_OR_AMOUNT</code><br><code>RECORD_RESULT</code></td>
+      <td><code>data/tasks/S02_PAINT_SURFACE.json</code></td>
+    </tr>
+    <tr>
+      <td>S03</td>
+      <td><code>APPLY_SEALANT</code></td>
+      <td><code>ATOMIC_TASK</code></td>
+      <td>선박 section 또는 exterior surface tile을 대상으로 용접, 표면처리, sealant 적용, 도장, 품질 확인을 수행하는 shipyard task입니다.</td>
+      <td>ship_section*: Any<br>sealant_spec*: Any</td>
+      <td>material_application<br>tool_use<br>surface_preparation<br>inspection<br>digital_recording</td>
+      <td>tool:sealant_dispenser<br>tool:coverage_sensor<br>equipment:ship_section<br>equipment:sealant_supply</td>
+      <td>MEDIUM</td>
+      <td><code>LOCALIZE_SURFACE</code><br><code>PRIMITIVE_PREPARE_SURFACE</code><br><code>OPERATE_TOOL_OR_DISPENSER</code><br><code>PRIMITIVE_APPLY_MATERIAL</code><br><code>VERIFY_COVERAGE_OR_AMOUNT</code><br><code>RECORD_RESULT</code></td>
+      <td><code>data/tasks/S03_APPLY_SEALANT.json</code></td>
+    </tr>
+    <tr>
+      <td>S04</td>
+      <td><code>VERIFY_SHIP_SECTION</code></td>
+      <td><code>ATOMIC_TASK</code></td>
+      <td>선박 section 또는 exterior surface tile을 대상으로 용접, 표면처리, sealant 적용, 도장, 품질 확인을 수행하는 shipyard task입니다.</td>
+      <td>ship_section*: Any<br>verification_plan*: Any</td>
+      <td>inspection<br>measurement<br>digital_recording<br>tool_use<br>equipment_interaction</td>
+      <td>tool:inspection_camera<br>tool:gauge<br>equipment:ship_section</td>
+      <td>LOW</td>
+      <td><code>PRIMITIVE_IDENTIFY_ITEM</code><br><code>LOCALIZE_OBJECT</code><br><code>EXECUTE_QUALITY_ACTION</code><br><code>CLASSIFY_RESULT</code><br><code>RECORD_RESULT</code></td>
+      <td><code>data/tasks/S04_VERIFY_SHIP_SECTION.json</code></td>
     </tr>
   </tbody>
 </table>

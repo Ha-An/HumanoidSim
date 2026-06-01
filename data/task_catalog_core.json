@@ -3,7 +3,7 @@
   "catalog_version": "0.2.0-core",
   "generated_at": "2026-05-15T13:11:32.296177+00:00",
   "source_workbook": "C:\\Github\\HumanoidSim\\manufacturing_humanoid_core_task_catalog.xlsx",
-  "task_count": 82,
+  "task_count": 86,
   "primitive_count": 59,
   "task_paths": [
     "data/tasks/A01_INITIALIZE_ROBOT.json",
@@ -87,7 +87,11 @@
     "data/tasks/M03_RECEIVE_FROM_OPERATOR.json",
     "data/tasks/M04_HANDOVER_TOOL.json",
     "data/tasks/M05_HOLD_OR_POSITION_FOR_OPERATOR.json",
-    "data/tasks/M06_ASSIST_OPERATOR_MOVE_OR_LIFT.json"
+    "data/tasks/M06_ASSIST_OPERATOR_MOVE_OR_LIFT.json",
+    "data/tasks/S01_WELD_SEAM.json",
+    "data/tasks/S02_PAINT_SURFACE.json",
+    "data/tasks/S03_APPLY_SEALANT.json",
+    "data/tasks/S04_VERIFY_SHIP_SECTION.json"
   ],
   "primitive_paths": [
     "data/primitives/ALIGN.json",
@@ -232,6 +236,10 @@
     "RECEIVE_FROM_OPERATOR",
     "HANDOVER_TOOL",
     "HOLD_OR_POSITION_FOR_OPERATOR",
-    "ASSIST_OPERATOR_MOVE_OR_LIFT"
+    "ASSIST_OPERATOR_MOVE_OR_LIFT",
+    "WELD_SEAM",
+    "PAINT_SURFACE",
+    "APPLY_SEALANT",
+    "VERIFY_SHIP_SECTION"
   ]
 }

@@ -384,7 +384,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CHANGE_MACHINE_CONFIGURATION</code><br><code>CLEAR_MACHINE_FAULT</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>DIAGNOSE_MACHINE</code><br><code>INSPECT_MACHINE</code><br><code>LOAD_MACHINE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>PREVENTIVE_MAINTENANCE</code><br><code>REPAIR_MACHINE</code><br><code>REPLACE_MACHINE_PART</code><br><code>SETUP_MACHINE</code><br><code>UNLOAD_MACHINE</code></td>
+      <td><code>CHANGE_MACHINE_CONFIGURATION</code><br><code>CLEAR_MACHINE_FAULT</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>DIAGNOSE_MACHINE</code><br><code>INSPECT_MACHINE</code><br><code>LOAD_MACHINE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>PREVENTIVE_MAINTENANCE</code><br><code>REPAIR_MACHINE</code><br><code>REPLACE_MACHINE_PART</code><br><code>SETUP_MACHINE</code><br><code>UNLOAD_MACHINE</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/CHECK_SAFETY_ZONE.json</code></td>
     </tr>
     <tr>
@@ -396,7 +396,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>MEASURE_FEATURE</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code></td>
+      <td><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>MEASURE_FEATURE</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code><br><code>VERIFY_SHIP_SECTION</code></td>
       <td><code>data/primitives/CLASSIFY_RESULT.json</code></td>
     </tr>
     <tr>
@@ -504,7 +504,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>MEASURE_FEATURE</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code></td>
+      <td><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>MEASURE_FEATURE</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code><br><code>VERIFY_SHIP_SECTION</code></td>
       <td><code>data/primitives/EXECUTE_QUALITY_ACTION.json</code></td>
     </tr>
     <tr>
@@ -540,7 +540,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code></td>
+      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/FIX_OR_HOLD_PART.json</code></td>
     </tr>
     <tr>
@@ -600,7 +600,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code></td>
+      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/INSPECT_RESULT.json</code></td>
     </tr>
     <tr>
@@ -636,7 +636,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>item: Any</td>
       <td>result: dict</td>
-      <td><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>LOAD_UNLOAD_TRANSFER_INTERFACE</code><br><code>MEASURE_FEATURE</code><br><code>TRANSFER</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code></td>
+      <td><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>LOAD_UNLOAD_TRANSFER_INTERFACE</code><br><code>MEASURE_FEATURE</code><br><code>TRANSFER</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code><br><code>VERIFY_SHIP_SECTION</code></td>
       <td><code>data/primitives/LOCALIZE_OBJECT.json</code></td>
     </tr>
     <tr>
@@ -660,7 +660,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>APPLY_MATERIAL</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
+      <td><code>APPLY_MATERIAL</code><br><code>APPLY_SEALANT</code><br><code>PAINT_SURFACE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/LOCALIZE_SURFACE.json</code></td>
     </tr>
     <tr>
@@ -696,7 +696,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code></td>
+      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/OPERATE_TOOL.json</code></td>
     </tr>
     <tr>
@@ -708,7 +708,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>APPLY_MATERIAL</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
+      <td><code>APPLY_MATERIAL</code><br><code>APPLY_SEALANT</code><br><code>PAINT_SURFACE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
       <td><code>data/primitives/OPERATE_TOOL_OR_DISPENSER.json</code></td>
     </tr>
     <tr>
@@ -756,7 +756,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>APPLY_MATERIAL</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
+      <td><code>APPLY_MATERIAL</code><br><code>APPLY_SEALANT</code><br><code>PAINT_SURFACE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
       <td><code>data/primitives/PRIMITIVE_APPLY_MATERIAL.json</code></td>
     </tr>
     <tr>
@@ -768,7 +768,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>COUNT_INVENTORY</code><br><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>MEASURE_FEATURE</code><br><code>REMOVE_MATERIAL</code><br><code>REPLENISH_MATERIAL</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code></td>
+      <td><code>COUNT_INVENTORY</code><br><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>MEASURE_FEATURE</code><br><code>REMOVE_MATERIAL</code><br><code>REPLENISH_MATERIAL</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_PACKAGE</code><br><code>VERIFY_SHIP_SECTION</code></td>
       <td><code>data/primitives/PRIMITIVE_IDENTIFY_ITEM.json</code></td>
     </tr>
     <tr>
@@ -780,7 +780,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>APPLY_MATERIAL</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
+      <td><code>APPLY_MATERIAL</code><br><code>APPLY_SEALANT</code><br><code>PAINT_SURFACE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
       <td><code>data/primitives/PRIMITIVE_PREPARE_SURFACE.json</code></td>
     </tr>
     <tr>
@@ -828,7 +828,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code></td>
+      <td><code>CREATE_FEATURE</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>MARK_PART</code><br><code>REMOVE_BURR_OR_FLASH</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/PROCESS_FEATURE_OR_SURFACE.json</code></td>
     </tr>
     <tr>
@@ -876,7 +876,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>APPLY_MATERIAL</code><br><code>CREATE_FEATURE</code><br><code>CURE_MATERIAL</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>LABEL_ITEM_OR_PACKAGE</code><br><code>MARK_PART</code><br><code>MEASURE_FEATURE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>REMOVE_BURR_OR_FLASH</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_MATERIAL_APPLICATION</code><br><code>VERIFY_PACKAGE</code></td>
+      <td><code>APPLY_MATERIAL</code><br><code>APPLY_SEALANT</code><br><code>CREATE_FEATURE</code><br><code>CURE_MATERIAL</code><br><code>CUT_OR_TRIM_MATERIAL</code><br><code>FINISH_SURFACE</code><br><code>IDENTIFY_ITEM</code><br><code>INSPECT_PRODUCT</code><br><code>LABEL_ITEM_OR_PACKAGE</code><br><code>MARK_PART</code><br><code>MEASURE_FEATURE</code><br><code>PAINT_SURFACE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>REMOVE_BURR_OR_FLASH</code><br><code>VERIFY_ASSEMBLY</code><br><code>VERIFY_MATERIAL_APPLICATION</code><br><code>VERIFY_PACKAGE</code><br><code>VERIFY_SHIP_SECTION</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/RECORD_RESULT.json</code></td>
     </tr>
     <tr>
@@ -948,7 +948,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>APPLY_MATERIAL</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
+      <td><code>APPLY_MATERIAL</code><br><code>APPLY_SEALANT</code><br><code>PAINT_SURFACE</code><br><code>PREPARE_SURFACE</code><br><code>REMOVE_APPLIED_MATERIAL</code><br><code>VERIFY_MATERIAL_APPLICATION</code></td>
       <td><code>data/primitives/VERIFY_COVERAGE_OR_AMOUNT.json</code></td>
     </tr>
     <tr>

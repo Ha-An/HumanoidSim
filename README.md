@@ -17,7 +17,7 @@ HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident
 
 | 항목 | 개수 | 설명 |
 | --- | ---: | --- |
-| Task | 82 | 제조 및 범용 휴머노이드 작업 카탈로그입니다. |
+| Task | 86 | 제조, 조선소, 범용 휴머노이드 작업 카탈로그입니다. |
 | Atomic Task | 51 | Primitive sequence만으로 실행되는 단일 task입니다. |
 | Composite Task | 31 | 하나 이상의 child task call을 포함하는 workflow task입니다. |
 | Primitive | 59 | Task를 구성하는 최소 실행 skill입니다. |
@@ -34,6 +34,19 @@ HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident
 `StepCall.call_code`는 primitive code뿐 아니라 task code도 참조할 수 있습니다. 이때 `expected_level`은 `PRIMITIVE_SKILL`, `ATOMIC_TASK`, `COMPOSITE_TASK` 중 실제 참조 대상의 level과 일치해야 합니다.
 
 예를 들어 `REPLENISH_MATERIAL`은 generic material request를 받은 뒤 `PRIMITIVE_IDENTIFY_ITEM` 단계에서 실제 material instance를 식별하고, child task인 `TRANSFER`로 운반을 수행합니다.
+
+## Shipyard Task Extension
+
+ManSim `shipyard_basic` scenario 검증을 위해 다음 task가 HumanoidSim catalog에 추가되었습니다. 새 primitive는 만들지 않고 기존 primitive를 재사용합니다.
+
+| Task | Level | Purpose |
+| --- | --- | --- |
+| `WELD_SEAM` | `ATOMIC_TASK` | Ship section 또는 exterior surface tile의 seam/joint를 안전 확인, 표면 localize, tool operation, result inspection 순서로 용접합니다. |
+| `PAINT_SURFACE` | `ATOMIC_TASK` | 준비된 ship section 또는 exterior surface tile에 paint/coating을 적용하고 coverage를 검증합니다. |
+| `APPLY_SEALANT` | `ATOMIC_TASK` | 필요한 section/tile joint 또는 edge에 sealant를 적용하고 적용량을 검증합니다. |
+| `VERIFY_SHIP_SECTION` | `ATOMIC_TASK` | Ship section 또는 exterior surface tile의 weld, sealant, paint 품질을 검사하고 결과를 분류/기록합니다. |
+
+Vehicle 기반 batch logistics는 기존 `OPERATE_VEHICLE_TRANSPORT` task를 사용합니다. ManSim `shipyard_basic`에서는 이 task로 cart가 `weld_wire` 또는 `paint_can`을 source에서 parking spot까지 운반하고, 마지막 작업 tile 공급은 기존 `TRANSFER` task로 표현합니다.
 
 ## State 모델
 

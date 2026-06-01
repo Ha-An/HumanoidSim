@@ -30,7 +30,7 @@ class ValidationLabTests(unittest.TestCase):
 
             summary = json.loads((Path(tmp) / "validation_summary.json").read_text(encoding="utf-8"))
             self.assertTrue(summary["ok"])
-            self.assertEqual(summary["catalog"]["task_count"], 82)
+            self.assertEqual(summary["catalog"]["task_count"], 86)
             self.assertEqual(summary["catalog"]["incident_count"], 35)
 
             dashboard = (Path(tmp) / "validation_dashboard.html").read_text(encoding="utf-8")

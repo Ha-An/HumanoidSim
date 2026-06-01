@@ -1,0 +1,308 @@
+{
+  "code": "PAINT_SURFACE",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-shipyard",
+  "name": "Paint Surface",
+  "description": "Apply coating or paint to a prepared ship section surface or exterior surface tile and verify coverage.",
+  "inputs": [
+    {
+      "name": "ship_section",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Target ship section surface or exterior surface tile.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "paint_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Paint color, layer, and coverage requirements.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "material_application",
+    "surface_preparation",
+    "tool_use",
+    "equipment_interaction",
+    "digital_recording"
+  ],
+  "required_tools": [
+    {
+      "alias": "paint_dispenser",
+      "tool_type": "paint_dispenser",
+      "tool_id": null,
+      "use_mode": "DISPENSING",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Shipyard v1 optional tool."
+    },
+    {
+      "alias": "coverage_sensor",
+      "tool_type": "coverage_sensor",
+      "tool_id": null,
+      "use_mode": "INSPECTION",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Shipyard v1 optional tool."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "ship_section",
+      "equipment_type": "ship_section",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "paint_supply",
+      "equipment_type": "paint_supply",
+      "equipment_id": null,
+      "use_mode": "STORAGE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "MEDIUM",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Shipyard v1 task safety risk: MEDIUM."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_localize_surface",
+      "call_code": "LOCALIZE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_primitive_prepare_surface",
+      "call_code": "PRIMITIVE_PREPARE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_localize_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_operate_tool_or_dispenser",
+      "call_code": "OPERATE_TOOL_OR_DISPENSER",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_primitive_prepare_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_primitive_apply_material",
+      "call_code": "PRIMITIVE_APPLY_MATERIAL",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_operate_tool_or_dispenser"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_verify_coverage_or_amount",
+      "call_code": "VERIFY_COVERAGE_OR_AMOUNT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_primitive_apply_material"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_record_result",
+      "call_code": "RECORD_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_verify_coverage_or_amount"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "S02",
+      "category_id": "S",
+      "category": "Shipyard Construction, Coating & Verification",
+      "function_signature": "paint_surface(ship_section, work_spec)",
+      "implementation_priority": "P1",
+      "customization_notes": "Added for ManSim shipyard_basic scenario. Reuses existing primitive skills.",
+      "primitive_template_id": "SHIPYARD-V1"
+    },
+    "resources": {
+      "raw_tools": "coverage_sensor, paint_dispenser",
+      "raw_vehicles": null,
+      "raw_equipment": "paint_supply, ship_section",
+      "optional_aliases": {
+        "tools": [
+          "paint_dispenser",
+          "coverage_sensor"
+        ],
+        "vehicles": [],
+        "equipment": [
+          "ship_section",
+          "paint_supply"
+        ]
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "HumanoidSim shipyard v1"
+    }
+  }
+}

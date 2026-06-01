@@ -1,0 +1,329 @@
+{
+  "code": "WELD_SEAM",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-shipyard",
+  "name": "Weld Seam",
+  "description": "Weld a seam or joint on a ship section or exterior surface tile after checking the working zone and localizing the seam surface.",
+  "inputs": [
+    {
+      "name": "ship_section",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Target ship section, exterior surface tile, or seam identifier.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "weld_spec",
+      "type_hint": "Any",
+      "required": true,
+      "description": "Weld procedure, pass count, or acceptance criteria.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "welding",
+    "surface_localization",
+    "tool_use",
+    "inspection",
+    "digital_recording"
+  ],
+  "required_tools": [
+    {
+      "alias": "welding_tool",
+      "tool_type": "welding_tool",
+      "tool_id": null,
+      "use_mode": "GENERAL",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Shipyard v1 optional tool."
+    },
+    {
+      "alias": "inspection_camera",
+      "tool_type": "inspection_camera",
+      "tool_id": null,
+      "use_mode": "INSPECTION",
+      "control_mode": "ROBOT_OPERATED",
+      "acquire_policy": "PICK_FROM_LOCATION",
+      "pickup_location": null,
+      "return_location": null,
+      "calibration_required": false,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": "Shipyard v1 optional tool."
+    }
+  ],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "ship_section",
+      "equipment_type": "ship_section",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "fixture",
+      "equipment_type": "fixture",
+      "equipment_id": null,
+      "use_mode": "FIXTURE",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {},
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "HIGH",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Shipyard v1 task safety risk: HIGH."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_check_safety_zone",
+      "call_code": "CHECK_SAFETY_ZONE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_localize_surface",
+      "call_code": "LOCALIZE_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_check_safety_zone"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_fix_or_hold_part",
+      "call_code": "FIX_OR_HOLD_PART",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_localize_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_operate_tool",
+      "call_code": "OPERATE_TOOL",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_fix_or_hold_part"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_process_feature_or_surface",
+      "call_code": "PROCESS_FEATURE_OR_SURFACE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_operate_tool"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_inspect_result",
+      "call_code": "INSPECT_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_process_feature_or_surface"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s07_record_result",
+      "call_code": "RECORD_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s06_inspect_result"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "S01",
+      "category_id": "S",
+      "category": "Shipyard Construction, Coating & Verification",
+      "function_signature": "weld_seam(ship_section, work_spec)",
+      "implementation_priority": "P1",
+      "customization_notes": "Added for ManSim shipyard_basic scenario. Reuses existing primitive skills.",
+      "primitive_template_id": "SHIPYARD-V1"
+    },
+    "resources": {
+      "raw_tools": "inspection_camera, welding_tool",
+      "raw_vehicles": null,
+      "raw_equipment": "fixture, ship_section",
+      "optional_aliases": {
+        "tools": [
+          "welding_tool",
+          "inspection_camera"
+        ],
+        "vehicles": [],
+        "equipment": [
+          "ship_section",
+          "fixture"
+        ]
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "HumanoidSim shipyard v1"
+    }
+  }
+}

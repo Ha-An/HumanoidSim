@@ -15,9 +15,9 @@ class CatalogTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.catalog = load_task_catalog()
 
-    def test_catalog_has_82_core_tasks(self) -> None:
-        self.assertEqual(self.catalog.task_count, 82)
-        self.assertEqual(len(set(self.catalog.tasks)), 82)
+    def test_catalog_has_86_core_tasks(self) -> None:
+        self.assertEqual(self.catalog.task_count, 86)
+        self.assertEqual(len(set(self.catalog.tasks)), 86)
 
     def test_all_tasks_validate_hierarchy(self) -> None:
         for code in self.catalog.tasks:
