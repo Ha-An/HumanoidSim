@@ -10,8 +10,8 @@
 
 ## 요약
 
-- Active primitive 수: 59
-- Registry primitive 수: 59
+- Active primitive 수: 61
+- Registry primitive 수: 61
 - 원본 primitive 정의: `data/primitives/*.json`
 - Primitive template index: `data/primitive_templates.json`
 - State relation 원본: 각 primitive JSON의 `metadata.state`, `data/state_schema_core.json`의 `primitive_state_profiles`
@@ -191,7 +191,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td>Safety &amp; Interaction</td>
       <td>안전 구역 확인, 의도 알림, 협업 readiness 확인, clearance 요청</td>
       <td>`WAITING` 또는 `EXECUTING` 중 safety reason과 연결 가능</td>
-      <td><code>ANNOUNCE_INTENT</code>, <code>CHECK_SAFETY_ZONE</code>, <code>CONFIRM_OPERATOR_STATE</code>, <code>EXECUTE_HUMAN_COLLABORATION_ACTION</code>, <code>VERIFY_AUTHORIZATION</code>, <code>VERIFY_LOCKOUT_IF_REQUIRED</code></td>
+      <td><code>ANNOUNCE_INTENT</code>, <code>CHECK_SAFETY_ZONE</code>, <code>CONFIRM_OPERATOR_STATE</code>, <code>EXECUTE_HUMAN_COLLABORATION_ACTION</code>, <code>EXECUTE_ROBOT_COLLABORATION_ACTION</code>, <code>SYNC_WITH_ROBOT</code>, <code>VERIFY_AUTHORIZATION</code>, <code>VERIFY_LOCKOUT_IF_REQUIRED</code></td>
     </tr>
     <tr>
       <td>P05</td>
@@ -297,25 +297,103 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
 
 권장 schema는 primitive JSON의 `metadata.group`에 `group_id`, `group_name`, `capability_axis`, `state_axes`를 추가하는 방식입니다. 이렇게 하면 task reference와 runtime executor가 primitive를 임의로 묶지 않고 HumanoidSim 정의를 그대로 사용할 수 있습니다.
 
-## Primitive 목록
+## Primitive Difficulty Weight
+
+OTC(Operational Task Complexity) 계산을 위해 모든 primitive는 `metadata.operational_complexity.difficulty_weight` 값을 가집니다. 값은 `0.0`부터 `1.0`까지 0.1 단위로 부여하며, 실행 시간보다는 motion precision, manipulation difficulty, safety risk, collaboration burden, recovery burden을 반영합니다.
 
 <table>
   <colgroup>
     <col style="width: 10%;" />
-    <col style="width: 10%;" />
-    <col style="width: 23%;" />
+    <col style="width: 24%;" />
+    <col style="width: 66%;" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Weight</th>
+      <th>Group</th>
+      <th>기준</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0.0</td>
+      <td>Administrative</td>
+      <td>기록/상태 갱신처럼 로봇 실행 부담이 거의 없는 primitive</td>
+    </tr>
+    <tr>
+      <td>0.1</td>
+      <td>Administrative</td>
+      <td>단순 선언, read, report 등 물리 동작이 거의 없는 primitive</td>
+    </tr>
+    <tr>
+      <td>0.2</td>
+      <td>Low Operational</td>
+      <td>낮은 부담의 확인/검증 primitive</td>
+    </tr>
+    <tr>
+      <td>0.3</td>
+      <td>Low Operational</td>
+      <td>표준 이동, 수량/상태 확인처럼 경로 또는 인지 부담이 조금 있는 primitive</td>
+    </tr>
+    <tr>
+      <td>0.4</td>
+      <td>Standard Robot Skill</td>
+      <td>localize, reach, inspect, verify처럼 위치/인지 정확도가 필요한 primitive</td>
+    </tr>
+    <tr>
+      <td>0.5</td>
+      <td>Standard Robot Skill</td>
+      <td>grasp/place 같은 표준 manipulation primitive</td>
+    </tr>
+    <tr>
+      <td>0.6</td>
+      <td>Manipulation & Process</td>
+      <td>lift, tool, machine, vehicle 등 물리 상태를 바꾸는 primitive</td>
+    </tr>
+    <tr>
+      <td>0.7</td>
+      <td>Manipulation & Process</td>
+      <td>공정 품질, payload, safety gate가 얽힌 고부담 primitive</td>
+    </tr>
+    <tr>
+      <td>0.8</td>
+      <td>Coordination & Recovery</td>
+      <td>robot sync, lockout, coordination처럼 동기화와 안전 영향이 큰 primitive</td>
+    </tr>
+    <tr>
+      <td>0.9</td>
+      <td>Coordination & Recovery</td>
+      <td>human collaboration, EHS action처럼 실패 시 안전/복구 부담이 매우 큰 primitive</td>
+    </tr>
+    <tr>
+      <td>1.0</td>
+      <td>Critical</td>
+      <td>시스템 중단, 장기 recovery, 인명/설비 위험으로 이어질 수 있는 critical primitive</td>
+    </tr>
+  </tbody>
+</table>
+
+## Primitive 목록
+
+<table>
+  <colgroup>
+    <col style="width: 9%;" />
+    <col style="width: 9%;" />
+    <col style="width: 6%;" />
+    <col style="width: 20%;" />
     <col style="width: 8%;" />
-    <col style="width: 10%;" />
-    <col style="width: 10%;" />
+    <col style="width: 9%;" />
+    <col style="width: 9%;" />
     <col style="width: 8%;" />
     <col style="width: 6%;" />
     <col style="width: 10%;" />
-    <col style="width: 5%;" />
+    <col style="width: 6%;" />
   </colgroup>
   <thead>
     <tr>
       <th>Code</th>
       <th>Group</th>
+      <th>Difficulty</th>
       <th>설명</th>
       <th>Availability State</th>
       <th>Mobility State</th>
@@ -330,6 +408,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>ALIGN</code></td>
       <td>P01<br>Mobility &amp; Spatial Alignment</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>설비, 충전기, 작업대 또는 대상 위치에 정렬하거나 docking합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>DOCKING</code> / 종료 <code>STATIONARY</code></td>
@@ -342,18 +421,20 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>ANNOUNCE_INTENT</code></td>
       <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.1<br>Administrative</td>
       <td>handover나 공동 작업 전에 의도와 다음 행동을 알립니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>HANDOVER_ITEM</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>RECEIVE_FROM_OPERATOR</code></td>
+      <td><code>HANDOVER_ITEM</code><br><code>HANDOVER_ITEM_TO_ROBOT</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>RECEIVE_FROM_OPERATOR</code></td>
       <td><code>data/primitives/ANNOUNCE_INTENT.json</code></td>
     </tr>
     <tr>
       <td><code>CHECK_CONTEXT</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.2<br>Low Operational</td>
       <td>요청, context, 안전 조건 또는 사전 조건을 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -366,6 +447,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>CHECK_REQUEST</code></td>
       <td>P09<br>Resource &amp; Inventory Interface</td>
+      <td>0.2<br>Low Operational</td>
       <td>요청, context, 안전 조건 또는 사전 조건을 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -378,18 +460,20 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>CHECK_SAFETY_ZONE</code></td>
       <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.7<br>Manipulation &amp; Process</td>
       <td>요청, context, 안전 조건 또는 사전 조건을 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CHANGE_MACHINE_CONFIGURATION</code><br><code>CLEAR_MACHINE_FAULT</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>DIAGNOSE_MACHINE</code><br><code>INSPECT_MACHINE</code><br><code>LOAD_MACHINE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>PREVENTIVE_MAINTENANCE</code><br><code>REPAIR_MACHINE</code><br><code>REPLACE_MACHINE_PART</code><br><code>SETUP_MACHINE</code><br><code>UNLOAD_MACHINE</code><br><code>WELD_SEAM</code></td>
+      <td><code>CHANGE_MACHINE_CONFIGURATION</code><br><code>CLEAR_MACHINE_FAULT</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>DIAGNOSE_MACHINE</code><br><code>HANDOVER_ITEM_TO_ROBOT</code><br><code>INSPECT_MACHINE</code><br><code>LOAD_MACHINE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>PREVENTIVE_MAINTENANCE</code><br><code>REPAIR_MACHINE</code><br><code>REPLACE_MACHINE_PART</code><br><code>SETUP_MACHINE</code><br><code>UNLOAD_MACHINE</code><br><code>WELD_SEAM</code></td>
       <td><code>data/primitives/CHECK_SAFETY_ZONE.json</code></td>
     </tr>
     <tr>
       <td><code>CLASSIFY_RESULT</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.2<br>Low Operational</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -402,6 +486,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>CONFIRM_OPERATOR_STATE</code></td>
       <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>operator 또는 협업 대상의 준비 상태와 안전 상태를 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -414,6 +499,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>CREATE_OR_UPDATE_RECORD</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.1<br>Administrative</td>
       <td>작업 결과, traceability, 재고 또는 예외 정보를 기록하거나 갱신합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -426,6 +512,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_ASSEMBLY_ACTION</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.7<br>Manipulation &amp; Process</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -438,6 +525,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_EHS_ACTION</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.9<br>Coordination &amp; Recovery</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -450,6 +538,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_HUMAN_COLLABORATION_ACTION</code></td>
       <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.9<br>Coordination &amp; Recovery</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -462,6 +551,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_MACHINE_ACTION</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -474,6 +564,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_MAINTENANCE_ACTION</code></td>
       <td>P08<br>Recovery &amp; Self-Maintenance</td>
+      <td>0.7<br>Manipulation &amp; Process</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -486,6 +577,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_PACKAGING_ACTION</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.5<br>Standard Robot Skill</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -498,6 +590,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_QUALITY_ACTION</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.5<br>Standard Robot Skill</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -508,8 +601,22 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td><code>data/primitives/EXECUTE_QUALITY_ACTION.json</code></td>
     </tr>
     <tr>
+      <td><code>EXECUTE_ROBOT_COLLABORATION_ACTION</code></td>
+      <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.8<br>Coordination &amp; Recovery</td>
+      <td>task context에 맞는 domain action을 수행합니다.</td>
+      <td><code>EXECUTING</code></td>
+      <td>시작 <code>STATIONARY</code></td>
+      <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
+      <td>peer_robot: EntityRef | str<br>collaboration_spec: dict</td>
+      <td>result: dict</td>
+      <td><code>HANDOVER_ITEM_TO_ROBOT</code></td>
+      <td><code>data/primitives/EXECUTE_ROBOT_COLLABORATION_ACTION.json</code></td>
+    </tr>
+    <tr>
       <td><code>EXECUTE_SYSTEM_ACTION</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -522,6 +629,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>EXECUTE_WAREHOUSE_ACTION</code></td>
       <td>P09<br>Resource &amp; Inventory Interface</td>
+      <td>0.5<br>Standard Robot Skill</td>
       <td>task context에 맞는 domain action을 수행합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -534,6 +642,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>FIX_OR_HOLD_PART</code></td>
       <td>P03<br>Manipulation &amp; Payload</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -546,6 +655,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>GRASP</code></td>
       <td>P03<br>Manipulation &amp; Payload</td>
+      <td>0.5<br>Standard Robot Skill</td>
       <td>대상 item이나 tool을 잡거나 지지합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -558,6 +668,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>IDENTIFY_PRODUCT</code></td>
       <td>P02<br>Perception &amp; Identification</td>
+      <td>0.3<br>Low Operational</td>
       <td>대상 item, 제품, 부품 또는 label의 정체를 식별합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -570,6 +681,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>INSPECT_AREA</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -582,6 +694,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>INSPECT_OR_DIAGNOSE</code></td>
       <td>P08<br>Recovery &amp; Self-Maintenance</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -594,6 +707,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>INSPECT_RESULT</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -606,6 +720,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>LIFT</code></td>
       <td>P03<br>Manipulation &amp; Payload</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>잡은 대상을 들어 운반 가능한 상태로 만듭니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -618,6 +733,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>LOCALIZE_COMPONENTS</code></td>
       <td>P02<br>Perception &amp; Identification</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>대상 객체, 부품, 표면 또는 영역의 위치와 접근 정보를 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -630,6 +746,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>LOCALIZE_OBJECT</code></td>
       <td>P02<br>Perception &amp; Identification</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>대상 객체, 부품, 표면 또는 영역의 위치와 접근 정보를 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -642,6 +759,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>LOCALIZE_PART</code></td>
       <td>P02<br>Perception &amp; Identification</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>대상 객체, 부품, 표면 또는 영역의 위치와 접근 정보를 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -654,6 +772,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>LOCALIZE_SURFACE</code></td>
       <td>P02<br>Perception &amp; Identification</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>대상 객체, 부품, 표면 또는 영역의 위치와 접근 정보를 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -666,30 +785,33 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>LOG_RESULT</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.0<br>Administrative</td>
       <td>작업 결과, traceability, 재고 또는 예외 정보를 기록하거나 갱신합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CALIBRATE_MACHINE</code><br><code>CALIBRATE_ROBOT</code><br><code>CAPTURE_EVIDENCE_OR_STATUS</code><br><code>CHANGE_END_EFFECTOR</code><br><code>CHANGE_MACHINE_CONFIGURATION</code><br><code>CLEAR_MACHINE_FAULT</code><br><code>COMPLETE_WORK_ORDER</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>CREATE_EXCEPTION_REPORT</code><br><code>DIAGNOSE_MACHINE</code><br><code>HANDOVER_ITEM</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>INITIALIZE_ROBOT</code><br><code>INSPECT_MACHINE</code><br><code>LOAD_MACHINE</code><br><code>LOAD_WORK_CONTEXT</code><br><code>MANAGE_ROBOT_POWER</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>PREVENTIVE_MAINTENANCE</code><br><code>RECEIVE_FROM_OPERATOR</code><br><code>RECORD_QUALITY_RESULT</code><br><code>RECOVER_FROM_FAULT</code><br><code>REGISTER_TRACEABILITY</code><br><code>REPAIR_MACHINE</code><br><code>REPLACE_MACHINE_PART</code><br><code>REPORT_HAZARD</code><br><code>REPORT_OPERATION_RESULT</code><br><code>SELF_CHECK</code><br><code>SERVICE_FLUID_OR_LUBRICATION</code><br><code>SETUP_MACHINE</code><br><code>SET_OPERATION_MODE</code><br><code>START_WORK_ORDER</code><br><code>UNLOAD_MACHINE</code><br><code>UPDATE_INVENTORY_RECORD</code></td>
+      <td><code>CALIBRATE_MACHINE</code><br><code>CALIBRATE_ROBOT</code><br><code>CAPTURE_EVIDENCE_OR_STATUS</code><br><code>CHANGE_END_EFFECTOR</code><br><code>CHANGE_MACHINE_CONFIGURATION</code><br><code>CLEAR_MACHINE_FAULT</code><br><code>COMPLETE_WORK_ORDER</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>CREATE_EXCEPTION_REPORT</code><br><code>DIAGNOSE_MACHINE</code><br><code>HANDOVER_ITEM</code><br><code>HANDOVER_ITEM_TO_ROBOT</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>INITIALIZE_ROBOT</code><br><code>INSPECT_MACHINE</code><br><code>LOAD_MACHINE</code><br><code>LOAD_WORK_CONTEXT</code><br><code>MANAGE_ROBOT_POWER</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>PREVENTIVE_MAINTENANCE</code><br><code>RECEIVE_FROM_OPERATOR</code><br><code>RECORD_QUALITY_RESULT</code><br><code>RECOVER_FROM_FAULT</code><br><code>REGISTER_TRACEABILITY</code><br><code>REPAIR_MACHINE</code><br><code>REPLACE_MACHINE_PART</code><br><code>REPORT_HAZARD</code><br><code>REPORT_OPERATION_RESULT</code><br><code>SELF_CHECK</code><br><code>SERVICE_FLUID_OR_LUBRICATION</code><br><code>SETUP_MACHINE</code><br><code>SET_OPERATION_MODE</code><br><code>START_WORK_ORDER</code><br><code>UNLOAD_MACHINE</code><br><code>UPDATE_INVENTORY_RECORD</code></td>
       <td><code>data/primitives/LOG_RESULT.json</code></td>
     </tr>
     <tr>
       <td><code>NAVIGATE_TO</code></td>
       <td>P01<br>Mobility &amp; Spatial Alignment</td>
+      <td>0.3<br>Low Operational</td>
       <td>목표 위치나 대상의 service tile까지 이동합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>NAVIGATING</code> / 종료 <code>STATIONARY</code></td>
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>area: Any<br>destination: Any<br>machine: Any<br>operator: Any<br>source: Any</td>
       <td>result: dict</td>
-      <td><code>CLEAN_ASSET</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>HANDOVER_ITEM</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>LOAD_MACHINE</code><br><code>LOAD_UNLOAD_TRANSFER_INTERFACE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>RECEIVE_FROM_OPERATOR</code><br><code>SETUP_MACHINE</code><br><code>TRANSFER</code><br><code>UNLOAD_MACHINE</code></td>
+      <td><code>CLEAN_ASSET</code><br><code>CONTROL_MACHINE_CYCLE</code><br><code>HANDOVER_ITEM</code><br><code>HANDOVER_ITEM_TO_ROBOT</code><br><code>HANDOVER_TOOL</code><br><code>HOLD_OR_POSITION_FOR_OPERATOR</code><br><code>LOAD_MACHINE</code><br><code>LOAD_UNLOAD_TRANSFER_INTERFACE</code><br><code>OPERATE_MACHINE_INTERFACE</code><br><code>RECEIVE_FROM_OPERATOR</code><br><code>SETUP_MACHINE</code><br><code>TRANSFER</code><br><code>UNLOAD_MACHINE</code></td>
       <td><code>data/primitives/NAVIGATE_TO.json</code></td>
     </tr>
     <tr>
       <td><code>OPERATE_TOOL</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>tool, dispenser, interface 또는 장치를 조작합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -702,6 +824,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>OPERATE_TOOL_OR_DISPENSER</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.7<br>Manipulation &amp; Process</td>
       <td>tool, dispenser, interface 또는 장치를 조작합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -714,6 +837,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PARK_OR_RELEASE_VEHICLE</code></td>
       <td>P01<br>Mobility &amp; Spatial Alignment</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -726,6 +850,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PLACE</code></td>
       <td>P03<br>Manipulation &amp; Payload</td>
+      <td>0.5<br>Standard Robot Skill</td>
       <td>운반 중인 대상을 목표 위치에 내려놓습니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -738,6 +863,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PREPARE_PACKAGING</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -750,6 +876,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PRIMITIVE_APPLY_MATERIAL</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.7<br>Manipulation &amp; Process</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -762,6 +889,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PRIMITIVE_IDENTIFY_ITEM</code></td>
       <td>P02<br>Perception &amp; Identification</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>대상 item, 제품, 부품 또는 label의 정체를 식별합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -774,6 +902,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PRIMITIVE_PREPARE_SURFACE</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.6<br>Manipulation &amp; Process</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -786,6 +915,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PRIMITIVE_UPDATE_INVENTORY_RECORD</code></td>
       <td>P09<br>Resource &amp; Inventory Interface</td>
+      <td>0.1<br>Administrative</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -798,6 +928,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PRIMITIVE_VERIFY_ASSEMBLY</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -810,6 +941,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PRIMITIVE_VERIFY_PACKAGE</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.3<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -822,6 +954,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>PROCESS_FEATURE_OR_SURFACE</code></td>
       <td>P05<br>Equipment &amp; Tool Operation</td>
+      <td>0.7<br>Manipulation &amp; Process</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -834,6 +967,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>REACH_TO</code></td>
       <td>P03<br>Manipulation &amp; Payload</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>대상 item이나 tool에 팔 또는 gripper를 접근시킵니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -846,6 +980,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>READ_CONTEXT</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.1<br>Administrative</td>
       <td>설비, 시스템 또는 작업 맥락의 현재 상태를 읽습니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -858,6 +993,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>READ_MACHINE_STATE</code></td>
       <td>P08<br>Recovery &amp; Self-Maintenance</td>
+      <td>0.2<br>Low Operational</td>
       <td>설비, 시스템 또는 작업 맥락의 현재 상태를 읽습니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -870,6 +1006,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>RECORD_RESULT</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.0<br>Administrative</td>
       <td>작업 결과, traceability, 재고 또는 예외 정보를 기록하거나 갱신합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -882,6 +1019,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>RELEASE</code></td>
       <td>P03<br>Manipulation &amp; Payload</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>잡고 있던 대상이나 tool을 놓습니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -894,6 +1032,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>REPORT_RESULT</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.1<br>Administrative</td>
       <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -904,8 +1043,22 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
       <td><code>data/primitives/REPORT_RESULT.json</code></td>
     </tr>
     <tr>
+      <td><code>SYNC_WITH_ROBOT</code></td>
+      <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.8<br>Coordination &amp; Recovery</td>
+      <td>task context에 따라 사용되는 휴머노이드 primitive skill입니다.</td>
+      <td><code>EXECUTING</code></td>
+      <td>시작 <code>STATIONARY</code></td>
+      <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
+      <td>peer_robot: EntityRef | str<br>sync_spec: dict</td>
+      <td>result: dict</td>
+      <td><code>HANDOVER_ITEM_TO_ROBOT</code></td>
+      <td><code>data/primitives/SYNC_WITH_ROBOT.json</code></td>
+    </tr>
+    <tr>
       <td><code>UPDATE_RECORD</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.1<br>Administrative</td>
       <td>작업 결과, traceability, 재고 또는 예외 정보를 기록하거나 갱신합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -918,6 +1071,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_AREA_STATE</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.3<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -930,6 +1084,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_AUTHORIZATION</code></td>
       <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.2<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -942,6 +1097,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_COVERAGE_OR_AMOUNT</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -954,6 +1110,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_LEVEL_OR_QUANTITY</code></td>
       <td>P09<br>Resource &amp; Inventory Interface</td>
+      <td>0.3<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -966,6 +1123,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_LOCKOUT_IF_REQUIRED</code></td>
       <td>P04<br>Safety &amp; Interaction</td>
+      <td>0.8<br>Coordination &amp; Recovery</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -978,6 +1136,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_MACHINE_STATE</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.3<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -990,6 +1149,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_PLACEMENT</code></td>
       <td>P06<br>Verification &amp; Quality</td>
+      <td>0.4<br>Standard Robot Skill</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -1002,6 +1162,7 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_RECORD</code></td>
       <td>P09<br>Resource &amp; Inventory Interface</td>
+      <td>0.1<br>Administrative</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
@@ -1014,18 +1175,20 @@ Primitive는 task category가 아니라 휴머노이드 기능 축을 기준으�
     <tr>
       <td><code>VERIFY_ROBOT_STATE</code></td>
       <td>P08<br>Recovery &amp; Self-Maintenance</td>
+      <td>0.3<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>
       <td>상황 의존: <code>FREE</code>, <code>REACHING</code>, <code>HOLDING</code>, <code>PLACING</code></td>
       <td>-</td>
       <td>result: dict</td>
-      <td><code>CALIBRATE_ROBOT</code><br><code>CHANGE_END_EFFECTOR</code><br><code>INITIALIZE_ROBOT</code><br><code>LOAD_WORK_CONTEXT</code><br><code>MANAGE_ROBOT_POWER</code><br><code>RECOVER_FROM_FAULT</code><br><code>SELF_CHECK</code><br><code>SET_OPERATION_MODE</code></td>
+      <td><code>CALIBRATE_ROBOT</code><br><code>CHANGE_END_EFFECTOR</code><br><code>HANDOVER_ITEM_TO_ROBOT</code><br><code>INITIALIZE_ROBOT</code><br><code>LOAD_WORK_CONTEXT</code><br><code>MANAGE_ROBOT_POWER</code><br><code>RECOVER_FROM_FAULT</code><br><code>SELF_CHECK</code><br><code>SET_OPERATION_MODE</code></td>
       <td><code>data/primitives/VERIFY_ROBOT_STATE.json</code></td>
     </tr>
     <tr>
       <td><code>VERIFY_TRANSACTION</code></td>
       <td>P07<br>Records &amp; Digital Context</td>
+      <td>0.2<br>Low Operational</td>
       <td>작업 조건, 배치, 상태 또는 결과가 기준에 맞는지 확인합니다.</td>
       <td><code>EXECUTING</code></td>
       <td>시작 <code>STATIONARY</code></td>

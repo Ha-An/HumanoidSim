@@ -2,6 +2,8 @@
 
 HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident`, `Recovery protocol`을 도메인 독립적으로 정의하고 검증하는 라이브러리입니다. ManSim 같은 시뮬레이터는 HumanoidSim의 정의를 import해서 사용할 수 있지만, HumanoidSim 자체는 ManSim에 의존하지 않습니다.
 
+현재 Python package version은 `0.1.0`, core catalog version은 `0.2.0-core`입니다. ManSim v0.5는 이 repository를 editable install해 최신 catalog와 complexity API를 사용합니다.
+
 ![HumanoidSim overview](assets/IMG.png)
 
 ## 핵심 원칙
@@ -17,10 +19,10 @@ HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident
 
 | 항목 | 개수 | 설명 |
 | --- | ---: | --- |
-| Task | 86 | 제조, 조선소, 범용 휴머노이드 작업 카탈로그입니다. |
-| Atomic Task | 51 | Primitive sequence만으로 실행되는 단일 task입니다. |
+| Task | 87 | 제조, 조선소, 범용 휴머노이드 작업 카탈로그입니다. |
+| Atomic Task | 56 | Primitive sequence만으로 실행되는 단일 task입니다. |
 | Composite Task | 31 | 하나 이상의 child task call을 포함하는 workflow task입니다. |
-| Primitive | 59 | Task를 구성하는 최소 실행 skill입니다. |
+| Primitive | 61 | Task를 구성하는 최소 실행 skill입니다. |
 | Incident | 35 | 범용 휴머노이드 돌발상황 taxonomy입니다. |
 
 ## Task 구조
@@ -47,6 +49,27 @@ ManSim `shipyard_basic` scenario 검증을 위해 다음 task가 HumanoidSim cat
 | `VERIFY_SHIP_SECTION` | `ATOMIC_TASK` | Ship section 또는 exterior surface tile의 weld, sealant, paint 품질을 검사하고 결과를 분류/기록합니다. |
 
 Vehicle 기반 batch logistics는 기존 `OPERATE_VEHICLE_TRANSPORT` task를 사용합니다. ManSim `shipyard_basic`에서는 이 task로 cart가 `weld_wire` 또는 `paint_can`을 source에서 parking spot까지 운반하고, 마지막 작업 tile 공급은 기존 `TRANSFER` task로 표현합니다.
+
+Robot-to-robot handover는 human/operator handover와 분리해서 정의합니다. `HANDOVER_ITEM_TO_ROBOT`은 `SYNC_WITH_ROBOT`과 `EXECUTE_ROBOT_COLLABORATION_ACTION`을 사용하고, 사람 대상 handover는 기존 human collaboration primitive를 유지합니다.
+
+## Primitive Difficulty Weight와 OTC
+
+OTC(Operational Task Complexity)는 시뮬레이션 기간 동안 발생한 task instance들이 얼마나 어려운 primitive 조합으로 구성되어 있는지 누적해서 보는 지표입니다. HumanoidSim의 모든 primitive는 `metadata.operational_complexity.difficulty_weight` 값을 가지며, ManSim 같은 외부 시뮬레이터는 이 값을 읽어 task별 복잡도와 기간별 OTC를 계산할 수 있습니다.
+
+난이도는 `0.0`부터 `1.0`까지 0.1 단위로 부여합니다. 값은 실행 시간 자체가 아니라 동작 정밀도, 조작 난이도, 안전 위험도, 협업 필요성, 실패 복구 부담을 반영합니다.
+
+| 범위 | 그룹 | 의미 |
+| --- | --- | --- |
+| `0.0 ~ 0.1` | Administrative | 기록, 상태 갱신, 단순 선언처럼 로봇 실행 부담이 거의 없는 primitive |
+| `0.2 ~ 0.3` | Low Operational | 낮은 부담의 확인, 검증, 표준 이동 primitive |
+| `0.4 ~ 0.5` | Standard Robot Skill | localize, reach, grasp/place 등 일반적인 로봇 skill |
+| `0.6 ~ 0.7` | Manipulation & Process | tool, machine, vehicle, material application처럼 물리 상태나 공정 품질을 바꾸는 primitive |
+| `0.8 ~ 0.9` | Coordination & Recovery | robot sync, lockout, human/robot collaboration처럼 동기화와 안전 부담이 큰 primitive |
+| `1.0` | Critical | 실패 시 system stop, 장기 recovery, 인명/설비 위험으로 이어질 수 있는 primitive |
+
+Task complexity는 task를 primitive leaf step까지 전개한 뒤, 각 primitive 등장 횟수와 difficulty weight의 가중합으로 계산합니다. 자세한 primitive별 값은 [docs/primitives_reference.md](docs/primitives_reference.md)의 Difficulty 컬럼을 참고하세요.
+
+`humanoidsim validate-lab --all`로 생성되는 `validation_dashboard.html`은 각 task trace 옆에 정적 task complexity와 primitive leaf count를 함께 표시합니다. Python API에서는 `task_complexity(task_code)`와 `task_complexity_index()`로 같은 값을 읽을 수 있습니다.
 
 ## State 모델
 
@@ -95,6 +118,16 @@ from humanoidsim import (
 ```
 
 `expand_task_steps(task_code, args, catalog=...)`는 nested composite task를 parent task, child task, primitive leaf까지 보존한 plan row로 반환합니다.
+
+## ManSim v0.5 Integration
+
+HumanoidSim과 ManSim의 책임 경계는 다음과 같습니다.
+
+- HumanoidSim은 task hierarchy, primitive difficulty, state transition, incident recovery 의미를 제공합니다.
+- ManSim은 factory/shipyard 조건에서 task instance를 만들고 item, machine, queue, battery 같은 domain side effect를 실행합니다.
+- ManSim의 OTC는 완료된 top-level task instance와 HumanoidSim `task_complexity()` 결과를 결합해 계산합니다.
+- ManSim이 최신 local 정의를 사용하도록 `python -m pip install -e ..\HumanoidSim` 형태의 editable install을 권장합니다.
+- HumanoidSim Validation Lab과 ROS adapter는 ManSim Hub나 ManSim artifact에 의존하지 않습니다.
 
 ## 실행
 
@@ -171,6 +204,7 @@ ROS 2 연동은 HumanoidSim core와 분리된 adapter로 제공합니다. 기준
 
 ## Reference
 
+- [Docs Index](docs/README.md): 현재 catalog 기준과 권장 읽기 순서를 정리합니다.
 - [Task Reference](docs/tasks_reference.md): task level, category, input, resource, nested sequence를 정리합니다.
 - [Primitive Reference](docs/primitives_reference.md): primitive group, state relation, 사용 task를 정리합니다.
 - [State Reference](docs/state_reference.md): Availability, Mobility, Power, Manipulation 축과 transition diagram을 정리합니다.
@@ -194,6 +228,14 @@ ROS 2 연동은 HumanoidSim core와 분리된 adapter로 제공합니다. 기준
 ## 테스트
 
 ```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests
+```
+
+Reference 문서는 catalog JSON에서 생성합니다. Task, primitive, incident definition을 수정한 뒤 다음 명령으로 문서를 다시 만들고 catalog와 전체 test를 검증합니다.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\generate_reference_docs.py
+.\.venv\Scripts\python.exe -m humanoidsim validate-catalog
 .\.venv\Scripts\python.exe -m unittest discover -s tests
 ```
 

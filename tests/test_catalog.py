@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from humanoidsim import expand_task_steps, export_validation_viewer, load_sequence_file, load_task_catalog, validate_task_sequence
+from humanoidsim.complexity import task_complexity, task_complexity_index
 from humanoidsim.catalog import TaskCatalog
 from humanoidsim.execution import HumanoidProfile
 from humanoidsim.task_schema import ParameterSpec, StepCall, TaskInstance, TaskLevel, TaskRegistry, TaskSpec
@@ -15,9 +16,9 @@ class CatalogTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.catalog = load_task_catalog()
 
-    def test_catalog_has_86_core_tasks(self) -> None:
-        self.assertEqual(self.catalog.task_count, 86)
-        self.assertEqual(len(set(self.catalog.tasks)), 86)
+    def test_catalog_has_core_tasks(self) -> None:
+        self.assertEqual(self.catalog.task_count, 87)
+        self.assertEqual(len(set(self.catalog.tasks)), 87)
 
     def test_all_tasks_validate_hierarchy(self) -> None:
         for code in self.catalog.tasks:
@@ -39,6 +40,57 @@ class CatalogTests(unittest.TestCase):
         transfer_steps = [step for step in spec.steps if step.call_code == "TRANSFER"]
         self.assertEqual(len(transfer_steps), 1)
         self.assertEqual(transfer_steps[0].expected_level, TaskLevel.ATOMIC_TASK)
+
+    def test_robot_handover_uses_robot_collaboration_primitives(self) -> None:
+        rows = expand_task_steps(
+            "HANDOVER_ITEM_TO_ROBOT",
+            {
+                "item": {"entity_type": "product", "entity_id": "PRODUCT-1"},
+                "recipient": {"entity_type": "robot", "entity_id": "A2"},
+                "handover_spec": {"mode": "product_collaboration_join"},
+            },
+            catalog=self.catalog,
+        )
+        primitive_codes = [row["call_code"] for row in rows if row["call_level"] == "PRIMITIVE_SKILL"]
+        self.assertIn("SYNC_WITH_ROBOT", primitive_codes)
+        self.assertIn("EXECUTE_ROBOT_COLLABORATION_ACTION", primitive_codes)
+        self.assertNotIn("EXECUTE_HUMAN_COLLABORATION_ACTION", primitive_codes)
+
+    def test_all_primitives_have_otc_difficulty_weight(self) -> None:
+        allowed_weights = {round(index / 10, 1) for index in range(11)}
+        allowed_groups = {
+            "Administrative",
+            "Low Operational",
+            "Standard Robot Skill",
+            "Manipulation & Process",
+            "Coordination & Recovery",
+            "Critical",
+        }
+        for spec in self.catalog.primitives.values():
+            complexity = spec.metadata.get("operational_complexity", {})
+            self.assertIn("difficulty_weight", complexity, spec.code)
+            self.assertIn("difficulty_group", complexity, spec.code)
+            self.assertIn("rationale", complexity, spec.code)
+            self.assertIn(round(float(complexity["difficulty_weight"]), 1), allowed_weights, spec.code)
+            self.assertGreaterEqual(float(complexity["difficulty_weight"]), 0.0, spec.code)
+            self.assertLessEqual(float(complexity["difficulty_weight"]), 1.0, spec.code)
+            self.assertIn(complexity["difficulty_group"], allowed_groups, spec.code)
+
+    def test_task_complexity_uses_primitive_difficulty_weights(self) -> None:
+        transfer = task_complexity("TRANSFER", {"item": "ITEM-1", "source": "A", "destination": "B"}, catalog=self.catalog)
+        self.assertEqual("TRANSFER", transfer["task_code"])
+        self.assertGreater(transfer["complexity"], 0.0)
+        self.assertGreater(transfer["primitive_count"], 0)
+        self.assertIn("NAVIGATE_TO", transfer["primitive_counts"])
+        self.assertIn("GRASP", transfer["primitive_contributions"])
+        self.assertEqual([], transfer["missing_weights"])
+
+    def test_all_tasks_have_static_complexity(self) -> None:
+        index = task_complexity_index(catalog=self.catalog)
+        self.assertEqual(set(index), set(self.catalog.tasks))
+        for task_code, payload in index.items():
+            self.assertGreaterEqual(payload["complexity"], 0.0, task_code)
+            self.assertGreater(payload["primitive_count"], 0, task_code)
 
     def test_expand_task_steps_preserves_nested_path(self) -> None:
         rows = expand_task_steps(

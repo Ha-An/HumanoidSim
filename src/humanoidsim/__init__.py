@@ -1,4 +1,5 @@
 from .catalog import TaskCatalog, find_project_root, load_task_catalog, task_spec_from_dict
+from .complexity import primitive_difficulty_weight, task_complexity, task_complexity_index
 from .execution import (
     HumanoidProfile,
     SequenceValidationResult,
@@ -108,6 +109,7 @@ __all__ = [
     "load_task_catalog",
     "parse_humanoid_state_snapshot",
     "primitive_state_hint",
+    "primitive_difficulty_weight",
     "recovery_protocol_for_incident",
     "resolve_incident_code",
     "run_validation_lab",
@@ -117,6 +119,8 @@ __all__ = [
     "transition_humanoid_state",
     "simulate_task_sequence",
     "task_spec_from_dict",
+    "task_complexity",
+    "task_complexity_index",
     "trace_to_json",
     "validate_primitive_state_profile",
     "validate_state_snapshot",

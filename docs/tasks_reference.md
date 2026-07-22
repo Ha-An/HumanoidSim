@@ -10,7 +10,7 @@
 
 ## 요약
 
-- Task 수: 86
+- Task 수: 87
 - 원본 task 정의: `data/tasks/*.json`
 - 통합 index: `data/task_catalog_core.json`
 - Primitive template index: `data/primitive_templates.json`
@@ -31,7 +31,7 @@
   <tbody>
     <tr>
       <td><code>ATOMIC_TASK</code></td>
-      <td>55</td>
+      <td>56</td>
     </tr>
     <tr>
       <td><code>COMPOSITE_TASK</code></td>
@@ -171,7 +171,7 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
     <tr>
       <td>M</td>
       <td>Human Collaboration &amp; Operator Assistance</td>
-      <td>6</td>
+      <td>7</td>
       <td>operator 지원, item/tool handover, operator로부터 수령, 작업 중 지지/정렬, 공동 lifting/move를 다룹니다.</td>
     </tr>
     <tr>
@@ -1196,6 +1196,18 @@ HumanoidSim v0.1에서 task level은 실행 workflow의 구조로 구분합니�
       <td>HIGH</td>
       <td><code>TRANSFER</code> [ATOMIC_TASK]<br><code>HANDOVER_ITEM</code> [ATOMIC_TASK]</td>
       <td><code>data/tasks/M06_ASSIST_OPERATOR_MOVE_OR_LIFT.json</code></td>
+    </tr>
+    <tr>
+      <td>M07</td>
+      <td><code>HANDOVER_ITEM_TO_ROBOT</code></td>
+      <td><code>ATOMIC_TASK</code></td>
+      <td>operator나 다른 휴머노이드와 handover, 수령, 협업, 보조 운반을 수행하는 task입니다.</td>
+      <td>item*: EntityRef | str<br>recipient*: EntityRef | str<br>handover_spec*: dict</td>
+      <td>robot_collaboration<br>handover<br>safe_interaction</td>
+      <td>equipment:recipient_robot<br>equipment:item</td>
+      <td>MEDIUM</td>
+      <td><code>NAVIGATE_TO</code><br><code>CHECK_SAFETY_ZONE</code><br><code>ANNOUNCE_INTENT</code><br><code>SYNC_WITH_ROBOT</code><br><code>EXECUTE_ROBOT_COLLABORATION_ACTION</code><br><code>VERIFY_ROBOT_STATE</code><br><code>LOG_RESULT</code></td>
+      <td><code>data/tasks/M07_HANDOVER_ITEM_TO_ROBOT.json</code></td>
     </tr>
     <tr>
       <td>S01</td>

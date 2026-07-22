@@ -1,0 +1,371 @@
+{
+  "code": "HANDOVER_ITEM_TO_ROBOT",
+  "level": "ATOMIC_TASK",
+  "version": "0.2.0-core",
+  "name": "Handover Item To Robot",
+  "description": "Safely hand over an item to another robot or synchronize with another robot for shared carry.",
+  "inputs": [
+    {
+      "name": "item",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Item or payload being handed over or shared.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "recipient",
+      "type_hint": "EntityRef | str",
+      "required": true,
+      "description": "Recipient robot or humanoid.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "handover_spec",
+      "type_hint": "dict",
+      "required": true,
+      "description": "Robot-robot handover or shared-carry contract.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Task execution result payload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "robot_collaboration",
+    "handover",
+    "safe_interaction"
+  ],
+  "required_tools": [],
+  "required_vehicles": [],
+  "required_equipment": [
+    {
+      "alias": "recipient_robot",
+      "equipment_type": "robot",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "robot, item"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    },
+    {
+      "alias": "item",
+      "equipment_type": "item",
+      "equipment_id": null,
+      "use_mode": "OTHER",
+      "control_mode": "PASSIVE",
+      "interface_type": null,
+      "location": null,
+      "settings": {
+        "source_text": "robot, item"
+      },
+      "required_capabilities": [],
+      "required_authorizations": [],
+      "required_for_steps": [],
+      "safety_notes": ""
+    }
+  ],
+  "safety": {
+    "risk_level": "MEDIUM",
+    "human_clearance_required": false,
+    "lockout_tagout_required": false,
+    "ppe_required": [
+      "standard_factory_ppe"
+    ],
+    "allowed_zones": [],
+    "forbidden_zones": [],
+    "max_payload_kg": null,
+    "max_speed_mps": null,
+    "max_force_n": null,
+    "max_torque_nm": null,
+    "required_authorizations": [],
+    "notes": "Robot-robot handover still requires local safety confirmation before synchronization."
+  },
+  "preconditions": [
+    {
+      "expression": "required_inputs_present",
+      "description": "All required TaskInstance args must be provided."
+    }
+  ],
+  "postconditions": [
+    {
+      "expression": "execution_record_written",
+      "description": "Execution result is recorded for traceability."
+    }
+  ],
+  "success_criteria": [
+    {
+      "metric": "status",
+      "operator": "==",
+      "value": "SUCCESS",
+      "unit": null,
+      "description": "Task completes successfully."
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "s01_navigate_to",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "destination": "$inputs.recipient"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s02_check_safety_zone",
+      "call_code": "CHECK_SAFETY_ZONE",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_navigate_to"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_announce_intent",
+      "call_code": "ANNOUNCE_INTENT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s02_check_safety_zone"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s04_sync_with_robot",
+      "call_code": "SYNC_WITH_ROBOT",
+      "args": {
+        "peer_robot": "$inputs.recipient",
+        "sync_spec": "$inputs.handover_spec"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s03_announce_intent"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s05_execute_robot_collaboration_action",
+      "call_code": "EXECUTE_ROBOT_COLLABORATION_ACTION",
+      "args": {
+        "peer_robot": "$inputs.recipient",
+        "collaboration_spec": "$inputs.handover_spec"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s04_sync_with_robot"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s06_verify_robot_state",
+      "call_code": "VERIFY_ROBOT_STATE",
+      "args": {
+        "robot": "$inputs.recipient"
+      },
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s05_execute_robot_collaboration_action"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s07_log_result",
+      "call_code": "LOG_RESULT",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s06_verify_robot_state"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    }
+  ],
+  "metadata": {
+    "catalog": {
+      "task_no": "M07",
+      "category_id": "M",
+      "category": "Human Collaboration & Operator Assistance",
+      "function_signature": "handover_item_to_robot(item, recipient, handover_spec)",
+      "implementation_priority": "P0",
+      "customization_notes": "Robot-robot variant of HANDOVER_ITEM. Use HANDOVER_ITEM for operator/human handover.",
+      "primitive_template_id": "PT-ROBOT-COLLAB"
+    },
+    "primitive_template": {
+      "template_id": "PT-ROBOT-COLLAB",
+      "name": "Robot collaboration",
+      "raw_sequence": "NAVIGATE_TO(robot) -> CHECK_SAFETY_ZONE -> ANNOUNCE_INTENT -> SYNC_WITH_ROBOT -> EXECUTE_ROBOT_COLLABORATION_ACTION -> VERIFY_ROBOT_STATE -> LOG_RESULT",
+      "used_for": "Robot-robot handovers, shared carry, and co-manipulation",
+      "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO",
+          "call_code": "NAVIGATE_TO",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {
+            "destination": "$inputs.recipient"
+          }
+        },
+        {
+          "raw": "CHECK_SAFETY_ZONE",
+          "call_code": "CHECK_SAFETY_ZONE",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {}
+        },
+        {
+          "raw": "ANNOUNCE_INTENT",
+          "call_code": "ANNOUNCE_INTENT",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {}
+        },
+        {
+          "raw": "SYNC_WITH_ROBOT",
+          "call_code": "SYNC_WITH_ROBOT",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {
+            "peer_robot": "$inputs.recipient",
+            "sync_spec": "$inputs.handover_spec"
+          }
+        },
+        {
+          "raw": "EXECUTE_ROBOT_COLLABORATION_ACTION",
+          "call_code": "EXECUTE_ROBOT_COLLABORATION_ACTION",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {
+            "peer_robot": "$inputs.recipient",
+            "collaboration_spec": "$inputs.handover_spec"
+          }
+        },
+        {
+          "raw": "VERIFY_ROBOT_STATE",
+          "call_code": "VERIFY_ROBOT_STATE",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {
+            "robot": "$inputs.recipient"
+          }
+        },
+        {
+          "raw": "LOG_RESULT",
+          "call_code": "LOG_RESULT",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {}
+        }
+      ]
+    },
+    "resources": {
+      "raw_tools": null,
+      "raw_vehicles": null,
+      "raw_equipment": "robot, item",
+      "optional_aliases": {
+        "tools": [],
+        "vehicles": [],
+        "equipment": []
+      }
+    },
+    "animation": {
+      "frames": [
+        "assets/worker_processed/setup1.png",
+        "assets/worker_processed/setup2.png"
+      ],
+      "placeholder": true,
+      "source": "ManSim replay_studio worker_processed"
+    }
+  }
+}

@@ -30,11 +30,13 @@ class ValidationLabTests(unittest.TestCase):
 
             summary = json.loads((Path(tmp) / "validation_summary.json").read_text(encoding="utf-8"))
             self.assertTrue(summary["ok"])
-            self.assertEqual(summary["catalog"]["task_count"], 86)
+            self.assertEqual(summary["catalog"]["task_count"], 87)
             self.assertEqual(summary["catalog"]["incident_count"], 35)
 
             dashboard = (Path(tmp) / "validation_dashboard.html").read_text(encoding="utf-8")
             self.assertIn("HumanoidSim Validation Lab", dashboard)
+            self.assertIn("Complexity", dashboard)
+            self.assertIn("Primitive Leaves", dashboard)
             self.assertIn("Incident Recovery Traces", dashboard)
 
     def test_validation_lab_records_expected_negative_transition_check(self) -> None:

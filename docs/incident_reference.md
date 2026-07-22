@@ -415,8 +415,8 @@ Incident code는 정의 단계부터 모두 대문자 canonical code를 사용�
       <td>Safety &amp; Human Interaction</td>
       <td>human/robot 또는 robot/robot handover를 안전하게 완료하지 못한 상황입니다.</td>
       <td><code>BLOCKED</code></td>
-      <td><code>ANNOUNCE_INTENT</code>, <code>CONFIRM_OPERATOR_STATE</code>, <code>EXECUTE_HUMAN_COLLABORATION_ACTION</code></td>
-      <td><code>ANNOUNCE_INTENT</code> -> <code>CONFIRM_OPERATOR_STATE</code> -> <code>HANDOVER_ITEM</code></td>
+      <td><code>ANNOUNCE_INTENT</code>, <code>CONFIRM_OPERATOR_STATE</code>, <code>EXECUTE_HUMAN_COLLABORATION_ACTION</code>, <code>SYNC_WITH_ROBOT</code>, <code>EXECUTE_ROBOT_COLLABORATION_ACTION</code></td>
+      <td><code>ANNOUNCE_INTENT</code> -> <code>CONFIRM_OPERATOR_STATE</code> (optional) -> <code>SYNC_WITH_ROBOT</code> (optional) -> <code>HANDOVER_ITEM</code> (optional) -> <code>HANDOVER_ITEM_TO_ROBOT</code> (optional)</td>
     </tr>
     <tr>
       <td><code>OPERATOR_NOT_READY</code></td>
@@ -506,7 +506,7 @@ Recovery protocol의 각 step은 `kind=primitive` 또는 `kind=task`를 갖습�
 - `kind=task`이면 `code`가 HumanoidSim task catalog에 존재해야 합니다.
 - 존재하지 않는 primitive/task를 참조하면 `validate_incident_schema()`가 실패합니다.
 
-현재 v0.1 schema 기준 recovery step은 총 86개이며, 모두 정의된 primitive 또는 task를 참조합니다.
+현재 v0.1 schema 기준 recovery step은 총 88개이며, 모두 정의된 primitive 또는 task를 참조합니다.
 
 Recovery protocol은 incident로 인해 막힌 상태를 해소하기 위한 절차입니다. 따라서 recovery step이 task 또는 primitive를 실행하더라도 Availability는 정상 작업의 `EXECUTING`으로 바꾸지 않고 `BLOCKED`를 유지합니다. 현재 수행 중인 recovery step은 `task_context.task_code` 또는 `task_context.primitive_call_code`에 기록하고, UI나 replay에서는 `CODE (RECOVERY)`처럼 일반 작업과 구분해서 표시합니다. Recovery protocol이 끝나면 runtime은 task 취소, 재할당, 재시도 같은 후속 정책에 따라 `AVAILABLE`, `ASSIGNED`, 또는 계속 `BLOCKED` 중 하나로 전이시킬 수 있습니다.
 

@@ -89,6 +89,13 @@
         }
       },
       "description": "Reach an arm/gripper toward a nearby object."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.4,
+      "difficulty_group": "Standard Robot Skill",
+      "rationale": "Controlled approach motion toward a target.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }

@@ -1,15 +1,24 @@
 {
-  "code": "LOCALIZE_OBJECT",
+  "code": "EXECUTE_ROBOT_COLLABORATION_ACTION",
   "level": "PRIMITIVE_SKILL",
   "version": "1.0.0",
-  "name": "Localize Object",
-  "description": "Primitive skill generated from manufacturing humanoid primitive templates for LOCALIZE_OBJECT.",
+  "name": "Execute Robot Collaboration Action",
+  "description": "Execute a robot-robot handover, co-lift, shared carry, or coordinated manipulation action after robot synchronization.",
   "inputs": [
     {
-      "name": "item",
-      "type_hint": "Any",
+      "name": "peer_robot",
+      "type_hint": "EntityRef | str",
       "required": false,
-      "description": "",
+      "description": "Robot or humanoid peer participating in the coordinated action.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "collaboration_spec",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Collaboration contract such as handover, co_lift, shared_carry, or co_manipulation.",
       "default": null,
       "unit": null,
       "allowed_values": []
@@ -20,18 +29,22 @@
       "name": "result",
       "type_hint": "dict",
       "required": false,
-      "description": "",
+      "description": "Robot collaboration result and ownership/shared-role update.",
       "default": null,
       "unit": null,
       "allowed_values": []
     }
   ],
-  "required_capabilities": [],
+  "required_capabilities": [
+    "robot_collaboration",
+    "handover",
+    "safe_interaction"
+  ],
   "required_tools": [],
   "required_vehicles": [],
   "required_equipment": [],
   "safety": {
-    "risk_level": "LOW",
+    "risk_level": "MEDIUM",
     "human_clearance_required": false,
     "lockout_tagout_required": false,
     "ppe_required": [],
@@ -42,7 +55,7 @@
     "max_force_n": null,
     "max_torque_nm": null,
     "required_authorizations": [],
-    "notes": ""
+    "notes": "Use after SYNC_WITH_ROBOT for robot-robot handover or co-manipulation. This is distinct from EXECUTE_HUMAN_COLLABORATION_ACTION."
   },
   "preconditions": [],
   "postconditions": [],
@@ -52,19 +65,21 @@
       "operator": "==",
       "value": "SUCCESS",
       "unit": null,
-      "description": ""
+      "description": "Robot collaboration action completes safely."
     }
   ],
   "steps": [],
   "metadata": {
-    "generated_from": "primitive_templates",
+    "generated_from": "manual_catalog_extension",
     "state": {
       "availability": {
         "running": "EXECUTING"
       },
       "allowed": {
         "mobility": [
-          "STATIONARY"
+          "STATIONARY",
+          "NAVIGATING",
+          "DOCKING"
         ],
         "manipulation": [
           "FREE",
@@ -85,12 +100,12 @@
           "mobility": "STATIONARY"
         }
       },
-      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+      "description": "Robot-robot action primitive that may use arms, grippers, or shared payload ownership."
     },
     "operational_complexity": {
-      "difficulty_weight": 0.4,
-      "difficulty_group": "Standard Robot Skill",
-      "rationale": "Perception localization with pose/context dependency.",
+      "difficulty_weight": 0.8,
+      "difficulty_group": "Coordination & Recovery",
+      "rationale": "Robot-to-robot collaboration action requiring synchronization.",
       "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
       "version": "otc_v1"
     }

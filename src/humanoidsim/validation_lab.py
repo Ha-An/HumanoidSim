@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .catalog import TaskCatalog, find_project_root, load_task_catalog
+from .complexity import task_complexity
 from .execution import HumanoidProfile, expand_task_steps, validate_task_sequence
 from .incident_schema import (
     IncidentSchema,
@@ -297,6 +298,7 @@ def _execute_task_trace(
         snapshot = _safe_transition(snapshot, event, state_schema, trace)
 
     rows = expand_task_steps(spec.code, args, catalog=catalog)
+    trace["complexity"] = task_complexity(spec.code, args, catalog=catalog)
     for row in rows[: cfg.max_steps]:
         if row["call_level"] != TaskLevel.PRIMITIVE_SKILL.value:
             trace["steps"].append(
@@ -725,6 +727,8 @@ def _render_dashboard(
         "<tr>"
         f"<td>{html.escape(str(row.get('task_code', '')))}</td>"
         f"<td>{'PASS' if row.get('ok') else 'FAIL'}</td>"
+        f"<td>{float((row.get('complexity', {}) if isinstance(row.get('complexity', {}), dict) else {}).get('complexity', 0.0) or 0.0):.2f}</td>"
+        f"<td>{int((row.get('complexity', {}) if isinstance(row.get('complexity', {}), dict) else {}).get('primitive_count', 0) or 0)}</td>"
         f"<td>{len(row.get('steps', []))}</td>"
         f"<td>{len(row.get('failures', []))}</td>"
         "</tr>"
@@ -789,7 +793,7 @@ def _render_dashboard(
   </section>
   <section class="panel"><h2>Standalone Viewer</h2><p>{viewer_link}</p></section>
   <section class="panel"><h2>State Transition Coverage</h2><table><thead><tr><th>Axis</th><th>Covered</th><th>Defined</th><th>Ratio</th></tr></thead><tbody>{coverage_rows}</tbody></table></section>
-  <section class="panel"><h2>Task Execution Traces</h2><table><thead><tr><th>Task</th><th>Status</th><th>Steps</th><th>Failures</th></tr></thead><tbody>{task_rows}</tbody></table></section>
+  <section class="panel"><h2>Task Execution Traces</h2><p>Complexity uses HumanoidSim primitive difficulty weights: C_task(t)=sum_k a_tk*d_k.</p><table><thead><tr><th>Task</th><th>Status</th><th>Complexity</th><th>Primitive Leaves</th><th>Trace Steps</th><th>Failures</th></tr></thead><tbody>{task_rows}</tbody></table></section>
   <section class="panel"><h2>Incident Recovery Traces</h2><table><thead><tr><th>Incident</th><th>Category</th><th>Default Availability</th><th>Status</th><th>Recovery Steps</th></tr></thead><tbody>{incident_rows}</tbody></table></section>
   <section class="panel"><h2>Fuzz</h2><p>Seed {fuzz_report['summary']['seed']}, cases {fuzz_report['summary']['case_count']}, failures {fuzz_report['summary']['failure_count']}.</p></section>
   <section class="panel"><h2>Issues</h2><table><thead><tr><th>Severity</th><th>Code</th><th>Subject</th><th>Message</th></tr></thead><tbody>{issue_rows}</tbody></table></section>

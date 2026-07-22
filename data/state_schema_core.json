@@ -642,6 +642,37 @@
       },
       "description": "Stationary action primitive that may use arms/tools depending on task context."
     },
+    "EXECUTE_ROBOT_COLLABORATION_ACTION": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY",
+          "NAVIGATING",
+          "DOCKING"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Robot-robot collaboration primitive for handover, shared carry, or coordinated manipulation."
+    },
     "EXECUTE_MACHINE_ACTION": {
       "availability": {
         "running": "EXECUTING"
@@ -1729,6 +1760,35 @@
         }
       },
       "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "SYNC_WITH_ROBOT": {
+      "availability": {
+        "running": "EXECUTING"
+      },
+      "allowed": {
+        "mobility": [
+          "STATIONARY"
+        ],
+        "manipulation": [
+          "FREE",
+          "REACHING",
+          "HOLDING",
+          "PLACING"
+        ],
+        "power": [
+          "POWER_NORMAL",
+          "POWER_LOW",
+          "POWER_CRITICAL",
+          "DEPLETED",
+          "CHARGING"
+        ]
+      },
+      "effects": {
+        "on_start": {
+          "mobility": "STATIONARY"
+        }
+      },
+      "description": "Synchronize intent, timing, pose, and ownership state with another robot."
     },
     "UPDATE_RECORD": {
       "availability": {

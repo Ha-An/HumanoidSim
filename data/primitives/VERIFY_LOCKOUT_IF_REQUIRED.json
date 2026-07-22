@@ -76,6 +76,13 @@
         }
       },
       "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.8,
+      "difficulty_group": "Coordination & Recovery",
+      "rationale": "Safety interlock verification with high operational consequence.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }

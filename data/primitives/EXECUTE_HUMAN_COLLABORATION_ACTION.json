@@ -78,6 +78,13 @@
         }
       },
       "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.9,
+      "difficulty_group": "Coordination & Recovery",
+      "rationale": "Human collaboration action with high synchronization and safety burden.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }

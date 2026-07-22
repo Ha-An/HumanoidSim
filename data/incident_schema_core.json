@@ -484,11 +484,19 @@
       "severity": "warning",
       "default_availability": "BLOCKED",
       "description": "A human/robot or robot/robot handover cannot be completed safely.",
-      "trigger_primitives": ["ANNOUNCE_INTENT", "CONFIRM_OPERATOR_STATE", "EXECUTE_HUMAN_COLLABORATION_ACTION"],
+      "trigger_primitives": [
+        "ANNOUNCE_INTENT",
+        "CONFIRM_OPERATOR_STATE",
+        "EXECUTE_HUMAN_COLLABORATION_ACTION",
+        "SYNC_WITH_ROBOT",
+        "EXECUTE_ROBOT_COLLABORATION_ACTION"
+      ],
       "recovery_protocol": [
         {"kind": "primitive", "code": "ANNOUNCE_INTENT"},
-        {"kind": "primitive", "code": "CONFIRM_OPERATOR_STATE"},
-        {"kind": "task", "code": "HANDOVER_ITEM"}
+        {"kind": "primitive", "code": "CONFIRM_OPERATOR_STATE", "optional": true},
+        {"kind": "primitive", "code": "SYNC_WITH_ROBOT", "optional": true},
+        {"kind": "task", "code": "HANDOVER_ITEM", "optional": true},
+        {"kind": "task", "code": "HANDOVER_ITEM_TO_ROBOT", "optional": true}
       ],
       "retry_policy": {"max_local_retries": 1, "retry_delay_min": 0.5}
     },

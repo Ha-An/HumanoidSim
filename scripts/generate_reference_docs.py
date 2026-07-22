@@ -154,6 +154,8 @@ PRIMITIVE_GROUPS = [
             "CHECK_SAFETY_ZONE",
             "CONFIRM_OPERATOR_STATE",
             "EXECUTE_HUMAN_COLLABORATION_ACTION",
+            "EXECUTE_ROBOT_COLLABORATION_ACTION",
+            "SYNC_WITH_ROBOT",
             "VERIFY_AUTHORIZATION",
             "VERIFY_LOCKOUT_IF_REQUIRED",
         ],
@@ -465,6 +467,28 @@ def _write_primitives_reference(tasks: list[dict[str, Any]], primitives: list[di
         "",
         "권장 schema는 primitive JSON의 `metadata.group`에 `group_id`, `group_name`, `capability_axis`, `state_axes`를 추가하는 방식입니다. 이렇게 하면 task reference와 runtime executor가 primitive를 임의로 묶지 않고 HumanoidSim 정의를 그대로 사용할 수 있습니다.",
         "",
+        "## Primitive Difficulty Weight",
+        "",
+        "OTC(Operational Task Complexity) 계산을 위해 모든 primitive는 `metadata.operational_complexity.difficulty_weight` 값을 가집니다. 값은 `0.0`부터 `1.0`까지 0.1 단위로 부여하며, 실행 시간보다는 motion precision, manipulation difficulty, safety risk, collaboration burden, recovery burden을 반영합니다.",
+        "",
+        _html_table(
+            ["Weight", "Group", "기준"],
+            [
+                ["0.0", "Administrative", "기록/상태 갱신처럼 로봇 실행 부담이 거의 없는 primitive"],
+                ["0.1", "Administrative", "단순 선언, read, report 등 물리 동작이 거의 없는 primitive"],
+                ["0.2", "Low Operational", "낮은 부담의 확인/검증 primitive"],
+                ["0.3", "Low Operational", "표준 이동, 수량/상태 확인처럼 경로 또는 인지 부담이 조금 있는 primitive"],
+                ["0.4", "Standard Robot Skill", "localize, reach, inspect, verify처럼 위치/인지 정확도가 필요한 primitive"],
+                ["0.5", "Standard Robot Skill", "grasp/place 같은 표준 manipulation primitive"],
+                ["0.6", "Manipulation & Process", "lift, tool, machine, vehicle 등 물리 상태를 바꾸는 primitive"],
+                ["0.7", "Manipulation & Process", "공정 품질, payload, safety gate가 얽힌 고부담 primitive"],
+                ["0.8", "Coordination & Recovery", "robot sync, lockout, coordination처럼 동기화와 안전 영향이 큰 primitive"],
+                ["0.9", "Coordination & Recovery", "human collaboration, EHS action처럼 실패 시 안전/복구 부담이 매우 큰 primitive"],
+                ["1.0", "Critical", "시스템 중단, 장기 recovery, 인명/설비 위험으로 이어질 수 있는 critical primitive"],
+            ],
+            ["10%", "24%", "66%"],
+        ),
+        "",
         "## Primitive 목록",
         "",
     ]
@@ -477,6 +501,7 @@ def _write_primitives_reference(tasks: list[dict[str, Any]], primitives: list[di
             [
                 _code(code),
                 _primitive_group_label(code),
+                _primitive_difficulty(primitive),
                 _text(_primitive_description(primitive)),
                 _code(_availability_text(primitive)),
                 _state_axis_text(primitive, "mobility"),
@@ -489,9 +514,9 @@ def _write_primitives_reference(tasks: list[dict[str, Any]], primitives: list[di
         )
     lines.append(
         _html_table(
-            ["Code", "Group", "설명", "Availability State", "Mobility State", "Manipulation State", "입력", "출력", "사용 Task", "원본"],
+            ["Code", "Group", "Difficulty", "설명", "Availability State", "Mobility State", "Manipulation State", "입력", "출력", "사용 Task", "원본"],
             primitive_rows,
-            ["10%", "10%", "23%", "8%", "10%", "10%", "8%", "6%", "10%", "5%"],
+            ["9%", "9%", "6%", "20%", "8%", "9%", "9%", "8%", "6%", "10%", "6%"],
         )
     )
 
@@ -813,6 +838,15 @@ def _primitive_group_label(code: str) -> str:
         return "-"
     group_name = next(group["name"] for group in PRIMITIVE_GROUPS if group["id"] == group_id)
     return f"{_text(group_id)}<br>{_text(group_name)}"
+
+
+def _primitive_difficulty(primitive: dict[str, Any]) -> str:
+    complexity = primitive.get("metadata", {}).get("operational_complexity", {})
+    weight = complexity.get("difficulty_weight")
+    group = complexity.get("difficulty_group", "")
+    if weight is None:
+        return "-"
+    return f"{_text(f'{float(weight):.1f}')}<br>{_text(group)}"
 
 
 def _availability_text(primitive: dict[str, Any]) -> str:

@@ -76,6 +76,13 @@
         }
       },
       "description": "Stationary action primitive that may use arms/tools depending on task context."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.6,
+      "difficulty_group": "Manipulation & Process",
+      "rationale": "Part holding or fixturing requires controlled manipulation.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }

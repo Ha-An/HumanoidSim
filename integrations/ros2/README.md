@@ -43,6 +43,8 @@ cd C:\Github\HumanoidSim
 
 Browser 3D Viewer는 ROS 없이 가장 빠르게 trace를 확인하는 경로입니다. RViz는 ROS topic과 URDF joint animation을 검증합니다. Gazebo는 bundled minimal humanoid model이 physics scene에 spawn되는지 확인합니다. v1에서는 실제 휴머노이드 보행 제어까지 검증하지 않습니다.
 
+세 화면은 같은 역할을 하지 않습니다. Browser viewer는 trace 의미와 step 순서를 확인하고, RViz는 ROS interface와 joint/TF publication을 확인하며, Gazebo는 model spawn과 physics scene 연결을 확인합니다. 실제 보행 안정성, 접촉 역학, controller tuning 결과를 검증한 것으로 해석하면 안 됩니다.
+
 ## ROS Interfaces
 
 Actions:

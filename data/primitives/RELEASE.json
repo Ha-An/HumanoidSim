@@ -89,6 +89,13 @@
         }
       },
       "description": "Place or release a held item/tool."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.4,
+      "difficulty_group": "Standard Robot Skill",
+      "rationale": "Controlled release of held object or tool.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }

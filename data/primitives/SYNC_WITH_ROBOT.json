@@ -1,22 +1,45 @@
 {
-  "code": "LOCALIZE_COMPONENTS",
+  "code": "SYNC_WITH_ROBOT",
   "level": "PRIMITIVE_SKILL",
   "version": "1.0.0",
-  "name": "Localize Components",
-  "description": "Primitive skill generated from manufacturing humanoid primitive templates for LOCALIZE_COMPONENTS.",
-  "inputs": [],
-  "outputs": [
+  "name": "Sync With Robot",
+  "description": "Synchronize intent, timing, pose, payload ownership, and ready state with another robot before robot-robot handover or co-manipulation.",
+  "inputs": [
     {
-      "name": "result",
+      "name": "peer_robot",
+      "type_hint": "EntityRef | str",
+      "required": false,
+      "description": "Robot or humanoid peer participating in the coordinated action.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    },
+    {
+      "name": "sync_spec",
       "type_hint": "dict",
       "required": false,
-      "description": "",
+      "description": "Optional synchronization contract such as rendezvous pose, handover side, timing, or shared payload role.",
       "default": null,
       "unit": null,
       "allowed_values": []
     }
   ],
-  "required_capabilities": [],
+  "outputs": [
+    {
+      "name": "result",
+      "type_hint": "dict",
+      "required": false,
+      "description": "Synchronization result and any agreed robot-robot coordination state.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
+    }
+  ],
+  "required_capabilities": [
+    "robot_collaboration",
+    "synchronization",
+    "safe_interaction"
+  ],
   "required_tools": [],
   "required_vehicles": [],
   "required_equipment": [],
@@ -32,7 +55,7 @@
     "max_force_n": null,
     "max_torque_nm": null,
     "required_authorizations": [],
-    "notes": ""
+    "notes": "Robot-robot coordination primitive. Use CHECK_SAFETY_ZONE before this step when the shared operation may affect nearby humans or equipment."
   },
   "preconditions": [],
   "postconditions": [],
@@ -42,12 +65,12 @@
       "operator": "==",
       "value": "SUCCESS",
       "unit": null,
-      "description": ""
+      "description": "Peer robot confirms a synchronized ready state."
     }
   ],
   "steps": [],
   "metadata": {
-    "generated_from": "primitive_templates",
+    "generated_from": "manual_catalog_extension",
     "state": {
       "availability": {
         "running": "EXECUTING"
@@ -75,12 +98,12 @@
           "mobility": "STATIONARY"
         }
       },
-      "description": "Stationary primitive; keeps manipulation unless a caller cargo event changes it."
+      "description": "Stationary robot-robot synchronization primitive."
     },
     "operational_complexity": {
-      "difficulty_weight": 0.4,
-      "difficulty_group": "Standard Robot Skill",
-      "rationale": "Perception localization with pose/context dependency.",
+      "difficulty_weight": 0.8,
+      "difficulty_group": "Coordination & Recovery",
+      "rationale": "Robot-to-robot synchronization with timing/intent dependency.",
       "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
       "version": "otc_v1"
     }

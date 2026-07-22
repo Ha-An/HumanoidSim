@@ -2,6 +2,8 @@
 
 이 문서는 ManSim과 분리된 HumanoidSim 독립 검증 도구를 설명합니다. 목적은 HumanoidSim이 소유한 `State`, `Task`, `Primitive`, `Incident`, `Recovery protocol` 정의가 실제 실행 trace로 자연스럽게 전개되는지 확인하는 것입니다.
 
+현재 검증 기준은 package `0.1.0`, catalog `0.2.0-core`, task 87개, primitive 61개, incident 35개입니다. Catalog가 변경되면 생성된 reference와 이 숫자도 함께 갱신해야 합니다.
+
 ## 실행 명령
 
 전체 validation lab을 실행합니다.
@@ -39,6 +41,10 @@ Gazebo physics validation만 직접 띄울 수도 있습니다.
 | Incident Recovery | 모든 incident를 주입하고 recovery protocol을 task/primitive execution trace로 전개합니다. |
 | Transition Coverage | state transition graph 중 task/recovery/fuzz trace에서 실제 관찰된 edge를 집계합니다. |
 | Fuzz | random task와 incident 조합을 실행해 invalid transition, unknown reference, invariant 위반을 찾습니다. |
+
+Task Execution trace에는 HumanoidSim primitive difficulty weight 기반의 task complexity가 포함됩니다. 계산식은 `C_task(t)=sum_k a_tk*d_k`이며, `a_tk`는 task를 primitive leaf step까지 전개했을 때 primitive `p_k`가 등장한 횟수, `d_k`는 해당 primitive의 difficulty weight입니다. Validation dashboard는 task별 complexity와 primitive leaf count를 표에 표시합니다.
+
+Validation Lab의 task complexity는 정적 catalog 구조를 검증하는 값입니다. ManSim의 OTC는 이 값에 실제 simulation에서 완료된 top-level task instance 수를 곱해 기간별 운영 부담으로 집계합니다.
 
 ## 결과물
 

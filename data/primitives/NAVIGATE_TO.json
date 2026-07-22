@@ -126,6 +126,13 @@
         }
       },
       "description": "Move toward a target tile or object service tile."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.3,
+      "difficulty_group": "Low Operational",
+      "rationale": "Standard navigation with route and occupancy dependency.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }

@@ -80,6 +80,13 @@
         }
       },
       "description": "Align or dock with equipment, charger, or workbench."
+    },
+    "operational_complexity": {
+      "difficulty_weight": 0.4,
+      "difficulty_group": "Standard Robot Skill",
+      "rationale": "Requires spatial alignment and docking precision.",
+      "scale": "0.0=minimal operational burden, 1.0=critical operational burden",
+      "version": "otc_v1"
     }
   }
 }
