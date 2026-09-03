@@ -22,6 +22,15 @@
       "default": null,
       "unit": null,
       "allowed_values": []
+    },
+    {
+      "name": "workstation",
+      "type_hint": "EntityRef | str",
+      "required": false,
+      "description": "Inspection workstation at which the stationary inspection is performed.",
+      "default": null,
+      "unit": null,
+      "allowed_values": []
     }
   ],
   "outputs": [
@@ -170,9 +179,11 @@
   ],
   "steps": [
     {
-      "step_id": "s01_primitive_identify_item",
-      "call_code": "PRIMITIVE_IDENTIFY_ITEM",
-      "args": {},
+      "step_id": "s01_navigate_to_workstation",
+      "call_code": "NAVIGATE_TO",
+      "args": {
+        "destination": "$inputs.workstation"
+      },
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [],
       "optional": false,
@@ -189,12 +200,33 @@
       "success_criteria": []
     },
     {
-      "step_id": "s02_localize_object",
+      "step_id": "s02_primitive_identify_item",
+      "call_code": "PRIMITIVE_IDENTIFY_ITEM",
+      "args": {},
+      "expected_level": "PRIMITIVE_SKILL",
+      "depends_on": [
+        "s01_navigate_to_workstation"
+      ],
+      "optional": false,
+      "timeout_s": null,
+      "retry": {
+        "max_attempts": 1,
+        "retry_on": [],
+        "recovery_step_code": null
+      },
+      "uses_tools": [],
+      "uses_vehicles": [],
+      "uses_equipment": [],
+      "preconditions": [],
+      "success_criteria": []
+    },
+    {
+      "step_id": "s03_localize_object",
       "call_code": "LOCALIZE_OBJECT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s01_primitive_identify_item"
+        "s02_primitive_identify_item"
       ],
       "optional": false,
       "timeout_s": null,
@@ -210,12 +242,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s03_execute_quality_action",
+      "step_id": "s04_execute_quality_action",
       "call_code": "EXECUTE_QUALITY_ACTION",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s02_localize_object"
+        "s03_localize_object"
       ],
       "optional": false,
       "timeout_s": null,
@@ -231,12 +263,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s04_classify_result",
+      "step_id": "s05_classify_result",
       "call_code": "CLASSIFY_RESULT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s03_execute_quality_action"
+        "s04_execute_quality_action"
       ],
       "optional": false,
       "timeout_s": null,
@@ -252,12 +284,12 @@
       "success_criteria": []
     },
     {
-      "step_id": "s05_record_result",
+      "step_id": "s06_record_result",
       "call_code": "RECORD_RESULT",
       "args": {},
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
-        "s04_classify_result"
+        "s05_classify_result"
       ],
       "optional": false,
       "timeout_s": null,
@@ -278,7 +310,7 @@
       "task_no": "G01",
       "category_id": "G",
       "category": "Quality Inspection, Measurement & Testing",
-      "function_signature": "inspect_product(target, inspection_plan)",
+      "function_signature": "inspect_product(target, inspection_plan, workstation=None)",
       "implementation_priority": "P0",
       "customization_notes": "Canonical inspection task; avoid separate visual/surface/presence task explosion.",
       "primitive_template_id": "PT-QUALITY"
@@ -286,9 +318,17 @@
     "primitive_template": {
       "template_id": "PT-QUALITY",
       "name": "Inspection / testing",
-      "raw_sequence": "IDENTIFY_ITEM → LOCALIZE_OBJECT → INSPECT / MEASURE / TEST → CLASSIFY_RESULT → RECORD_RESULT",
+      "raw_sequence": "NAVIGATE_TO(workstation) → IDENTIFY_ITEM → LOCALIZE_OBJECT → INSPECT / MEASURE / TEST → CLASSIFY_RESULT → RECORD_RESULT",
       "used_for": "QC inspection, measurement, ID verification, testing",
       "normalized_steps": [
+        {
+          "raw": "NAVIGATE_TO",
+          "call_code": "NAVIGATE_TO",
+          "expected_level": "PRIMITIVE_SKILL",
+          "args": {
+            "destination": "$inputs.workstation"
+          }
+        },
         {
           "raw": "PRIMITIVE_IDENTIFY_ITEM",
           "call_code": "PRIMITIVE_IDENTIFY_ITEM",

@@ -25,9 +25,21 @@
     },
     {
       "name": "action",
-      "type_hint": "Any",
+      "type_hint": "str",
       "required": true,
-      "description": "Catalog input parameter: action.",
+      "description": "Interface operation to perform: load or unload.",
+      "default": null,
+      "unit": null,
+      "allowed_values": [
+        "load",
+        "unload"
+      ]
+    },
+    {
+      "name": "source",
+      "type_hint": "LocationRef | str",
+      "required": true,
+      "description": "Location from which the item is picked.",
       "default": null,
       "unit": null,
       "allowed_values": []
@@ -362,7 +374,7 @@
       "call_code": "PLACE",
       "args": {
         "item": "$inputs.item",
-        "destination_pose": "$inputs.destination_pose"
+        "destination_pose": "$inputs.destination"
       },
       "expected_level": "PRIMITIVE_SKILL",
       "depends_on": [
@@ -433,7 +445,7 @@
       "task_no": "B04",
       "category_id": "B",
       "category": "Mobility, Intralogistics & Material Flow",
-      "function_signature": "load_unload_transfer_interface(item, interface, action, destination=None)",
+      "function_signature": "load_unload_transfer_interface(item, interface, action, source, destination)",
       "implementation_priority": "P1",
       "customization_notes": "Absorbs CONVEYOR_LOAD, CONVEYOR_UNLOAD, ASRS_PICKUP, ASRS_DROPOFF.",
       "primitive_template_id": "PT-TRANSFER"
@@ -498,7 +510,7 @@
           "expected_level": "PRIMITIVE_SKILL",
           "args": {
             "item": "$inputs.item",
-            "destination_pose": "$inputs.destination_pose"
+            "destination_pose": "$inputs.destination"
           }
         },
         {

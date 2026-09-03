@@ -2,7 +2,7 @@
 
 HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident`, `Recovery protocol`을 도메인 독립적으로 정의하고 검증하는 라이브러리입니다. ManSim 같은 시뮬레이터는 HumanoidSim의 정의를 import해서 사용할 수 있지만, HumanoidSim 자체는 ManSim에 의존하지 않습니다.
 
-현재 Python package version은 `0.1.0`, core catalog version은 `0.2.0-core`입니다. ManSim v0.5는 이 repository를 editable install해 최신 catalog와 complexity API를 사용합니다.
+현재 Python package version은 `0.1.0`, core catalog version은 `0.2.0-core`입니다. ManSim v0.6은 이 repository를 editable install해 최신 catalog와 complexity API를 사용합니다.
 
 ![HumanoidSim overview](assets/IMG.png)
 
@@ -119,7 +119,43 @@ from humanoidsim import (
 
 `expand_task_steps(task_code, args, catalog=...)`는 nested composite task를 parent task, child task, primitive leaf까지 보존한 plan row로 반환합니다.
 
-## ManSim v0.5 Integration
+## Inspection Interface 계약
+
+HumanoidSim은 product 운반과 정지 상태의 품질검사를 분리합니다. `LOAD_UNLOAD_TRANSFER_INTERFACE`는
+`action=load|unload`에 따라 concrete item을 `source`에서 `destination`으로 옮깁니다.
+`INSPECT_PRODUCT`는 optional `workstation`으로 이동한 뒤 staged item을 식별하고 검사, 분류와
+결과 기록만 수행합니다.
+
+ManSim은 inspection을 다음 세 개의 독립 top-level task instance로 실행합니다.
+
+```text
+LOAD_UNLOAD_TRANSFER_INTERFACE (load)
+-> INSPECT_PRODUCT
+-> LOAD_UNLOAD_TRANSFER_INTERFACE (unload)
+```
+
+Simulator는 interface capacity, item reservation, PASS/FAIL routing과 interruption recovery를
+소유합니다. HumanoidSim은 validation, task complexity와 OTC 계산에 사용하는 task/primitive 의미를
+소유합니다.
+
+## Dock Charging 연동
+
+`MANAGE_ROBOT_POWER`는 battery pack 교환 없이 직접 dock charging하는 동작을 지원합니다. ManSim의
+`mfg_flow_shop`은 내부 `BATTERY_CHARGE` opportunity를 다음 인자로 이 task에 binding합니다.
+
+```json
+{
+  "action": "dock_charge",
+  "station": "charging_dock_A1",
+  "target_soc": 1.0
+}
+```
+
+HumanoidSim은 task sequence(`CHECK_CONTEXT -> EXECUTE_SYSTEM_ACTION -> VERIFY_ROBOT_STATE ->
+LOG_RESULT`)를 소유합니다. ManSim은 지정 dock까지의 이동, 확률적 충전시간, 선형 SOC 진행과 충전
+event를 소유합니다.
+
+## ManSim v0.6 Integration
 
 HumanoidSim과 ManSim의 책임 경계는 다음과 같습니다.
 
