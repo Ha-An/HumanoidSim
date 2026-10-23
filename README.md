@@ -1,8 +1,10 @@
-# HumanoidSim
+# HumanoidSim v0.0.1
 
 HumanoidSim은 휴머노이드 로봇의 `State`, `Task`, `Primitive`, `Incident`, `Recovery protocol`을 도메인 독립적으로 정의하고 검증하는 라이브러리입니다. ManSim 같은 시뮬레이터는 HumanoidSim의 정의를 import해서 사용할 수 있지만, HumanoidSim 자체는 ManSim에 의존하지 않습니다.
 
-현재 Python package version은 `0.1.0`, core catalog version은 `0.2.0-core`입니다. ManSim v0.6은 이 repository를 editable install해 최신 catalog와 complexity API를 사용합니다.
+현재 저장소 기준 버전은 **`v0.0.1`**입니다. 이후 코드 수정 전의 기준 상태는 `v0.0.1` 브랜치에 보존하며, 후속 개발은 `main` 브랜치에서 진행합니다.
+
+저장소 기준 버전과 별도로 Python package version은 `0.1.0`, core catalog version은 `0.2.0-core`를 유지합니다. ManSim v0.6은 이 repository를 editable install해 최신 catalog와 complexity API를 사용합니다.
 
 ![HumanoidSim overview](assets/IMG.png)
 
